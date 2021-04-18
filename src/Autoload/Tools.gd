@@ -40,6 +40,7 @@ signal color_changed(color, button)
 
 var _tools = {
 	"RectSelect" : "res://src/Tools/RectSelect.tscn",
+	"Move" : "res://src/Tools/Move.tscn",
 	"Zoom" : "res://src/Tools/Zoom.tscn",
 	"Pan" : "res://src/Tools/Pan.tscn",
 	"ColorPicker" : "res://src/Tools/ColorPicker.tscn",
@@ -47,6 +48,8 @@ var _tools = {
 	"Eraser" : "res://src/Tools/Eraser.tscn",
 	"Bucket" : "res://src/Tools/Bucket.tscn",
 	"LightenDarken" : "res://src/Tools/LightenDarken.tscn",
+	"RectangleTool" : "res://src/Tools/RectangleTool.tscn",
+	"EllipseTool" : "res://src/Tools/EllipseTool.tscn",
 }
 var _slots = {}
 var _panels = {}
@@ -58,6 +61,10 @@ var pen_pressure := 1.0
 var control := false
 var shift := false
 var alt := false
+
+onready var left_tool_background := preload("res://assets/graphics/tool_backgrounds/l.png")
+onready var right_tool_background := preload("res://assets/graphics/tool_backgrounds/r.png")
+onready var left_right_tool_background := preload("res://assets/graphics/tool_backgrounds/l_r.png")
 
 
 func _ready() -> void:
@@ -141,14 +148,15 @@ func get_assigned_color(button : int) -> Color:
 
 func update_tool_buttons() -> void:
 	for child in _tool_buttons.get_children():
-		var texture : TextureRect = child.get_child(0)
-		var filename = child.name.to_lower()
+		var texture : TextureRect = child.get_node("Background")
 		if _slots[BUTTON_LEFT].tool_node.name == child.name:
-			filename += "_l"
-		if _slots[BUTTON_RIGHT].tool_node.name == child.name:
-			filename += "_r"
-		filename += ".png"
-		Global.change_button_texturerect(texture, filename)
+			texture.texture = left_tool_background
+			if _slots[BUTTON_RIGHT].tool_node.name == child.name:
+				texture.texture = left_right_tool_background
+		elif _slots[BUTTON_RIGHT].tool_node.name == child.name:
+			texture.texture = right_tool_background
+		else:
+			texture.texture = null
 
 
 func update_tool_cursors() -> void:
@@ -165,9 +173,18 @@ func draw_indicator() -> void:
 		_slots[BUTTON_RIGHT].tool_node.draw_indicator()
 
 
+func draw_preview() -> void:
+	_slots[BUTTON_LEFT].tool_node.draw_preview()
+	_slots[BUTTON_RIGHT].tool_node.draw_preview()
+
+
 func handle_draw(position : Vector2, event : InputEvent) -> void:
 	if not (Global.can_draw and Global.has_focus):
 		return
+
+	var draw_pos := position
+	if Global.mirror_view:
+		draw_pos.x = Global.current_project.size.x - position.x - 1
 
 	if event is InputEventWithModifiers:
 		control = event.control
@@ -178,9 +195,9 @@ func handle_draw(position : Vector2, event : InputEvent) -> void:
 		if event.button_index in [BUTTON_LEFT, BUTTON_RIGHT]:
 			if event.pressed and _active_button == -1:
 				_active_button = event.button_index
-				_slots[_active_button].tool_node.draw_start(position)
+				_slots[_active_button].tool_node.draw_start(draw_pos)
 			elif not event.pressed and event.button_index == _active_button:
-				_slots[_active_button].tool_node.draw_end(position)
+				_slots[_active_button].tool_node.draw_end(draw_pos)
 				_active_button = -1
 
 	if event is InputEventMouseMotion:
@@ -193,7 +210,7 @@ func handle_draw(position : Vector2, event : InputEvent) -> void:
 			_slots[BUTTON_LEFT].tool_node.cursor_move(position)
 			_slots[BUTTON_RIGHT].tool_node.cursor_move(position)
 			if _active_button != -1:
-				_slots[_active_button].tool_node.draw_move(position)
+				_slots[_active_button].tool_node.draw_move(draw_pos)
 
 	var project : Project = Global.current_project
 	var text := "[%s×%s]" % [project.size.x, project.size.y]
