@@ -129,13 +129,13 @@ func frame_value_changed(value : int, vertical : bool) -> void:
 	frame_size_label.text = tr("Frame Size") + ": " + str(frame_width) + "×" + str(frame_height)
 
 
-func split_image(image : Image, horizontal : int, vertical : int) -> void:
+func split_image(given_image : Image, horizontal : int, vertical : int) -> void:
 	# data needed to slice images
 	var start_frame = Global.current_project.current_frame
-	horizontal = min(horizontal, image.get_size().x)
-	vertical = min(vertical, image.get_size().y)
-	var frame_width := image.get_size().x / horizontal
-	var frame_height := image.get_size().y / vertical
+	horizontal = min(horizontal, given_image.get_size().x)
+	vertical = min(vertical, given_image.get_size().y)
+	var frame_width := given_image.get_size().x / horizontal
+	var frame_height := given_image.get_size().y / vertical
 	
 	var first_split_frame = start_frame + 1
 
@@ -148,9 +148,9 @@ func split_image(image : Image, horizontal : int, vertical : int) -> void:
 				cropped_image.create(Global.current_project.size.x, Global.current_project.size.y, false, Image.FORMAT_RGBA8)
 				
 				if get_node("VBoxContainer/MoveToCorner").pressed:
-					cropped_image.blend_rect(image, Rect2(frame_width * xx, frame_height * yy, frame_width, frame_height), Vector2.ZERO)
+					cropped_image.blend_rect(given_image, Rect2(frame_width * xx, frame_height * yy, frame_width, frame_height), Vector2.ZERO)
 				else:
-					cropped_image.blend_rect(image, Rect2(frame_width * xx, frame_height * yy, frame_width, frame_height), Vector2(frame_width * xx, frame_height * yy))
+					cropped_image.blend_rect(given_image, Rect2(frame_width * xx, frame_height * yy, frame_width, frame_height), Vector2(frame_width * xx, frame_height * yy))
 				
 				OpenSave.open_image_as_new_frame(cropped_image, Global.current_project.current_layer)
 				# move the new frame (which is located at the end) back to the position it is supposed to be (at the position "current_split_frame")
