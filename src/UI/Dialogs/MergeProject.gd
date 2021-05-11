@@ -23,7 +23,7 @@ func _on_MergeProject_confirmed():
 	if from == Global.current_project:
 		return
 	var project_width :int = max(from.size.x, Global.current_project.size.x)
-	var project_height :int = max(from.size.x, Global.current_project.size.y)
+	var project_height :int = max(from.size.y, Global.current_project.size.y)
 	DrawingAlgos.resize_canvas(project_width, project_height, 0, 0)
 	
 	for layer in from.layers.size():
