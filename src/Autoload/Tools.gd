@@ -54,6 +54,7 @@ var _tools = {
 	"LineTool" : "res://src/Tools/LineTool.tscn",
 	"RectangleTool" : "res://src/Tools/RectangleTool.tscn",
 	"EllipseTool" : "res://src/Tools/EllipseTool.tscn",
+	"Text" : "res://src/Tools/Text.tscn",
 }
 var _slots = {}
 var _panels = {}
@@ -114,6 +115,9 @@ func assign_tool(name : String, button : int) -> void:
 	if slot.tool_node != null:
 		if slot.tool_node.name == name:
 			return
+		# If we leave the text tool, make sure to get rid of the TextEdit node
+		if slot.tool_node.name == "Text":
+			slot.tool_node.text_to_pixels()
 		panel.remove_child(slot.tool_node)
 		slot.tool_node.queue_free()
 
@@ -165,6 +169,7 @@ func update_tool_buttons() -> void:
 
 func update_tool_cursors() -> void:
 	var image = "res://assets/graphics/cursor_icons/%s_cursor.png" % _slots[BUTTON_LEFT].tool_node.name.to_lower()
+	print(image)
 	Global.left_cursor_tool_texture.create_from_image(load(image), 0)
 	image = "res://assets/graphics/cursor_icons/%s_cursor.png" % _slots[BUTTON_RIGHT].tool_node.name.to_lower()
 	Global.right_cursor_tool_texture.create_from_image(load(image), 0)
