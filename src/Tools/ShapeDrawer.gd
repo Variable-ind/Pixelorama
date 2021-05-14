@@ -2,9 +2,11 @@ extends "res://src/Tools/Draw.gd"
 
 
 var _start := Vector2.ZERO
+var _offset := Vector2.ZERO
 var _dest := Vector2.ZERO
 var _fill := false
 var _drawing := false
+var _displace_origin := false
 var _thickness := 1
 
 
@@ -52,17 +54,30 @@ func _get_shape_points_filled(_size: Vector2) -> PoolVector2Array:
 	return PoolVector2Array()
 
 
+func _input(event : InputEvent) -> void:
+	if _drawing:
+		if event.is_action_pressed("alt"):
+			_displace_origin = true
+		elif event.is_action_released("alt"):
+			_displace_origin = false
+
+
 func draw_start(position : Vector2) -> void:
+	Global.canvas.selection.transform_content_confirm()
 	update_mask()
 
 	_start = position
+	_offset = position
 	_dest = position
 	_drawing = true
 
 
 func draw_move(position : Vector2) -> void:
 	if _drawing:
+		if _displace_origin:
+			_start += position - _offset
 		_dest = position
+		_offset = position
 
 
 func draw_end(position : Vector2) -> void:
@@ -72,11 +87,12 @@ func draw_end(position : Vector2) -> void:
 		_start = Vector2.ZERO
 		_dest = Vector2.ZERO
 		_drawing = false
+		_displace_origin = false
 
 
 func draw_preview() -> void:
 	if _drawing:
-		var canvas = Global.canvas.previews
+		var canvas : CanvasItem = Global.canvas.previews
 		var indicator := BitMap.new()
 		var rect := _get_result_rect(_start, _dest)
 		var points := _get_points(rect.size)
@@ -99,7 +115,7 @@ func _draw_shape(origin: Vector2, dest: Vector2) -> void:
 	var points := _get_points(rect.size)
 	prepare_undo()
 	for point in points:
-		# Reset drawer every time because pixel perfect sometimes brake the tool
+		# Reset drawer every time because pixel perfect sometimes breaks the tool
 		_drawer.reset()
 		# Draw each point offseted based on the shape's thickness
 		draw_tool(rect.position + point - Vector2.ONE * (_thickness - 1))

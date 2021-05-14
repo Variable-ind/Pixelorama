@@ -219,9 +219,9 @@ func _ready() -> void:
 	cursor_position_label = find_node_by_name(root, "CursorPosition")
 	zoom_level_label = find_node_by_name(root, "ZoomLevel")
 
-	tool_panel = control.get_node("MenuAndUI/UI/ToolPanel")
-	right_panel = control.get_node("MenuAndUI/UI/RightPanel")
-	tabs_container = control.get_node("MenuAndUI/UI/CanvasAndTimeline/ViewportAndRulers/TabsContainer")
+	tool_panel = control.find_node("ToolPanel")
+	right_panel = control.find_node("RightPanel")
+	tabs_container = control.find_node("TabsContainer")
 
 	recent_projects_submenu = PopupMenu.new()
 	recent_projects_submenu.set_name("recent_projects_submenu")
@@ -422,7 +422,7 @@ func title_changed(value : String) -> void:
 
 
 func project_changed(value : int) -> void:
-	canvas.selection.move_content_confirm()
+	canvas.selection.transform_content_confirm()
 	current_project_index = value
 	current_project = projects[value]
 	current_project.change_project()
@@ -475,9 +475,28 @@ func update_hint_tooltips() -> void:
 	rect_select.hint_tooltip = tr("""Rectangular Selection
 
 %s for left mouse button
-%s for right mouse button
+%s for right mouse button""") % [InputMap.get_action_list("left_rectangle_select_tool")[0].as_text(), InputMap.get_action_list("right_rectangle_select_tool")[0].as_text()]
 
-Press %s to move the content""") % [InputMap.get_action_list("left_rectangle_select_tool")[0].as_text(), InputMap.get_action_list("right_rectangle_select_tool")[0].as_text(), "Shift"]
+	var ellipse_select : BaseButton = tool_buttons.find_node("EllipseSelect")
+	ellipse_select.hint_tooltip = tr("""Elliptical Selection
+
+%s for left mouse button
+%s for right mouse button""") % [InputMap.get_action_list("left_ellipse_select_tool")[0].as_text(), InputMap.get_action_list("right_ellipse_select_tool")[0].as_text()]
+
+
+	var color_select : BaseButton = tool_buttons.find_node("ColorSelect")
+	color_select.hint_tooltip = tr("""Select By Color
+
+%s for left mouse button
+%s for right mouse button""") % [InputMap.get_action_list("left_color_select_tool")[0].as_text(), InputMap.get_action_list("right_color_select_tool")[0].as_text()]
+
+
+	var magic_wand : BaseButton = tool_buttons.find_node("MagicWand")
+	magic_wand.hint_tooltip = tr("""Magic Wand
+
+%s for left mouse button
+%s for right mouse button""") % [InputMap.get_action_list("left_magic_wand_tool")[0].as_text(), InputMap.get_action_list("right_magic_wand_tool")[0].as_text()]
+
 
 	var move_select : BaseButton = tool_buttons.find_node("Move")
 	move_select.hint_tooltip = tr("""Move
@@ -532,6 +551,17 @@ Hold %s to make a line""") % [InputMap.get_action_list("left_eraser_tool")[0].as
 
 %s for left mouse button
 %s for right mouse button""") % [InputMap.get_action_list("left_lightdark_tool")[0].as_text(), InputMap.get_action_list("right_lightdark_tool")[0].as_text()]
+
+	var linetool : BaseButton = find_node_by_name(root, "LineTool")
+	linetool.hint_tooltip = tr("""Line Tool
+
+%s for left mouse button
+%s for right mouse button
+
+Hold %s to snap the angle of the line
+Hold %s to center the shape on the click origin
+Hold %s to displace the shape's origin""") % [InputMap.get_action_list("left_linetool_tool")[0].as_text(), InputMap.get_action_list("right_linetool_tool")[0].as_text(), "Shift", "Ctrl", "Alt"]
+
 
 	var recttool : BaseButton = find_node_by_name(root, "RectangleTool")
 	recttool.hint_tooltip = tr("""Rectangle Tool

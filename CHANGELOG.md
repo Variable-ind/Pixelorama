@@ -16,7 +16,7 @@ DragonOfWar, novhack
 - The palette system has been completely replaced with a new one. See [#447](https://github.com/Orama-Interactive/Pixelorama/pull/447) for more details.
 <br><br>
 
-## [v0.8.3] - Unreleased
+## [v0.8.3] - 2021-05-04
 This update has been brought to you by the contributions of:
 
 Laurenz Reinthaler (Schweini07), kleonc, Fayez Akhtar (Variable), THWLF, Gamespleasure, ballerburg9005, kevinms
@@ -30,6 +30,7 @@ Laurenz Reinthaler (Schweini07), kleonc, Fayez Akhtar (Variable), THWLF, Gamespl
 - Added a new pixel grid, which is a grid of size 1px and it appears after a certain zoom level. ([#427](https://github.com/Orama-Interactive/Pixelorama/pull/427))
 - Added offset options to the grid. ([#434](https://github.com/Orama-Interactive/Pixelorama/pull/434))
 - The isometric grid has been refactored to work better and to offer more changeable options, such as the width and height of the cell bounds. ([#430](https://github.com/Orama-Interactive/Pixelorama/pull/430))
+- Pixelorama macOS binaries are now universal, which means that they should work with both x86_64 and ARM64 Mac devices. - Thanks to Godot 3.3
 - Added portrait and landscape buttons in the new image dialog.
 - Full support for auto Tallscreen/Widescreen has been implemented. ([#458](https://github.com/Orama-Interactive/Pixelorama/pull/458))
 - Added a new Centralize Image option in the Image menu, which places the visible pixels of the image in the center of the canvas. ([#441](https://github.com/Orama-Interactive/Pixelorama/pull/441))
@@ -42,6 +43,7 @@ Laurenz Reinthaler (Schweini07), kleonc, Fayez Akhtar (Variable), THWLF, Gamespl
 - Undo and redo now work when their respective keyboard shortcuts are being held. ([#405](https://github.com/Orama-Interactive/Pixelorama/pull/405))
 - CPU usage has been significantly been lowered when Pixelorama is idle. ([#394](https://github.com/Orama-Interactive/Pixelorama/pull/394))
 - The FPS of the project animation is now stored in the pxo file. This effectively means that every project can have its own FPS.
+- You can no longer draw on hidden layers.
 - You can now toggle if you want the grid to be drawn over the tile mode or just the original part of the canvas. ([#434](https://github.com/Orama-Interactive/Pixelorama/pull/434))
 - Frame tags can now be set for frames larger than 100. ([#408](https://github.com/Orama-Interactive/Pixelorama/pull/408))
 - The "lock aspect ratio" button in the create new image dialog has been changed to a texture button.
@@ -63,6 +65,9 @@ Laurenz Reinthaler (Schweini07), kleonc, Fayez Akhtar (Variable), THWLF, Gamespl
 - Fixed potential index out of bounds error when loading backup files. ([#446](https://github.com/Orama-Interactive/Pixelorama/pull/446))
 - Mirroring view should now work on all tools.
 - Fixed hue and saturation getting reset when draging value slider to zero. ([#473](https://github.com/Orama-Interactive/Pixelorama/pull/473))
+- Image effects will not longer get applied to locked and/or hidden layers.
+- Fixed memory leaks when opening and closing Pixelorama. ([#387](https://github.com/Orama-Interactive/Pixelorama/issues/387))
+- The color picker now displays "HSV" and "Raw" next to the respective CheckButtons - thanks to Godot 3.3.
 <br><br>
 
 ## [v0.8.2] - 2020-12-12

@@ -78,7 +78,7 @@ func _init(_frames := [], _name := tr("untitled"), _size := Vector2(64, 64)) -> 
 
 func commit_undo() -> void:
 	if Global.canvas.selection.is_moving_content:
-		Global.canvas.selection.move_content_cancel()
+		Global.canvas.selection.transform_content_cancel()
 	else:
 		undo_redo.undo()
 
@@ -358,10 +358,10 @@ func deserialize(dict : Dictionary) -> void:
 	if dict.has("symmetry_points"):
 		x_symmetry_point = dict.symmetry_points[0]
 		y_symmetry_point = dict.symmetry_points[1]
-		x_symmetry_axis.points[0].y = floor(y_symmetry_point / 2 + 1)
-		x_symmetry_axis.points[1].y = floor(y_symmetry_point / 2 + 1)
-		y_symmetry_axis.points[0].x = floor(x_symmetry_point / 2 + 1)
-		y_symmetry_axis.points[1].x = floor(x_symmetry_point / 2 + 1)
+		for point in x_symmetry_axis.points:
+			point.y = floor(y_symmetry_point / 2 + 1)
+		for point in y_symmetry_axis.points:
+			point.x = floor(x_symmetry_point / 2 + 1)
 	if dict.has("export_directory_path"):
 		directory_path = dict.export_directory_path
 	if dict.has("export_file_name"):
@@ -456,6 +456,7 @@ func remove_cel_buttons() -> void:
 
 
 func frame_changed(value : int) -> void:
+	Global.canvas.selection.transform_content_confirm()
 	current_frame = value
 	Global.current_frame_mark_label.text = "%s/%s" % [str(current_frame + 1), frames.size()]
 
@@ -487,6 +488,7 @@ func frame_changed(value : int) -> void:
 
 
 func layer_changed(value : int) -> void:
+	Global.canvas.selection.transform_content_confirm()
 	current_layer = value
 
 	for container in Global.layers_container.get_children():
@@ -637,12 +639,15 @@ func resize_bitmap(bitmap : BitMap, new_size : Vector2) -> BitMap:
 
 
 # Unexposed BitMap class function - https://github.com/godotengine/godot/blob/master/scene/resources/bit_map.cpp#L622
-func bitmap_to_image(bitmap : BitMap) -> Image:
+func bitmap_to_image(bitmap : BitMap, square := true) -> Image:
 	var image := Image.new()
 	var width := bitmap.get_size().x
 	var height := bitmap.get_size().y
-	var square_size = max(width, height)
-	image.create(square_size, square_size, false, Image.FORMAT_LA8)
+	if square:
+		var square_size = max(width, height)
+		image.create(square_size, square_size, false, Image.FORMAT_LA8)
+	else:
+		image.create(width, height, false, Image.FORMAT_LA8)
 	image.lock()
 	for x in width:
 		for y in height:
@@ -680,7 +685,7 @@ func get_selection_rectangle(bitmap : BitMap = selection_bitmap) -> Rect2:
 		return Rect2(minx, miny, maxx - minx + 1, maxy - miny + 1)
 
 
-func move_bitmap_values(bitmap : BitMap) -> void:
+func move_bitmap_values(bitmap : BitMap, move_offset := true) -> void:
 	var selection_node = Global.canvas.selection
 	var selection_position : Vector2 = selection_node.big_bounding_rectangle.position
 	var selection_end : Vector2 = selection_node.big_bounding_rectangle.end
@@ -688,7 +693,6 @@ func move_bitmap_values(bitmap : BitMap) -> void:
 	var image : Image = bitmap_to_image(bitmap)
 	var selection_rect := image.get_used_rect()
 	var smaller_image := image.get_rect(selection_rect)
-	image.lock()
 	image.fill(Color(0))
 	var dst := selection_position
 	var x_diff = selection_end.x - size.x
@@ -698,16 +702,20 @@ func move_bitmap_values(bitmap : BitMap) -> void:
 
 	if selection_position.x < 0:
 		nw -= selection_position.x
-		self.selection_offset.x = selection_position.x
+		if move_offset:
+			self.selection_offset.x = selection_position.x
 		dst.x = 0
 	else:
-		self.selection_offset.x = 0
+		if move_offset:
+			self.selection_offset.x = 0
 	if selection_position.y < 0:
 		nh -= selection_position.y
-		self.selection_offset.y = selection_position.y
+		if move_offset:
+			self.selection_offset.y = selection_position.y
 		dst.y = 0
 	else:
-		self.selection_offset.y = 0
+		if move_offset:
+			self.selection_offset.y = 0
 
 	if nw <= image.get_size().x:
 		nw = image.get_size().x
@@ -733,10 +741,13 @@ func resize_bitmap_values(bitmap : BitMap, new_size : Vector2, flip_x : bool, fl
 	if selection_position.x <= 0:
 		self.selection_offset.x = selection_position.x
 		dst.x = 0
+	else:
+		self.selection_offset.x = 0
 	if selection_position.y <= 0:
 		self.selection_offset.y = selection_position.y
 		dst.y = 0
-	image.lock()
+	else:
+		self.selection_offset.y = 0
 	image.fill(Color(0))
 	smaller_image.resize(new_size.x, new_size.y, Image.INTERPOLATE_NEAREST)
 	if flip_x:
