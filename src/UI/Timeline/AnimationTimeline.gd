@@ -1,5 +1,6 @@
 extends Panel
 
+
 var animation_loop := 1 # 0 is no loop, 1 is cycle loop, 2 is ping-pong loop
 var animation_forward := true
 var first_frame := 0
@@ -532,7 +533,14 @@ func _on_MergeDownLayer_pressed() -> void:
 
 
 func _on_OpacitySlider_value_changed(value) -> void:
-	Global.current_project.frames[Global.current_project.current_frame].cels[Global.current_project.current_layer].opacity = value / 100
+	if !Global.layer_opacity_checkbox.pressed:
+		Global.current_project.frames[Global.current_project.current_frame].cels[Global.current_project.current_layer].opacity = value / 100
+	else:
+		if value/100 != Global.current_project.frames[Global.current_project.current_frame].cels[Global.current_project.current_layer].opacity:
+			for frame in Global.current_project.frames.size():
+				Global.current_project.frames[frame].cels[Global.current_project.current_layer].opacity = value / 100
+		else:
+			pass
 	Global.layer_opacity_slider.value = value
 	Global.layer_opacity_slider.value = value
 	Global.layer_opacity_spinbox.value = value
@@ -541,3 +549,6 @@ func _on_OpacitySlider_value_changed(value) -> void:
 
 func _on_OnionSkinningSettings_popup_hide() -> void:
 	Global.can_draw = true
+
+
+
