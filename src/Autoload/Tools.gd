@@ -40,6 +40,7 @@ signal color_changed(color, button)
 
 var _tools = {
 	"RectSelect" : "res://src/Tools/SelectionTools/RectSelect.tscn",
+	"EllipseSelect" : "res://src/Tools/SelectionTools/EllipseSelect.tscn",
 	"ColorSelect" : "res://src/Tools/SelectionTools/ColorSelect.tscn",
 	"MagicWand" : "res://src/Tools/SelectionTools/MagicWand.tscn",
 	"Move" : "res://src/Tools/Move.tscn",
@@ -50,6 +51,7 @@ var _tools = {
 	"Eraser" : "res://src/Tools/Eraser.tscn",
 	"Bucket" : "res://src/Tools/Bucket.tscn",
 	"LightenDarken" : "res://src/Tools/LightenDarken.tscn",
+	"LineTool" : "res://src/Tools/LineTool.tscn",
 	"RectangleTool" : "res://src/Tools/RectangleTool.tscn",
 	"EllipseTool" : "res://src/Tools/EllipseTool.tscn",
 }
