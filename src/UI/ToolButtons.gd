@@ -18,6 +18,7 @@ onready var tools := [
 	[$LineTool, "linetool"],
 	[$RectangleTool, "rectangletool"],
 	[$EllipseTool, "ellipsetool"],
+	[$Text, "text"],
 ]
 
 

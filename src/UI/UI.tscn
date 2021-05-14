@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=2]
+[gd_scene load_steps=36 format=2]
 
 [ext_resource path="res://src/UI/ToolButtons.gd" type="Script" id=1]
 [ext_resource path="res://src/UI/Canvas/CanvasPreview.tscn" type="PackedScene" id=2]
@@ -31,6 +31,7 @@
 [ext_resource path="res://assets/graphics/dark_themes/tools/magicwand.png" type="Texture" id=29]
 [ext_resource path="res://assets/graphics/dark_themes/tools/linetool.png" type="Texture" id=30]
 [ext_resource path="res://assets/graphics/dark_themes/tools/ellipseselect.png" type="Texture" id=31]
+[ext_resource path="res://assets/graphics/dark_themes/tools/text.png" type="Texture" id=32]
 
 [sub_resource type="ShaderMaterial" id=1]
 shader = ExtResource( 9 )
@@ -95,7 +96,7 @@ __meta__ = {
 margin_left = 7.0
 margin_top = 7.0
 margin_right = 39.0
-margin_bottom = 543.0
+margin_bottom = 579.0
 size_flags_horizontal = 4
 size_flags_vertical = 0
 script = ExtResource( 1 )
@@ -472,6 +473,31 @@ __meta__ = {
 margin_right = 32.0
 margin_bottom = 32.0
 texture = ExtResource( 25 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Text" type="Button" parent="ToolsAndCanvas/ToolPanel/PanelContainer/ToolButtons" groups=[
+"UIButtons",
+]]
+margin_top = 540.0
+margin_right = 32.0
+margin_bottom = 572.0
+rect_min_size = Vector2( 32, 32 )
+mouse_default_cursor_shape = 2
+button_mask = 3
+
+[node name="Background" type="TextureRect" parent="ToolsAndCanvas/ToolPanel/PanelContainer/ToolButtons/Text"]
+margin_right = 32.0
+margin_bottom = 32.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ToolIcon" type="TextureRect" parent="ToolsAndCanvas/ToolPanel/PanelContainer/ToolButtons/Text"]
+margin_right = 32.0
+margin_bottom = 32.0
+texture = ExtResource( 32 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
