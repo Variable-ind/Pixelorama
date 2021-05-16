@@ -18,7 +18,6 @@ DragonOfWar, novhack
 
 ## [v0.8.3] - 2021-05-04
 This update has been brought to you by the contributions of:
-
 Laurenz Reinthaler (Schweini07), kleonc, Fayez Akhtar (Variable), THWLF, Gamespleasure, ballerburg9005, kevinms
 
 ### Added
