@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=2]
+[gd_scene load_steps=18 format=2]
 
 [ext_resource path="res://assets/themes/dark/theme.tres" type="Theme" id=1]
 [ext_resource path="res://src/Main.gd" type="Script" id=2]
@@ -9,6 +9,7 @@
 [ext_resource path="res://src/UI/Dialogs/ImageEffects/ImageEffects.tscn" type="PackedScene" id=7]
 [ext_resource path="res://src/UI/Dialogs/SaveSpriteHTML5.tscn" type="PackedScene" id=8]
 [ext_resource path="res://src/UI/Timeline/FrameProperties.tscn" type="PackedScene" id=9]
+[ext_resource path="res://src/UI/Dialogs/MergeProject.tscn" type="PackedScene" id=10]
 [ext_resource path="res://src/UI/Dialogs/SaveSprite.tscn" type="PackedScene" id=11]
 [ext_resource path="res://src/UI/Dialogs/OpenSprite.tscn" type="PackedScene" id=12]
 [ext_resource path="res://src/UI/Dialogs/SplashDialog.tscn" type="PackedScene" id=27]
@@ -59,11 +60,17 @@ margin_right = 375.0
 
 [node name="OpenSprite" parent="Dialogs" instance=ExtResource( 12 )]
 
+current_dir = "/home/variable/Documents/Godot/Godot projects/Pixelorama-split_image"
+current_path = "/home/variable/Documents/Godot/Godot projects/Pixelorama-split_image/"
+
 [node name="SaveSprite" parent="Dialogs" instance=ExtResource( 11 )]
 margin_left = 108.0
 margin_top = 40.0
 margin_right = 623.0
 margin_bottom = 388.0
+
+current_dir = "/home/variable/Documents/Godot/Godot projects/Pixelorama-split_image"
+current_path = "/home/variable/Documents/Godot/Godot projects/Pixelorama-split_image/untitled"
 
 [node name="SaveSpriteHTML5" parent="Dialogs" instance=ExtResource( 8 )]
 
@@ -111,6 +118,8 @@ dialog_text = "Autosaved backup for %s was found.
 Do you want to reload it?"
 
 [node name="FrameProperties" parent="Dialogs" instance=ExtResource( 9 )]
+
+[node name="MergeProject" parent="Dialogs" instance=ExtResource( 10 )]
 
 [node name="LeftCursor" type="Sprite" parent="."]
 visible = false

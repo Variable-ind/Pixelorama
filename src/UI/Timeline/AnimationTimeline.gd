@@ -1,5 +1,6 @@
 extends Panel
 
+
 var animation_loop := 1 # 0 is no loop, 1 is cycle loop, 2 is ping-pong loop
 var animation_forward := true
 var first_frame := 0
@@ -224,7 +225,7 @@ func _on_MoveRight_pressed() -> void:
 
 func _on_OnionSkinning_pressed() -> void:
 	Global.onion_skinning = !Global.onion_skinning
-	Global.canvas.update()
+	Global.canvas.refresh_onion()
 	var texture_button : TextureRect = Global.onion_skinning_button.get_child(0)
 	if Global.onion_skinning:
 		Global.change_button_texturerect(texture_button, "onion_skinning.png")
@@ -392,6 +393,16 @@ func _on_BlueRedMode_toggled(button_pressed : bool) -> void:
 	Global.canvas.update()
 
 
+func _on_PastPlacement_item_selected(index):
+	Global.past_above_canvas = (index == 0)
+	Global.canvas.get_node("OnionPast").set("show_behind_parent", !Global.past_above_canvas) 
+
+
+func _on_FuturePlacement_item_selected(index):
+	Global.future_above_canvas = (index == 0)
+	Global.canvas.get_node("OnionFuture").set("show_behind_parent", !Global.future_above_canvas)
+
+
 # Layer buttons
 
 func add_layer(is_new := true) -> void:
@@ -532,7 +543,14 @@ func _on_MergeDownLayer_pressed() -> void:
 
 
 func _on_OpacitySlider_value_changed(value) -> void:
-	Global.current_project.frames[Global.current_project.current_frame].cels[Global.current_project.current_layer].opacity = value / 100
+	if !Global.layer_opacity_checkbox.pressed:
+		Global.current_project.frames[Global.current_project.current_frame].cels[Global.current_project.current_layer].opacity = value / 100
+	else:
+		if value/100 != Global.current_project.frames[Global.current_project.current_frame].cels[Global.current_project.current_layer].opacity:
+			for frame in Global.current_project.frames.size():
+				Global.current_project.frames[frame].cels[Global.current_project.current_layer].opacity = value / 100
+		else:
+			pass
 	Global.layer_opacity_slider.value = value
 	Global.layer_opacity_slider.value = value
 	Global.layer_opacity_spinbox.value = value
@@ -541,3 +559,6 @@ func _on_OpacitySlider_value_changed(value) -> void:
 
 func _on_OnionSkinningSettings_popup_hide() -> void:
 	Global.can_draw = true
+
+
+

@@ -1,10 +1,10 @@
 extends Panel
 
 
-enum FileMenuId {NEW, OPEN, OPEN_LAST_PROJECT, SAVE, SAVE_AS, EXPORT, EXPORT_AS, QUIT}
+enum FileMenuId {NEW, OPEN, OPEN_LAST_PROJECT, SAVE, SAVE_AS, EXPORT, EXPORT_AS, MERGE_PROJECT, QUIT}
 enum EditMenuId {UNDO, REDO, COPY, CUT, PASTE, DELETE, PREFERENCES}
 enum ViewMenuId {TILE_MODE, WINDOW_TRANSPARENCY, PANEL_LAYOUT, MIRROR_VIEW, SHOW_GRID, SHOW_PIXEL_GRID, SHOW_RULERS, SHOW_GUIDES, SHOW_ANIMATION_TIMELINE, ZEN_MODE, FULLSCREEN_MODE}
-enum ImageMenuId {SCALE_IMAGE, CENTRALIZE_IMAGE, CROP_IMAGE, RESIZE_CANVAS, FLIP, ROTATE, INVERT_COLORS, DESATURATION, OUTLINE, HSV, GRADIENT, SHADER}
+enum ImageMenuId {SCALE_IMAGE, CENTRALIZE_IMAGE, CROP_IMAGE, SPLIT_IMAGE, RESIZE_CANVAS, FLIP, ROTATE, INVERT_COLORS, DESATURATION, OUTLINE, HSV, GRADIENT, SHADER}
 enum SelectMenuId {SELECT_ALL, CLEAR_SELECTION, INVERT}
 enum HelpMenuId {VIEW_SPLASH_SCREEN, ONLINE_DOCS, ISSUE_TRACKER, CHANGELOG, ABOUT_PIXELORAMA}
 
@@ -46,6 +46,7 @@ func setup_file_menu() -> void:
 		"Save as..." : InputMap.get_action_list("save_file_as")[0].get_scancode_with_modifiers(),
 		"Export..." : InputMap.get_action_list("export_file")[0].get_scancode_with_modifiers(),
 		"Export as..." : InputMap.get_action_list("export_file_as")[0].get_scancode_with_modifiers(),
+		"Merge Project" : 0,
 		"Quit" : InputMap.get_action_list("quit")[0].get_scancode_with_modifiers(),
 		}
 	file_menu = file_menu_button.get_popup()
@@ -152,6 +153,7 @@ func setup_image_menu() -> void:
 		"Scale Image" : 0,
 		"Centralize Image" : 0,
 		"Crop Image" : 0,
+		"Split Image" : 0,
 		"Resize Canvas" : 0,
 		"Flip" : 0,
 		"Rotate Image" : 0,
@@ -225,6 +227,8 @@ func file_menu_id_pressed(id : int) -> void:
 		FileMenuId.EXPORT_AS:
 			Global.export_dialog.popup_centered()
 			Global.dialog_open(true)
+		FileMenuId.MERGE_PROJECT:
+			merge_project_dialog()
 		FileMenuId.QUIT:
 			Global.control.show_quit_dialog()
 
@@ -282,6 +286,8 @@ func export_file() -> void:
 	else:
 		Export.external_export()
 
+func merge_project_dialog() -> void:
+	Global.control.get_node("Dialogs/MergeProject").popup_centered()
 
 func on_recent_projects_submenu_id_pressed(id : int) -> void:
 	Global.control.load_recent_project_file(Global.recent_projects[id])
@@ -449,6 +455,9 @@ func image_menu_id_pressed(id : int) -> void:
 		ImageMenuId.CROP_IMAGE:
 			DrawingAlgos.crop_image(image)
 
+		ImageMenuId.SPLIT_IMAGE:
+			show_split_image_popup()
+
 		ImageMenuId.RESIZE_CANVAS:
 			show_resize_canvas_popup()
 
@@ -484,6 +493,11 @@ func image_menu_id_pressed(id : int) -> void:
 
 func show_scale_image_popup() -> void:
 	Global.control.get_node("Dialogs/ImageEffects/ScaleImage").popup_centered()
+	Global.dialog_open(true)
+
+
+func show_split_image_popup() -> void:
+	Global.control.get_node("Dialogs/ImageEffects/SplitImage").popup_centered()
 	Global.dialog_open(true)
 
 
