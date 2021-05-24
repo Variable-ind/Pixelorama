@@ -21,7 +21,7 @@ __meta__ = {
 
 [node name="FileMenu" type="MenuButton" parent="MenuItems"]
 margin_right = 35.0
-margin_bottom = 20.0
+margin_bottom = 24.0
 mouse_default_cursor_shape = 2
 text = "File"
 switch_on_hover = true
@@ -29,7 +29,7 @@ switch_on_hover = true
 [node name="EditMenu" type="MenuButton" parent="MenuItems"]
 margin_left = 39.0
 margin_right = 75.0
-margin_bottom = 20.0
+margin_bottom = 24.0
 mouse_default_cursor_shape = 2
 text = "Edit"
 switch_on_hover = true
@@ -37,7 +37,7 @@ switch_on_hover = true
 [node name="SelectMenu" type="MenuButton" parent="MenuItems"]
 margin_left = 79.0
 margin_right = 130.0
-margin_bottom = 20.0
+margin_bottom = 24.0
 mouse_default_cursor_shape = 2
 text = "Select"
 switch_on_hover = true
@@ -45,7 +45,7 @@ switch_on_hover = true
 [node name="ImageMenu" type="MenuButton" parent="MenuItems"]
 margin_left = 134.0
 margin_right = 186.0
-margin_bottom = 20.0
+margin_bottom = 24.0
 mouse_default_cursor_shape = 2
 text = "Image"
 switch_on_hover = true
@@ -53,7 +53,7 @@ switch_on_hover = true
 [node name="ViewMenu" type="MenuButton" parent="MenuItems"]
 margin_left = 190.0
 margin_right = 232.0
-margin_bottom = 20.0
+margin_bottom = 24.0
 mouse_default_cursor_shape = 2
 text = "View"
 switch_on_hover = true
@@ -61,10 +61,37 @@ switch_on_hover = true
 [node name="HelpMenu" type="MenuButton" parent="MenuItems"]
 margin_left = 236.0
 margin_right = 278.0
-margin_bottom = 20.0
+margin_bottom = 24.0
 mouse_default_cursor_shape = 2
 text = "Help"
 switch_on_hover = true
+
+[node name="CanvasRotationLabel" type="Label" parent="MenuItems"]
+margin_left = 282.0
+margin_top = 5.0
+margin_right = 402.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 120, 0 )
+text = "Canvas Rotation:"
+align = 2
+
+[node name="CanvasRotationSlider" type="HSlider" parent="MenuItems"]
+margin_left = 406.0
+margin_right = 506.0
+margin_bottom = 16.0
+rect_min_size = Vector2( 100, 0 )
+min_value = -180.0
+max_value = 180.0
+
+[node name="CanvasRotationSpinBox" type="SpinBox" parent="MenuItems"]
+margin_left = 510.0
+margin_right = 584.0
+margin_bottom = 24.0
+min_value = -180.0
+max_value = 180.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="TopLabels" type="HBoxContainer" parent="."]
 anchor_left = 0.5
@@ -124,3 +151,6 @@ margin_right = 223.0
 margin_bottom = 23.0
 size_flags_vertical = 1
 text = "1/2"
+
+[connection signal="value_changed" from="MenuItems/CanvasRotationSlider" to="." method="_on_CanvasRotationSlider_value_changed"]
+[connection signal="value_changed" from="MenuItems/CanvasRotationSpinBox" to="." method="_on_CanvasRotationSpinBox_value_changed"]

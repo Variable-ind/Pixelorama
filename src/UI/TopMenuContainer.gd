@@ -531,3 +531,15 @@ func help_menu_id_pressed(id : int) -> void:
 		HelpMenuId.ABOUT_PIXELORAMA:
 			Global.control.get_node("Dialogs/AboutDialog").popup_centered()
 			Global.dialog_open(true)
+
+
+func _on_CanvasRotationSpinBox_value_changed(value):
+	Global.camera.global_rotation_degrees = -value
+	$MenuItems/CanvasRotationSlider.value = value
+	if value == 0:
+		glo
+
+
+func _on_CanvasRotationSlider_value_changed(value):
+	Global.camera.global_rotation_degrees = -value
+	$MenuItems/CanvasRotationSpinBox.value = value
