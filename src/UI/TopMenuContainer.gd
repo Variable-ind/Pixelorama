@@ -536,8 +536,6 @@ func help_menu_id_pressed(id : int) -> void:
 func _on_CanvasRotationSpinBox_value_changed(value):
 	Global.camera.global_rotation_degrees = -value
 	$MenuItems/CanvasRotationSlider.value = value
-	if value == 0:
-		glo
 
 
 func _on_CanvasRotationSlider_value_changed(value):
