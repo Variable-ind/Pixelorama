@@ -539,7 +539,7 @@ func help_menu_id_pressed(id : int) -> void:
 			Global.control.get_node("Dialogs/AboutDialog").popup_centered()
 			Global.dialog_open(true)
 
-
+#added by Variable
 func _on_CanvasRotationSpinBox_value_changed(value):
 	Global.camera.global_rotation_degrees = -value
 	$MenuItems/CanvasRotationSlider.value = value
@@ -548,3 +548,4 @@ func _on_CanvasRotationSpinBox_value_changed(value):
 func _on_CanvasRotationSlider_value_changed(value):
 	Global.camera.global_rotation_degrees = -value
 	$MenuItems/CanvasRotationSpinBox.value = value
+###
