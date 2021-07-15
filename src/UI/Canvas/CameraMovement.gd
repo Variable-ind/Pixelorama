@@ -106,7 +106,9 @@ func process_direction_action_pressed(event: InputEvent) -> void:
 	Global.key_move_press_time[dir] += increment
 	var this_direction_press_time : float = Global.key_move_press_time[dir]
 	var move_speed := dir_move_zoom_multiplier(this_direction_press_time)
+	#added by Variable
 	offset = offset + move_speed * increment * directional_sign_multipliers[dir].rotated(global_rotation) * zoom
+	###
 	update_rulers()
 	update_transparent_checker_offset()
 
@@ -138,9 +140,13 @@ func _input(event : InputEvent) -> void:
 			else:
 				zoom_camera(-1)
 		elif event is InputEventPanGesture: # Pan Gesture on a Latop touchpad
+			#added by Variable
 			offset = offset + event.delta.rotated(global_rotation) * zoom * 7 # for moving the canvas
+			###
 		elif event is InputEventMouseMotion && drag:
+			#added by Variable
 			offset = offset - event.relative.rotated(global_rotation) * zoom
+			###
 			update_transparent_checker_offset()
 			update_rulers()
 		elif is_action_direction_pressed(event):
