@@ -12,6 +12,8 @@ var frames := [] setget frames_changed # Array of Frames (that contain Cels)
 var layers := [] setget layers_changed # Array of Layers
 var current_frame := 0 setget frame_changed
 var current_layer := 0 setget layer_changed
+var selected_cels := [[0, 0]] # Array of Arrays of 2 integers (frame & layer)
+
 var animation_tags := [] setget animation_tags_changed # Array of AnimationTags
 var guides := [] # Array of Guides
 var brushes := [] # Array of Images
@@ -36,6 +38,8 @@ var directory_path := ""
 var file_name := "untitled"
 var file_format : int = Export.FileFormat.PNG
 var was_exported := false
+
+var frame_button_node = preload("res://src/UI/Timeline/FrameButton.tscn")
 
 
 func _init(_frames := [], _name := tr("untitled"), _size := Vector2(64, 64)) -> void:
@@ -120,8 +124,8 @@ func change_project() -> void:
 	for i in range(layers.size() - 1, -1, -1):
 		# Create layer buttons
 		var layer_container = load("res://src/UI/Timeline/LayerButton.tscn").instance()
-		layer_container.i = i
-		if layers[i].name == tr("Layer") + " 0":
+		layer_container.layer = i
+		if layers[i].name == "":
 			layers[i].name = tr("Layer") + " %s" % i
 
 		Global.layers_container.add_child(layer_container)
@@ -140,13 +144,13 @@ func change_project() -> void:
 			layers[i].frame_container.add_child(cel_button)
 
 	for j in range(frames.size()): # Create frame ID labels
-		var label := Label.new()
-		label.rect_min_size.x = Global.animation_timeline.cel_size
-		label.align = Label.ALIGN_CENTER
-		label.text = str(j + 1)
+		var button : Button = frame_button_node.instance()
+		button.frame = j
+		button.rect_min_size.x = Global.animation_timeline.cel_size
+		button.text = str(j + 1)
 		if j == current_frame:
-			label.add_color_override("font_color", Global.control.theme.get_color("Selected Color", "Label"))
-		Global.frame_ids.add_child(label)
+			button.add_color_override("font_color", Global.control.theme.get_color("Selected Color", "Label"))
+		Global.frame_ids.add_child(button)
 
 	var layer_button = Global.layers_container.get_child(Global.layers_container.get_child_count() - 1 - current_layer)
 	layer_button.pressed = true
@@ -383,7 +387,9 @@ func size_changed(value : Vector2) -> void:
 
 
 func frames_changed(value : Array) -> void:
+	Global.canvas.selection.transform_content_confirm()
 	frames = value
+	selected_cels.clear()
 	remove_cel_buttons()
 
 	for frame_id in Global.frame_ids.get_children():
@@ -394,11 +400,11 @@ func frames_changed(value : Array) -> void:
 		Global.frames_container.add_child(layers[i].frame_container)
 
 	for j in range(frames.size()):
-		var label := Label.new()
-		label.rect_min_size.x = Global.animation_timeline.cel_size
-		label.align = Label.ALIGN_CENTER
-		label.text = str(j + 1)
-		Global.frame_ids.add_child(label)
+		var button : Button = frame_button_node.instance()
+		button.frame = j
+		button.rect_min_size.x = Global.animation_timeline.cel_size
+		button.text = str(j + 1)
+		Global.frame_ids.add_child(button)
 
 		for i in range(layers.size() - 1, -1, -1):
 			var cel_button = load("res://src/UI/Timeline/CelButton.tscn").instance()
@@ -417,6 +423,8 @@ func layers_changed(value : Array) -> void:
 		Global.layers_changed_skip = false
 		return
 
+	selected_cels.clear()
+
 	for container in Global.layers_container.get_children():
 		container.queue_free()
 
@@ -424,8 +432,8 @@ func layers_changed(value : Array) -> void:
 
 	for i in range(layers.size() - 1, -1, -1):
 		var layer_container = load("res://src/UI/Timeline/LayerButton.tscn").instance()
-		layer_container.i = i
-		if layers[i].name == tr("Layer") + " 0":
+		layer_container.layer = i
+		if layers[i].name == "":
 			layers[i].name = tr("Layer") + " %s" % i
 
 		Global.layers_container.add_child(layer_container)
@@ -469,11 +477,17 @@ func frame_changed(value : int) -> void:
 			if i < layer.frame_container.get_child_count():
 				layer.frame_container.get_child(i).pressed = false
 
+	if selected_cels.empty():
+		selected_cels.append([current_frame, current_layer])
 	# Select the new frame
-	if current_frame < Global.frame_ids.get_child_count():
-		Global.frame_ids.get_child(current_frame).add_color_override("font_color", Global.control.theme.get_color("Selected Color", "Label"))
-	if layers and current_frame < layers[current_layer].frame_container.get_child_count():
-		layers[current_layer].frame_container.get_child(current_frame).pressed = true
+	for cel in selected_cels:
+		var _current_frame : int = cel[0]
+		var _current_layer : int = cel[1]
+		if _current_frame < Global.frame_ids.get_child_count():
+			Global.frame_ids.get_child(_current_frame).add_color_override("font_color", Global.control.theme.get_color("Selected Color", "Label"))
+		if layers:
+			if _current_frame < layers[_current_layer].frame_container.get_child_count():
+				layers[_current_layer].frame_container.get_child(_current_frame).pressed = true
 
 	Global.disable_button(Global.remove_frame_button, frames.size() == 1)
 	Global.disable_button(Global.move_left_frame_button, frames.size() == 1 or current_frame == 0)
@@ -491,17 +505,18 @@ func layer_changed(value : int) -> void:
 	Global.canvas.selection.transform_content_confirm()
 	current_layer = value
 
-	for container in Global.layers_container.get_children():
-		container.pressed = false
-
-	if current_layer < Global.layers_container.get_child_count():
-		var layer_button = Global.layers_container.get_child(Global.layers_container.get_child_count() - 1 - current_layer)
-		layer_button.pressed = true
-
 	toggle_layer_buttons_current_layer()
 
 	yield(Global.get_tree().create_timer(0.01), "timeout")
 	self.current_frame = current_frame # Call frame_changed to update UI
+	for layer_button in Global.layers_container.get_children():
+		layer_button.pressed = false
+
+	for cel in selected_cels:
+		var _current_layer : int = cel[1]
+		if _current_layer < Global.layers_container.get_child_count():
+			var layer_button = Global.layers_container.get_child(Global.layers_container.get_child_count() - 1 - _current_layer)
+			layer_button.pressed = true
 
 
 func toggle_layer_buttons_layers() -> void:
@@ -602,16 +617,16 @@ func is_empty() -> bool:
 	return frames.size() == 1 and layers.size() == 1 and frames[0].cels[0].image.is_invisible() and animation_tags.size() == 0
 
 
-func can_pixel_get_drawn(pixel : Vector2) -> bool:
+func can_pixel_get_drawn(pixel : Vector2, bitmap : BitMap = selection_bitmap, selection_position : Vector2 = Global.canvas.selection.big_bounding_rectangle.position) -> bool:
 	if pixel.x < 0 or pixel.y < 0 or pixel.x >= size.x or pixel.y >= size.y:
 		return false
-	var selection_position : Vector2 = Global.canvas.selection.big_bounding_rectangle.position
-	if selection_position.x < 0:
-		pixel.x -= selection_position.x
-	if selection_position.y < 0:
-		pixel.y -= selection_position.y
+
 	if has_selection:
-		return selection_bitmap.get_bit(pixel)
+		if selection_position.x < 0:
+			pixel.x -= selection_position.x
+		if selection_position.y < 0:
+			pixel.y -= selection_position.y
+		return bitmap.get_bit(pixel)
 	else:
 		return true
 
@@ -658,6 +673,7 @@ func bitmap_to_image(bitmap : BitMap, square := true) -> Image:
 	return image
 
 
+# Algorithm taken from Image.get_used_rect() -  https://github.com/godotengine/godot/blob/master/core/io/image.cpp
 func get_selection_rectangle(bitmap : BitMap = selection_bitmap) -> Rect2:
 	if bitmap.get_true_bit_count() == 0:
 		return Rect2()

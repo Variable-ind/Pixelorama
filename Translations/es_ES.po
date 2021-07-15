@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2021-04-16 18:10\n"
+"PO-Revision-Date: 2021-06-29 21:11\n"
 
 msgid "OK"
 msgstr "OK"
@@ -30,6 +30,9 @@ msgstr "Confirme, por favor..."
 msgid "File Name:"
 msgstr "Nombre del archivo:"
 
+msgid "Project Name:"
+msgstr "Nombre de proyecto:"
+
 msgid "Image Size"
 msgstr "Tamaño de la imagen"
 
@@ -39,8 +42,8 @@ msgstr "Tamaño del lienzo"
 msgid "Frame Size"
 msgstr "Tamaño del marco"
 
-msgid "Size"
-msgstr ""
+msgid "Size:"
+msgstr "Tamaño:"
 
 msgid "Width:"
 msgstr "Ancho:"
@@ -56,6 +59,9 @@ msgstr "Archivo"
 
 msgid "Edit"
 msgstr "Editar"
+
+msgid "Select"
+msgstr "Selecciona"
 
 msgid "View"
 msgstr "Ver"
@@ -126,6 +132,9 @@ msgstr "Pegar"
 msgid "Delete"
 msgstr "Borrar"
 
+msgid "New Brush"
+msgstr "Nuevo Pincel"
+
 msgid "Scale Image"
 msgstr "Escalar imagen"
 
@@ -147,8 +156,11 @@ msgstr "Centralizar imagen"
 msgid "Rotate Image"
 msgstr "Rotar Imagen"
 
-msgid "Clear Selection"
-msgstr "Anular selección"
+msgid "Clear"
+msgstr "Limpiar"
+
+msgid "Invert"
+msgstr "Invertir"
 
 msgid "Flip"
 msgstr "Girar"
@@ -169,16 +181,16 @@ msgid "Window Transparency"
 msgstr "Transparencia de ventana"
 
 msgid "Panel Layout"
-msgstr ""
+msgstr "Diseño del panel"
 
 msgid "Auto"
-msgstr ""
+msgstr "Auto"
 
 msgid "Widescreen"
-msgstr ""
+msgstr "Pantalla ancha"
 
 msgid "Tallscreen"
-msgstr ""
+msgstr "Pantalla alta"
 
 msgid "Mirror View"
 msgstr "Vista de espejo"
@@ -229,13 +241,13 @@ msgid "Spritesheet (new tab)"
 msgstr "Hoja de sprites (nueva pestaña)"
 
 msgid "Spritesheet (new layer)"
-msgstr ""
+msgstr "Hoja de sprites (nueva capa)"
 
 msgid "New frame"
 msgstr "Nuevo fotograma"
 
 msgid "Replace frame"
-msgstr ""
+msgstr "Reemplazar marco"
 
 msgid "New layer"
 msgstr "Nueva capa"
@@ -256,13 +268,13 @@ msgid "Vertical frames:"
 msgstr "Fotogramas verticales:"
 
 msgid "Start frame:"
-msgstr ""
+msgstr "Fotograma inicial:"
 
 msgid "At frame:"
-msgstr ""
+msgstr "En el cuadro:"
 
 msgid "At layer:"
-msgstr ""
+msgstr "En la capa:"
 
 msgid "Brush type:"
 msgstr "Tipo de pincel:"
@@ -422,6 +434,9 @@ msgstr "Temas"
 msgid "Canvas"
 msgstr "Lienzo"
 
+msgid "Selection"
+msgstr "Selección"
+
 msgid "Shortcuts"
 msgstr "Teclas de acceso directo"
 
@@ -468,7 +483,7 @@ msgid "Display Scale"
 msgstr "Escala de interfaz"
 
 msgid "Dim interface on dialog popup"
-msgstr ""
+msgstr "Atenuar interface al abrir ventana emergente"
 
 msgid "Dark"
 msgstr "Oscuro"
@@ -488,8 +503,29 @@ msgstr "Claro"
 msgid "Purple"
 msgstr "Morado"
 
+msgid "Theme"
+msgstr "Tema"
+
+msgid "Icon color from:"
+msgstr ""
+
+msgid "Icon color:"
+msgstr ""
+
+msgid "Tool button size:"
+msgstr ""
+
+msgid "Small"
+msgstr ""
+
+msgid "Big"
+msgstr ""
+
 msgid "Only affect selection"
 msgstr "Sólo afecta a la selección"
+
+msgid "Selected cels"
+msgstr ""
 
 msgid "Current cel"
 msgstr "Celda actual"
@@ -677,8 +713,8 @@ msgstr "Árabe"
 msgid "Turkish"
 msgstr "Turco"
 
-msgid "Norwegian"
-msgstr "Noruego"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Korean"
 msgstr "Coreano"
@@ -691,6 +727,9 @@ msgstr "Rumano"
 
 msgid "Japanese"
 msgstr "Japonés"
+
+msgid "Ukrainian"
+msgstr "Ucraniano"
 
 msgid "Development Team"
 msgstr "Equipo de desarrollo"
@@ -737,17 +776,41 @@ msgstr "Guardar y salir"
 msgid "Exit without saving"
 msgstr "Salir sin guardar"
 
-msgid "Utility Tools"
-msgstr "Utilidades"
-
 msgid "Rectangular Selection\n\n"
 "%s for left mouse button\n"
-"%s for right mouse button\n\n"
-"Press %s to move the content"
-msgstr "Selección rectangular\n\n"
-"%s para el botón izquierdo del ratón\n"
-"%s para el botón derecho del ratón\n\n"
-"Presione %s para mover el contenido"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Elliptical Selection\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Polygonal Selection\n"
+"Double-click to connect the last point to the starting point\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Select By Color\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Magic Wand\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Lasso / Free Select Tool\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Move\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
 
 msgid "Zoom\n\n"
 "%s for left mouse button\n"
@@ -769,9 +832,6 @@ msgstr "Selector de color\n"
 "Seleccione un color de un píxel del sprite\n\n"
 "%s para el botón izquierdo del ratón\n"
 "%s para el botón derecho del ratón"
-
-msgid "Draw Tools"
-msgstr "Herramientas de Dibujo"
 
 msgid "Pencil\n\n"
 "%s for left mouse button\n"
@@ -798,18 +858,25 @@ msgstr "Cubo de pintura\n\n"
 "%s para botón izquierdo del ratón\n"
 "%s para botón derecho del ratón"
 
-msgid "Lighten/Darken\n\n"
+msgid "Shading Tool\n\n"
 "%s for left mouse button\n"
 "%s for right mouse button"
-msgstr "Iluminar/Oscurecer\n\n"
-"%s para el botón izquierdo del ratón\n"
-"%s para el botón derecho del ratón"
+msgstr ""
+
+msgid "Line Tool\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button\n\n"
+"Hold %s to snap the angle of the line\n"
+"Hold %s to center the shape on the click origin\n"
+"Hold %s to displace the shape's origin"
+msgstr ""
 
 msgid "Rectangle Tool\n\n"
 "%s for left mouse button\n"
 "%s for right mouse button\n\n"
 "Hold %s to create a 1:1 shape\n"
 "Hold %s to center the shape on the click origin\n"
+"Hold %s to displace the shape's origin"
 msgstr ""
 
 msgid "Ellipse Tool\n\n"
@@ -817,6 +884,7 @@ msgid "Ellipse Tool\n\n"
 "%s for right mouse button\n\n"
 "Hold %s to create a 1:1 shape\n"
 "Hold %s to center the shape on the click origin\n"
+"Hold %s to displace the shape's origin"
 msgstr ""
 
 msgid "Rectangle"
@@ -992,6 +1060,15 @@ msgstr "Seguir el nivel de zoom del lienzo"
 msgid "The transparent checker follow the zoom level of canvas"
 msgstr "El verificador transparente sigue el nivel de zoom del lienzo"
 
+msgid "Animated selection borders"
+msgstr ""
+
+msgid "Border color 1:"
+msgstr ""
+
+msgid "Border color 2:"
+msgstr ""
+
 msgid "Only custom preset can be modified"
 msgstr "Sólo se puede modificar el ajuste preestablecido"
 
@@ -1036,6 +1113,9 @@ msgstr ""
 
 msgid "Pixel Perfect"
 msgstr "Pixelado perfecto"
+
+msgid "Fill inside"
+msgstr ""
 
 msgid "Makes lines smooth by removing the extra pixels on the edges"
 msgstr ""
@@ -1529,6 +1609,24 @@ msgstr "Personalizado"
 msgid "Rectangular Selection"
 msgstr "Selección rectangular"
 
+msgid "Elliptical Selection"
+msgstr ""
+
+msgid "Polygonal Selection"
+msgstr ""
+
+msgid "Select By Color"
+msgstr ""
+
+msgid "Magic Wand"
+msgstr ""
+
+msgid "Lasso / Free Select Tool"
+msgstr ""
+
+msgid "Move"
+msgstr ""
+
 msgid "Zoom"
 msgstr "Zoom"
 
@@ -1547,8 +1645,17 @@ msgstr "Borrador"
 msgid "Bucket"
 msgstr "Cubo de pintura"
 
-msgid "Lighten/Darken"
-msgstr "Iluminar/Oscurecer"
+msgid "Shading Tool"
+msgstr ""
+
+msgid "Line Tool"
+msgstr ""
+
+msgid "Rectangle Tool"
+msgstr ""
+
+msgid "Ellipse Tool"
+msgstr ""
 
 msgid "Switch Colors"
 msgstr "Cambiar colores"
@@ -1661,9 +1768,6 @@ msgid "Tiled In Y Axis"
 msgstr ""
 
 msgid "Create a new palette"
-msgstr ""
-
-msgid "Create New Palette"
 msgstr ""
 
 msgid "Comment:"

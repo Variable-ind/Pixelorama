@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2021-04-17 10:10\n"
+"PO-Revision-Date: 2021-06-30 09:48\n"
 
 msgid "OK"
 msgstr "OK"
@@ -30,6 +30,9 @@ msgstr "確認して下さい"
 msgid "File Name:"
 msgstr "ファイル名:"
 
+msgid "Project Name:"
+msgstr "プロジェクト名:"
+
 msgid "Image Size"
 msgstr "画像サイズ"
 
@@ -39,8 +42,8 @@ msgstr "キャンバス サイズ"
 msgid "Frame Size"
 msgstr "フレームサイズ"
 
-msgid "Size"
-msgstr "サイズ"
+msgid "Size:"
+msgstr "サイズ:"
 
 msgid "Width:"
 msgstr "幅:"
@@ -56,6 +59,9 @@ msgstr "ファイル"
 
 msgid "Edit"
 msgstr "編集"
+
+msgid "Select"
+msgstr "選択"
 
 msgid "View"
 msgstr "表示"
@@ -126,6 +132,9 @@ msgstr "ペースト"
 msgid "Delete"
 msgstr "削除"
 
+msgid "New Brush"
+msgstr "新しいブラシ"
+
 msgid "Scale Image"
 msgstr "画像の拡大縮小"
 
@@ -147,8 +156,11 @@ msgstr "画像を中央に"
 msgid "Rotate Image"
 msgstr "画像を回転"
 
-msgid "Clear Selection"
-msgstr "選択をクリア"
+msgid "Clear"
+msgstr "削除"
+
+msgid "Invert"
+msgstr "反転"
 
 msgid "Flip"
 msgstr "反転"
@@ -422,6 +434,9 @@ msgstr "テーマ"
 msgid "Canvas"
 msgstr "キャンバス"
 
+msgid "Selection"
+msgstr "選択範囲"
+
 msgid "Shortcuts"
 msgstr "ショートカット"
 
@@ -488,8 +503,29 @@ msgstr "ライト"
 msgid "Purple"
 msgstr "紫"
 
+msgid "Theme"
+msgstr "テーマ"
+
+msgid "Icon color from:"
+msgstr "次のもののアイコンの色:"
+
+msgid "Icon color:"
+msgstr "アイコンの色:"
+
+msgid "Tool button size:"
+msgstr "ツールボタンのサイズ:"
+
+msgid "Small"
+msgstr "小"
+
+msgid "Big"
+msgstr "大"
+
 msgid "Only affect selection"
 msgstr "選択範囲のみに影響"
+
+msgid "Selected cels"
+msgstr "選択中のセル"
 
 msgid "Current cel"
 msgstr "現在のセル"
@@ -677,8 +713,8 @@ msgstr "アラビア語"
 msgid "Turkish"
 msgstr "トルコ語"
 
-msgid "Norwegian"
-msgstr "ノルウェー語"
+msgid "Norwegian Bokmål"
+msgstr "ノルウェー語・ボークモール"
 
 msgid "Korean"
 msgstr "韓国語"
@@ -691,6 +727,9 @@ msgstr "ルーマニア語"
 
 msgid "Japanese"
 msgstr "日本語"
+
+msgid "Ukrainian"
+msgstr "ウクライナ語"
 
 msgid "Development Team"
 msgstr "Development Team"
@@ -737,17 +776,56 @@ msgstr "セーブして終了"
 msgid "Exit without saving"
 msgstr "保存せずに終了"
 
-msgid "Utility Tools"
-msgstr "ユーティリティツール"
-
 msgid "Rectangular Selection\n\n"
 "%s for left mouse button\n"
-"%s for right mouse button\n\n"
-"Press %s to move the content"
+"%s for right mouse button"
 msgstr "矩形選択\n\n"
-"%sでマウスの左ボタンを ズーム に変更\n"
-"%sでマウスの右ボタンを ズーム に変更\n\n"
-"%s を押してコンテンツを移動します"
+"%sでマウスの左ボタンを 矩形選択 に変更\n"
+"%sでマウスの右ボタンを 矩形選択 に変更"
+
+msgid "Elliptical Selection\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr "楕円形選択\n\n"
+"%sでマウスの左ボタンを 楕円形選択 に変更\n"
+"%sでマウスの右ボタンを 楕円形選択 に変更"
+
+msgid "Polygonal Selection\n"
+"Double-click to connect the last point to the starting point\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr "多角形選択\n"
+"最後の点を開始点に接続するにはダブルクリック\n\n"
+"%sでマウスの左ボタンを 多角形選択 に変更\n"
+"%sでマウスの右ボタンを 多角形選択 に変更"
+
+msgid "Select By Color\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr "色選択\n\n"
+"%sでマウスの左ボタンを 色選択 に変更\n"
+"%sでマウスの右ボタンを 色選択 に変更"
+
+msgid "Magic Wand\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr "自動選択\n\n"
+"%sでマウスの左ボタンを 自動選択 に変更\n"
+"%sでマウスの右ボタンを 自動選択 に変更"
+
+msgid "Lasso / Free Select Tool\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr "なげなわ/自由選択\n\n"
+"%sでマウスの左ボタンを なげなわ/自由選択 に変更\n"
+"%sでマウスの右ボタンを なげなわ/自由選択 に変更"
+
+msgid "Move\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr "移動\n\n"
+"%sでマウスの左ボタンを 移動 に変更\n"
+"%sでマウスの右ボタンを 移動 に変更"
 
 msgid "Zoom\n\n"
 "%s for left mouse button\n"
@@ -771,9 +849,6 @@ msgstr "カラーピッカー\n"
 "スプライトのピクセルから色を選択してください。\n\n"
 "%sでマウスの左ボタンを カラーピッカー に変更\n"
 "%sでマウスの右ボタンを カラーピッカー に変更"
-
-msgid "Draw Tools"
-msgstr "描画ツール"
 
 msgid "Pencil\n\n"
 "%s for left mouse button\n"
@@ -800,34 +875,51 @@ msgstr "バケツ\n"
 "%sでマウスの左ボタンを バケツ に変更\n"
 "%sでマウスの右ボタンを バケツ に変更"
 
-msgid "Lighten/Darken\n\n"
+msgid "Shading Tool\n\n"
 "%s for left mouse button\n"
 "%s for right mouse button"
-msgstr "明るく/暗く\n\n"
-"%sでマウスの左ボタンを 明るく/暗く に変更\n"
-"%sでマウスの右ボタンを 明るく/暗く に変更"
+msgstr "シューディングツール\n\n"
+"%sでマウスの左ボタンを シューディングツール に変更\n"
+"%sでマウスの右ボタンを シューディングツール に変更"
+
+msgid "Line Tool\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button\n\n"
+"Hold %s to snap the angle of the line\n"
+"Hold %s to center the shape on the click origin\n"
+"Hold %s to displace the shape's origin"
+msgstr "直線ツール\n\n"
+"%sでマウスの左ボタンを 直線ツール に変更\n"
+"%sでマウスの右ボタンを 直線ツール に変更\n\n"
+" %s を長押しして線の角度をスナップ\n"
+" %s を長押ししてクリックした原点を図形の中心に配置\n"
+" %s を長押しして図形の原点を変更します"
 
 msgid "Rectangle Tool\n\n"
 "%s for left mouse button\n"
 "%s for right mouse button\n\n"
 "Hold %s to create a 1:1 shape\n"
 "Hold %s to center the shape on the click origin\n"
+"Hold %s to displace the shape's origin"
 msgstr "矩形ツール\n\n"
 "%sでマウスの左ボタンを 矩形ツール に変更\n"
 "%sでマウスの右ボタンを 矩形ツール に変更\n\n"
 "%sを長押しして正方形を作成\n"
-"%sを長押ししてクリックした場所を原点に図形を配置\n"
+"%s を長押ししてクリックした原点を図形の中心に配置\n"
+"%sを長押しして図形の原点を変更"
 
 msgid "Ellipse Tool\n\n"
 "%s for left mouse button\n"
 "%s for right mouse button\n\n"
 "Hold %s to create a 1:1 shape\n"
 "Hold %s to center the shape on the click origin\n"
+"Hold %s to displace the shape's origin"
 msgstr "楕円形ツール\n\n"
 "%sでマウスの左ボタンを 楕円形ツール に変更\n"
 "%sでマウスの右ボタンを 楕円形ツール に変更\n\n"
 "%sを長押しして真円を作成\n"
-"%sを長押ししてクリックした場所を原点に図形を配置\n"
+"%s を長押ししてクリックした原点を図形の中心に配置\n"
+"%sを長押しして図形の原点を変更"
 
 msgid "Rectangle"
 msgstr "矩形"
@@ -1002,6 +1094,15 @@ msgstr "キャンバスのズームレベルをフォロー"
 msgid "The transparent checker follow the zoom level of canvas"
 msgstr "透明なチェッカーはキャンバスのズームレベルに従います"
 
+msgid "Animated selection borders"
+msgstr "アニメーション化された範囲"
+
+msgid "Border color 1:"
+msgstr "境界色 1:"
+
+msgid "Border color 2:"
+msgstr "境界色 2:"
+
 msgid "Only custom preset can be modified"
 msgstr "カスタムプリセットのみ変更できます"
 
@@ -1046,6 +1147,9 @@ msgstr "ブレンドの代わりに色を上書きします。このオプショ
 
 msgid "Pixel Perfect"
 msgstr "ピクセルパーフェクト"
+
+msgid "Fill inside"
+msgstr "中を塗りつぶす"
 
 msgid "Makes lines smooth by removing the extra pixels on the edges"
 msgstr "エッジの余分なピクセルを削除することで線を滑らかにします"
@@ -1539,6 +1643,24 @@ msgstr "カスタム"
 msgid "Rectangular Selection"
 msgstr "矩形選択"
 
+msgid "Elliptical Selection"
+msgstr "楕円形選択"
+
+msgid "Polygonal Selection"
+msgstr "多角形選択"
+
+msgid "Select By Color"
+msgstr "色選択"
+
+msgid "Magic Wand"
+msgstr "自動選択"
+
+msgid "Lasso / Free Select Tool"
+msgstr "なげなわ/自由選択"
+
+msgid "Move"
+msgstr "移動"
+
 msgid "Zoom"
 msgstr "ズーム"
 
@@ -1557,8 +1679,17 @@ msgstr "消しゴム"
 msgid "Bucket"
 msgstr "バケット"
 
-msgid "Lighten/Darken"
-msgstr "明るく/暗く"
+msgid "Shading Tool"
+msgstr "シェーディングツール"
+
+msgid "Line Tool"
+msgstr "直線ツール"
+
+msgid "Rectangle Tool"
+msgstr "矩形ツール"
+
+msgid "Ellipse Tool"
+msgstr "楕円形ツール"
 
 msgid "Switch Colors"
 msgstr "色の切り替え"
@@ -1672,9 +1803,6 @@ msgstr "Y軸にタイルされています"
 
 msgid "Create a new palette"
 msgstr "新しいパレットを作成"
-
-msgid "Create New Palette"
-msgstr "新しい空のパレットを作成しますか"
 
 msgid "Comment:"
 msgstr "コメント:"

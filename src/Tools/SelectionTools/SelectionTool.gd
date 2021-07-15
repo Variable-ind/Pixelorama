@@ -85,6 +85,7 @@ func draw_start(position : Vector2) -> void:
 			_move_content = true
 			if Tools.alt: # Move the selection without cutting it from the original position / makes a quick copy of it
 				selection_node.transform_content_confirm()
+				selection_node.clear_in_selected_cels = false
 			selection_node.transform_content_start()
 			if Tools.alt: # Continuation of the above
 				var cel_image : Image = project.frames[project.current_frame].cels[project.current_layer].image
@@ -112,6 +113,7 @@ func draw_move(position : Vector2) -> void:
 				position.x = _start_pos.x
 		if _snap_to_grid:
 			position = position.snapped(Vector2(Global.grid_width, Global.grid_height))
+			position += Vector2(Global.grid_offset_x, Global.grid_offset_y)
 
 		if _move_content:
 			selection_node.move_content(position - _offset)

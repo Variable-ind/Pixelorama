@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
-"PO-Revision-Date: 2021-04-25 22:48\n"
+"PO-Revision-Date: 2021-07-04 17:09\n"
 
 msgid "OK"
 msgstr "Εντάξει"
@@ -30,6 +30,9 @@ msgstr "Παρακαλώ επιβεβαιώστε..."
 msgid "File Name:"
 msgstr "Όνομα αρχείου:"
 
+msgid "Project Name:"
+msgstr "Όνομα έργου:"
+
 msgid "Image Size"
 msgstr "Μέγεθος εικόνας"
 
@@ -39,8 +42,8 @@ msgstr "Μέγεθος Καμβά"
 msgid "Frame Size"
 msgstr "Μέγεθος Καρέ"
 
-msgid "Size"
-msgstr "Μέγεθος"
+msgid "Size:"
+msgstr "Μέγεθος:"
 
 msgid "Width:"
 msgstr "Πλάτος:"
@@ -56,6 +59,9 @@ msgstr "Αρχείο"
 
 msgid "Edit"
 msgstr "Επεξεργασία"
+
+msgid "Select"
+msgstr "Επιλογή"
 
 msgid "View"
 msgstr "Προβολή"
@@ -126,6 +132,9 @@ msgstr "Επικόλληση"
 msgid "Delete"
 msgstr "Διαγραφή"
 
+msgid "New Brush"
+msgstr "Νέο πινέλο"
+
 msgid "Scale Image"
 msgstr "Κλιμάκωση εικόνας"
 
@@ -147,8 +156,11 @@ msgstr "Μετακίνηση εικόνας στο κέντρο"
 msgid "Rotate Image"
 msgstr "Περιστροφή Εικόνας"
 
-msgid "Clear Selection"
-msgstr "Καθαρισμός επιλογής"
+msgid "Clear"
+msgstr "Εκκαθάριση"
+
+msgid "Invert"
+msgstr "Αντιστροφή"
 
 msgid "Flip"
 msgstr "Αναστροφή"
@@ -422,6 +434,9 @@ msgstr "Θέματα"
 msgid "Canvas"
 msgstr "Καμβάς"
 
+msgid "Selection"
+msgstr "Επιλογή"
+
 msgid "Shortcuts"
 msgstr "Συντομεύσεις"
 
@@ -488,8 +503,29 @@ msgstr "Φωτεινό"
 msgid "Purple"
 msgstr "Μωβ"
 
+msgid "Theme"
+msgstr "Θέμα"
+
+msgid "Icon color from:"
+msgstr "Χρώμα εικονιδίων από:"
+
+msgid "Icon color:"
+msgstr "Χρώμα εικονιδίων:"
+
+msgid "Tool button size:"
+msgstr "Μέγεθος κουμπιών εργαλείων:"
+
+msgid "Small"
+msgstr "Μικρά"
+
+msgid "Big"
+msgstr "Μεγάλα"
+
 msgid "Only affect selection"
 msgstr "Επηρεάζει μόνο την επιλογή"
+
+msgid "Selected cels"
+msgstr "Επιλεγμένα cels"
 
 msgid "Current cel"
 msgstr "Τρέχον cel"
@@ -677,8 +713,8 @@ msgstr "Αραβικά"
 msgid "Turkish"
 msgstr "Τουρκικά"
 
-msgid "Norwegian"
-msgstr "Νορβηγικά"
+msgid "Norwegian Bokmål"
+msgstr "Νορβηγικά Μποκμάλ"
 
 msgid "Korean"
 msgstr "Κορεάτικα"
@@ -691,6 +727,9 @@ msgstr "Ρουμανικά"
 
 msgid "Japanese"
 msgstr "Ιαπωνικά"
+
+msgid "Ukrainian"
+msgstr "Ουκρανικά"
 
 msgid "Development Team"
 msgstr "Ομάδα Ανάπτυξης"
@@ -737,17 +776,56 @@ msgstr "Αποθήκευση & έξοδος"
 msgid "Exit without saving"
 msgstr "Έξοδος χωρίς αποθήκευση"
 
-msgid "Utility Tools"
-msgstr "Βοηθητικά Εργαλεία"
-
 msgid "Rectangular Selection\n\n"
 "%s for left mouse button\n"
-"%s for right mouse button\n\n"
-"Press %s to move the content"
+"%s for right mouse button"
 msgstr "Ορθογώνια επιλογή\n\n"
 "%s για το αριστερό κουμπί ποντικιού\n"
-"%s για το δεξί κουμπί ποντικιού\n\n"
-"Πατήστε %s για να μετακινηθεί το περιεχόμενο"
+"%s για το δεξί κουμπί ποντικιού"
+
+msgid "Elliptical Selection\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr "Ελλειπτική επιλογή\n\n"
+"%s για το αριστερό κουμπί ποντικιού\n"
+"%s για το δεξί κουμπί ποντικιού"
+
+msgid "Polygonal Selection\n"
+"Double-click to connect the last point to the starting point\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr "Πολυγωνική επιλογή\n"
+"Κάντε διπλό κλικ για να συνδέσετε το τελευταίο σημείο στο σημείο εκκίνησης\n\n"
+"%s για το αριστερό πλήκτρο του ποντικιού\n"
+"%s για το δεξί πλήκτρο του ποντικιού"
+
+msgid "Select By Color\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr "Επιλογή κατά χρώμα\n\n"
+"%s για το αριστερό κουμπί ποντικιού\n"
+"%s για το δεξί κουμπί ποντικιού"
+
+msgid "Magic Wand\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr "Μαγικό ραβδί\n\n"
+"%s για το αριστερό κουμπί ποντικιού\n"
+"%s για το δεξί κουμπί ποντικιού"
+
+msgid "Lasso / Free Select Tool\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr "Ελεύθερη επιλογή\n\n"
+"%s για το αριστερό κουμπί ποντικιού\n"
+"%s για το δεξί κουμπί ποντικιού"
+
+msgid "Move\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr "Μετακίνηση\n\n"
+"%s για το αριστερό κουμπί ποντικιού\n"
+"%s για το δεξί κουμπί ποντικιού"
 
 msgid "Zoom\n\n"
 "%s for left mouse button\n"
@@ -771,9 +849,6 @@ msgstr "Επιλογέας χρωμάτων\n"
 "Επιλέξτε ένα χρώμα από ένα εικονοστοιχείο της εικόνας\n\n"
 "%s για το αριστερό κουμπί ποντικιού\n"
 "%s για το δεξί κουμπί ποντικιού"
-
-msgid "Draw Tools"
-msgstr "Εργαλεία Ζωγραφικής"
 
 msgid "Pencil\n\n"
 "%s for left mouse button\n"
@@ -800,26 +875,51 @@ msgstr "Κουβάς\n\n"
 "%s για το αριστερό κουμπί ποντικιού\n"
 "%s για το δεξί κουμπί ποντικιού"
 
-msgid "Lighten/Darken\n\n"
+msgid "Shading Tool\n\n"
 "%s for left mouse button\n"
 "%s for right mouse button"
-msgstr "Φώτισμα/Σκούρημα\n\n"
+msgstr "Εργαλείο σκίασης\n\n"
 "%s για το αριστερό κουμπί ποντικιού\n"
 "%s για το δεξί κουμπί ποντικιού"
+
+msgid "Line Tool\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button\n\n"
+"Hold %s to snap the angle of the line\n"
+"Hold %s to center the shape on the click origin\n"
+"Hold %s to displace the shape's origin"
+msgstr "Εργαλείο γραμμής\n\n"
+"%s για το αριστερό πλήκτρο του ποντικιού\n"
+"%s για το δεξί πλήκτρο του ποντικιού\n\n"
+"Κρατήστε το %s για να περιορίσετε τη γωνία της γραμμής\n"
+"Κρατήστε το %s για να κεντράρετε το σχήμα στην αρχή του κλικ\n"
+"Κρατήστε το %s για να μετακινήσετε την προέλευση του σχήματος"
 
 msgid "Rectangle Tool\n\n"
 "%s for left mouse button\n"
 "%s for right mouse button\n\n"
 "Hold %s to create a 1:1 shape\n"
 "Hold %s to center the shape on the click origin\n"
-msgstr ""
+"Hold %s to displace the shape's origin"
+msgstr "Ορθογώνιο εργαλείο\n\n"
+"%s για το αριστερό πλήκτρο του ποντικιού\n"
+"%s για το δεξί πλήκτρο του ποντικιού\n\n"
+"Κρατήστε το %s για να δημιουργηθεί ένα 1:1 σχήμα\n"
+"Κρατήστε το %s για να κεντράρετε το σχήμα στην αρχή του κλικ\n"
+"Κρατήστε το %s για να μετακινήσετε την προέλευση του σχήματος"
 
 msgid "Ellipse Tool\n\n"
 "%s for left mouse button\n"
 "%s for right mouse button\n\n"
 "Hold %s to create a 1:1 shape\n"
 "Hold %s to center the shape on the click origin\n"
-msgstr ""
+"Hold %s to displace the shape's origin"
+msgstr "Εργαλείο έλλειψης\n\n"
+"%s για το αριστερό πλήκτρο του ποντικιού\n"
+"%s για το δεξί πλήκτρο του ποντικιού\n\n"
+"Κρατήστε το %s για να δημιουργηθεί ένα 1:1 σχήμα\n"
+"Κρατήστε το %s για να κεντράρετε το σχήμα στην αρχή του κλικ\n"
+"Κρατήστε το %s για να μετακινήσετε την προέλευση του σχήματος"
 
 msgid "Rectangle"
 msgstr "Ορθογώνιο"
@@ -994,6 +1094,15 @@ msgstr "Να ακολουθεί το επίπεδο μεγέθυνσης (ζου
 msgid "The transparent checker follow the zoom level of canvas"
 msgstr "Το διάφανο υποβάθρο - σκακιέρα να ακολουθεί το επίπεδο μεγέθυνσης (ζουμ) του καμβά"
 
+msgid "Animated selection borders"
+msgstr "Κίνηση περιγράμματος επιλογής"
+
+msgid "Border color 1:"
+msgstr "Χρώμα περιγράμματος 1:"
+
+msgid "Border color 2:"
+msgstr "Χρώμα περιγράμματος 2:"
+
 msgid "Only custom preset can be modified"
 msgstr "Μόνο η προσαρμοσμένη προεπιλογή μπορεί να τροποποιηθεί"
 
@@ -1031,13 +1140,16 @@ msgid "Brush size:"
 msgstr "Μέγεθος πινέλου:"
 
 msgid "Overwrite Color"
-msgstr "Αντικατάσταση Χρώματος"
+msgstr "Αντικατάσταση χρώματος"
 
 msgid "Overwrites color instead of blending it. This option is only relevant with colors that are not fully opaque"
 msgstr "Αντικαθιστά το χρώμα αντί να το συνδυάζει. Αυτή η επιλογή σχετίζεται μόνο με χρώματα που δεν είναι πλήρως αδιαφανή"
 
 msgid "Pixel Perfect"
 msgstr "Pixel Perfect"
+
+msgid "Fill inside"
+msgstr "Εσωτερικό γέμισμα"
 
 msgid "Makes lines smooth by removing the extra pixels on the edges"
 msgstr "Κάνει τις γραμμές ομαλές αφαιρώντας τα επιπλέον pixel στα άκρα"
@@ -1046,7 +1158,7 @@ msgid "Fill Shape"
 msgstr "Γέμισμα Σχήματος"
 
 msgid "Fills the drawn shape with color, instead of drawing a hollow shape"
-msgstr ""
+msgstr "Γεμίζει το σχεδιασμένο σχήμα με χρώμα, αντί να σχεδιάστεί ένα άδειο σχήμα"
 
 msgid "Brush color from"
 msgstr "Χρώμα πινέλου από"
@@ -1531,6 +1643,24 @@ msgstr "Προσαρμοσμένο"
 msgid "Rectangular Selection"
 msgstr "Ορθογώνια επιλογή"
 
+msgid "Elliptical Selection"
+msgstr "Ελλειπτική επιλογή"
+
+msgid "Polygonal Selection"
+msgstr "Πολυγωνική επιλογή"
+
+msgid "Select By Color"
+msgstr "Επιλογή κατά χρώμα"
+
+msgid "Magic Wand"
+msgstr "Μαγικό ραβδί"
+
+msgid "Lasso / Free Select Tool"
+msgstr "Ελεύθερη επιλογή"
+
+msgid "Move"
+msgstr "Μετακίνηση"
+
 msgid "Zoom"
 msgstr "Ζουμ"
 
@@ -1549,8 +1679,17 @@ msgstr "Γόμα"
 msgid "Bucket"
 msgstr "Κουβάς"
 
-msgid "Lighten/Darken"
-msgstr "Φώτισμα/Σκούρημα"
+msgid "Shading Tool"
+msgstr "Εργαλείο σκίασης"
+
+msgid "Line Tool"
+msgstr "Εργαλείο γραμμής"
+
+msgid "Rectangle Tool"
+msgstr "Ορθογώνιο εργαλείο"
+
+msgid "Ellipse Tool"
+msgstr "Εργαλείο έλλειψης"
 
 msgid "Switch Colors"
 msgstr "Εναλλαγή χρωμάτων"
@@ -1663,10 +1802,7 @@ msgid "Tiled In Y Axis"
 msgstr "Επανάληψη στον Άξονα Υ"
 
 msgid "Create a new palette"
-msgstr ""
-
-msgid "Create New Palette"
-msgstr ""
+msgstr "Δημιουργία νέας παλέτας"
 
 msgid "Comment:"
 msgstr "Σχόλια:"
@@ -1675,26 +1811,26 @@ msgid "Empty"
 msgstr "Κενή"
 
 msgid "From Current Palette"
-msgstr ""
+msgstr "Από την τρέχουσα παλέτα"
 
 msgid "From Current Sprite"
-msgstr ""
+msgstr "Από την τρέχουσα εικόνα"
 
 msgid "From Current Selection"
-msgstr ""
+msgstr "Από την τρέχουσα επιλογή"
 
 msgid "Add a new color"
-msgstr ""
+msgstr "Προσθήκη νέου χρώματος"
 
 msgid "Remove a selected color"
-msgstr ""
+msgstr "Αφαίρεση επιλεγμένου χρώματος"
 
 msgid "Palette with the same name and path already exists!"
-msgstr ""
+msgstr "Υπάρχει ήδη παλέτα με το ίδιο όνομα και διαδρομή!"
 
 msgid "Palette name is required!"
-msgstr ""
+msgstr "Απαιτείται όνομα παλέτας!"
 
 msgid "Reducing palette size will reset positions of colors. Colors that don't fit in new palette size will be lost!"
-msgstr ""
+msgstr "Η μείωση του μεγέθους της παλέτας θα επηρεάσει τις θέσεις των χρωμάτων. Τα χρώματα που δεν χωρούν στο νέο μέγεθος της παλέτας θα χαθούν!"
 

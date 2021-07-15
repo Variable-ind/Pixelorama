@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
-"PO-Revision-Date: 2021-04-21 07:54\n"
+"PO-Revision-Date: 2021-06-29 21:11\n"
 
 msgid "OK"
 msgstr "OK"
@@ -30,6 +30,9 @@ msgstr "Proszę potwierdzić..."
 msgid "File Name:"
 msgstr "Nazwa pliku:"
 
+msgid "Project Name:"
+msgstr "Nazwa projektu:"
+
 msgid "Image Size"
 msgstr "Rozmiar obrazu"
 
@@ -39,8 +42,8 @@ msgstr "Rozmiar płótna"
 msgid "Frame Size"
 msgstr "Rozmiar klatki"
 
-msgid "Size"
-msgstr "Rozmiar"
+msgid "Size:"
+msgstr "Rozmiar:"
 
 msgid "Width:"
 msgstr "Szerokość:"
@@ -56,6 +59,9 @@ msgstr "Plik"
 
 msgid "Edit"
 msgstr "Edycja"
+
+msgid "Select"
+msgstr "Zaznacz"
 
 msgid "View"
 msgstr "Widok"
@@ -126,6 +132,9 @@ msgstr "Wklej"
 msgid "Delete"
 msgstr "Usuń"
 
+msgid "New Brush"
+msgstr "Nowy pędzel"
+
 msgid "Scale Image"
 msgstr "Skaluj obraz"
 
@@ -147,8 +156,11 @@ msgstr "Wyśrodkuj obraz"
 msgid "Rotate Image"
 msgstr "Obróć obraz"
 
-msgid "Clear Selection"
-msgstr "Wyczyść zaznaczenie"
+msgid "Clear"
+msgstr "Wyczyść"
+
+msgid "Invert"
+msgstr "Odwróć"
 
 msgid "Flip"
 msgstr "Odwróć"
@@ -421,6 +433,9 @@ msgstr "Motywy"
 msgid "Canvas"
 msgstr "Płótno"
 
+msgid "Selection"
+msgstr "Zaznaczanie"
+
 msgid "Shortcuts"
 msgstr "Skróty klawiszowe"
 
@@ -487,8 +502,29 @@ msgstr "Jasny"
 msgid "Purple"
 msgstr "Fioletowy"
 
+msgid "Theme"
+msgstr "Motyw"
+
+msgid "Icon color from:"
+msgstr "Kolor ikony z:"
+
+msgid "Icon color:"
+msgstr "Kolor ikony:"
+
+msgid "Tool button size:"
+msgstr "Rozmiar przycisku narzędzi:"
+
+msgid "Small"
+msgstr "Mały"
+
+msgid "Big"
+msgstr "Duży"
+
 msgid "Only affect selection"
 msgstr "Wpływ tylko na zaznaczenie"
+
+msgid "Selected cels"
+msgstr ""
 
 msgid "Current cel"
 msgstr "Bieżąca komórka"
@@ -676,8 +712,8 @@ msgstr "Arabski"
 msgid "Turkish"
 msgstr "Turecki"
 
-msgid "Norwegian"
-msgstr "Norweski"
+msgid "Norwegian Bokmål"
+msgstr "Norweski (Bokmål)"
 
 msgid "Korean"
 msgstr "Koreański"
@@ -690,6 +726,9 @@ msgstr "Rumuński"
 
 msgid "Japanese"
 msgstr "Japoński"
+
+msgid "Ukrainian"
+msgstr "Ukraiński"
 
 msgid "Development Team"
 msgstr "Zespół developerski"
@@ -736,17 +775,41 @@ msgstr "Zapisz i wyjdź"
 msgid "Exit without saving"
 msgstr "Wyjdź bez zapisywania"
 
-msgid "Utility Tools"
-msgstr "Narzędzia"
-
 msgid "Rectangular Selection\n\n"
 "%s for left mouse button\n"
-"%s for right mouse button\n\n"
-"Press %s to move the content"
-msgstr "Zaznaczenie prostokątne\n\n"
-"%s dla lewego przycisku myszy\n"
-"%s dla prawego przycisku myszy\n\n"
-"Przytrzymaj %s aby przenieść zawartość"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Elliptical Selection\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Polygonal Selection\n"
+"Double-click to connect the last point to the starting point\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Select By Color\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Magic Wand\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Lasso / Free Select Tool\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Move\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
 
 msgid "Zoom\n\n"
 "%s for left mouse button\n"
@@ -770,9 +833,6 @@ msgstr "Próbnik\n"
 "Pobiera kolor wybranego piksela do wybranego narzędzia.\n\n"
 "%s dla lewego przycisku myszy\n"
 "%s dla prawego przycisku myszy"
-
-msgid "Draw Tools"
-msgstr "Narzędzia rysowania"
 
 msgid "Pencil\n\n"
 "%s for left mouse button\n"
@@ -799,34 +859,36 @@ msgstr "Wiaderko\n\n"
 "%s na lewy przycisk myszy\n"
 "%s na prawy przycisk myszy"
 
-msgid "Lighten/Darken\n\n"
+msgid "Shading Tool\n\n"
 "%s for left mouse button\n"
 "%s for right mouse button"
-msgstr "Rozjaśnianie/Ściemnianie\n\n"
+msgstr "Narzędzie cieniowania\n\n"
 "%s na lewy przycisk myszy\n"
 "%s na prawy przycisk myszy"
+
+msgid "Line Tool\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button\n\n"
+"Hold %s to snap the angle of the line\n"
+"Hold %s to center the shape on the click origin\n"
+"Hold %s to displace the shape's origin"
+msgstr ""
 
 msgid "Rectangle Tool\n\n"
 "%s for left mouse button\n"
 "%s for right mouse button\n\n"
 "Hold %s to create a 1:1 shape\n"
 "Hold %s to center the shape on the click origin\n"
-msgstr "Prostokąt\n\n"
-"%s na lewy przycisk myszy\n"
-"%s na prawy przycisk myszy\n\n"
-"Przytrzymaj %s aby stworzyć kwadrat\n"
-"Przytrzymaj %s aby wyśrodkować kształt na źródłowym miejscu kliknięcia\n"
+"Hold %s to displace the shape's origin"
+msgstr ""
 
 msgid "Ellipse Tool\n\n"
 "%s for left mouse button\n"
 "%s for right mouse button\n\n"
 "Hold %s to create a 1:1 shape\n"
 "Hold %s to center the shape on the click origin\n"
-msgstr "Elipsa\n\n"
-"%s na lewy przycisk myszy\n"
-"%s na prawy przycisk myszy\n\n"
-"Przytrzymaj %s aby stworzyć okrąg/koło\n"
-"Przytrzymaj %s aby wyśrodkować kształt na źródłowym miejscu kliknięcia\n"
+"Hold %s to displace the shape's origin"
+msgstr ""
 
 msgid "Rectangle"
 msgstr "Prostokąt"
@@ -1001,6 +1063,15 @@ msgstr "Śledź poziom przybliżenia płótna"
 msgid "The transparent checker follow the zoom level of canvas"
 msgstr "Przezroczysta siatka śledzi poziom przybliżenia płótna"
 
+msgid "Animated selection borders"
+msgstr "Animowana ramka obszaru zaznaczenia"
+
+msgid "Border color 1:"
+msgstr "Kolor obramowania 1:"
+
+msgid "Border color 2:"
+msgstr "Kolor obramowania 2:"
+
 msgid "Only custom preset can be modified"
 msgstr "Tylko niestandardowe ustawienia mogą być modyfikowane"
 
@@ -1045,6 +1116,9 @@ msgstr "Zastępuje kolor zamiast zmieszać się z nim. Ta opcja zadziała tylko 
 
 msgid "Pixel Perfect"
 msgstr "Pixel Perfect"
+
+msgid "Fill inside"
+msgstr "Wypełnij wnętrze"
 
 msgid "Makes lines smooth by removing the extra pixels on the edges"
 msgstr "Sprawia, że linie są gładkie przez usunięcie dodatkowych pikseli na krawędziach"
@@ -1538,6 +1612,24 @@ msgstr "Niestandardowe"
 msgid "Rectangular Selection"
 msgstr "Zaznaczenie prostokątne"
 
+msgid "Elliptical Selection"
+msgstr ""
+
+msgid "Polygonal Selection"
+msgstr ""
+
+msgid "Select By Color"
+msgstr ""
+
+msgid "Magic Wand"
+msgstr ""
+
+msgid "Lasso / Free Select Tool"
+msgstr ""
+
+msgid "Move"
+msgstr ""
+
 msgid "Zoom"
 msgstr "Przybliżenie"
 
@@ -1556,8 +1648,17 @@ msgstr "Gumka"
 msgid "Bucket"
 msgstr "Wiaderko"
 
-msgid "Lighten/Darken"
-msgstr "Rozjaśnianie/Ściemnianie"
+msgid "Shading Tool"
+msgstr "Narzędzie cieniowania"
+
+msgid "Line Tool"
+msgstr ""
+
+msgid "Rectangle Tool"
+msgstr ""
+
+msgid "Ellipse Tool"
+msgstr ""
 
 msgid "Switch Colors"
 msgstr "Zmień kolory"
@@ -1670,9 +1771,6 @@ msgid "Tiled In Y Axis"
 msgstr "Kafelkowanie na osi Y"
 
 msgid "Create a new palette"
-msgstr "Stwórz nową paletę"
-
-msgid "Create New Palette"
 msgstr "Stwórz nową paletę"
 
 msgid "Comment:"

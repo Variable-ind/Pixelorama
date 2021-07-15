@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
-"PO-Revision-Date: 2021-04-16 18:10\n"
+"PO-Revision-Date: 2021-06-29 21:11\n"
 
 msgid "OK"
 msgstr "Onayla"
@@ -30,6 +30,9 @@ msgstr "Lütfen Onaylayın..."
 msgid "File Name:"
 msgstr "Dosya Adı:"
 
+msgid "Project Name:"
+msgstr ""
+
 msgid "Image Size"
 msgstr "Resim Boyutu"
 
@@ -39,7 +42,7 @@ msgstr "Tuval Boyutu"
 msgid "Frame Size"
 msgstr "Çerçeve Boyutu"
 
-msgid "Size"
+msgid "Size:"
 msgstr ""
 
 msgid "Width:"
@@ -56,6 +59,9 @@ msgstr "Dosya"
 
 msgid "Edit"
 msgstr "Düzenle"
+
+msgid "Select"
+msgstr ""
 
 msgid "View"
 msgstr "Görüntü"
@@ -126,6 +132,9 @@ msgstr "Yapıştır"
 msgid "Delete"
 msgstr "Sil"
 
+msgid "New Brush"
+msgstr ""
+
 msgid "Scale Image"
 msgstr "Resmi Ölçüle"
 
@@ -147,8 +156,11 @@ msgstr ""
 msgid "Rotate Image"
 msgstr "Resmi Döndür"
 
-msgid "Clear Selection"
-msgstr "Seçimi Temizle"
+msgid "Clear"
+msgstr ""
+
+msgid "Invert"
+msgstr ""
 
 msgid "Flip"
 msgstr "Döndür"
@@ -422,6 +434,9 @@ msgstr "Temalar"
 msgid "Canvas"
 msgstr "Tuval"
 
+msgid "Selection"
+msgstr ""
+
 msgid "Shortcuts"
 msgstr "Kısayollar"
 
@@ -488,8 +503,29 @@ msgstr "Açık"
 msgid "Purple"
 msgstr "Mor"
 
+msgid "Theme"
+msgstr ""
+
+msgid "Icon color from:"
+msgstr ""
+
+msgid "Icon color:"
+msgstr ""
+
+msgid "Tool button size:"
+msgstr ""
+
+msgid "Small"
+msgstr ""
+
+msgid "Big"
+msgstr ""
+
 msgid "Only affect selection"
 msgstr "Sadece seçilene uygula"
+
+msgid "Selected cels"
+msgstr ""
 
 msgid "Current cel"
 msgstr "Aktif kare"
@@ -677,8 +713,8 @@ msgstr "Arapça"
 msgid "Turkish"
 msgstr "Türkçe"
 
-msgid "Norwegian"
-msgstr "Norveççe"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Korean"
 msgstr "Korece"
@@ -691,6 +727,9 @@ msgstr "Rumence"
 
 msgid "Japanese"
 msgstr "Japonca"
+
+msgid "Ukrainian"
+msgstr ""
 
 msgid "Development Team"
 msgstr "Geliştirici Takımı"
@@ -737,17 +776,41 @@ msgstr "Kaydet & Çık"
 msgid "Exit without saving"
 msgstr "Kaydetmeden çık"
 
-msgid "Utility Tools"
-msgstr "Yardımcı araçlar"
-
 msgid "Rectangular Selection\n\n"
 "%s for left mouse button\n"
-"%s for right mouse button\n\n"
-"Press %s to move the content"
-msgstr "Karesel Seçim\n\n"
-"%s için farenin sol tuşu\n"
-"%s için farenin sağ tuşu\n\n"
-"Taşımak için %s'a basın"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Elliptical Selection\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Polygonal Selection\n"
+"Double-click to connect the last point to the starting point\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Select By Color\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Magic Wand\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Lasso / Free Select Tool\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Move\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
 
 msgid "Zoom\n\n"
 "%s for left mouse button\n"
@@ -768,9 +831,6 @@ msgstr "Damlalık\n\n"
 "Sprite pikselinden bir renk seç\n\n"
 "%s için sol tıkla\n"
 "%s için sağ tıkla"
-
-msgid "Draw Tools"
-msgstr "Çizim Aletleri"
 
 msgid "Pencil\n\n"
 "%s for left mouse button\n"
@@ -797,18 +857,25 @@ msgstr "Kova\n\n"
 "sol fare butonu için %s\n"
 "sağ fare butonu için %s"
 
-msgid "Lighten/Darken\n\n"
+msgid "Shading Tool\n\n"
 "%s for left mouse button\n"
 "%s for right mouse button"
-msgstr "Aydınlatma/Karartma\n\n"
-"Sol tık için %s\n"
-"Sağ tık için %s"
+msgstr ""
+
+msgid "Line Tool\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button\n\n"
+"Hold %s to snap the angle of the line\n"
+"Hold %s to center the shape on the click origin\n"
+"Hold %s to displace the shape's origin"
+msgstr ""
 
 msgid "Rectangle Tool\n\n"
 "%s for left mouse button\n"
 "%s for right mouse button\n\n"
 "Hold %s to create a 1:1 shape\n"
 "Hold %s to center the shape on the click origin\n"
+"Hold %s to displace the shape's origin"
 msgstr ""
 
 msgid "Ellipse Tool\n\n"
@@ -816,6 +883,7 @@ msgid "Ellipse Tool\n\n"
 "%s for right mouse button\n\n"
 "Hold %s to create a 1:1 shape\n"
 "Hold %s to center the shape on the click origin\n"
+"Hold %s to displace the shape's origin"
 msgstr ""
 
 msgid "Rectangle"
@@ -991,6 +1059,15 @@ msgstr "Tuval ölçek seviyesini takip et"
 msgid "The transparent checker follow the zoom level of canvas"
 msgstr "Geçirgen dama deseni tuval ölçek seviyesini takip eder"
 
+msgid "Animated selection borders"
+msgstr ""
+
+msgid "Border color 1:"
+msgstr ""
+
+msgid "Border color 2:"
+msgstr ""
+
 msgid "Only custom preset can be modified"
 msgstr "Sadece özel yapılmış seçenekler değiştirilebilir"
 
@@ -1035,6 +1112,9 @@ msgstr "Renkleri karıştırmak yerine rengin üzerine yazar. Bu seçenek sadece
 
 msgid "Pixel Perfect"
 msgstr "Mükemmel Piksel"
+
+msgid "Fill inside"
+msgstr ""
 
 msgid "Makes lines smooth by removing the extra pixels on the edges"
 msgstr "Çizgileri kenarlardaki fazla pikselleri silerek yumuşatır"
@@ -1524,6 +1604,24 @@ msgstr "Özel"
 msgid "Rectangular Selection"
 msgstr "Dikdörtgen Seçim"
 
+msgid "Elliptical Selection"
+msgstr ""
+
+msgid "Polygonal Selection"
+msgstr ""
+
+msgid "Select By Color"
+msgstr ""
+
+msgid "Magic Wand"
+msgstr ""
+
+msgid "Lasso / Free Select Tool"
+msgstr ""
+
+msgid "Move"
+msgstr ""
+
 msgid "Zoom"
 msgstr "Yakınlaştır"
 
@@ -1542,8 +1640,17 @@ msgstr "Silgi"
 msgid "Bucket"
 msgstr "Kova"
 
-msgid "Lighten/Darken"
-msgstr "Açık/Koyu"
+msgid "Shading Tool"
+msgstr ""
+
+msgid "Line Tool"
+msgstr ""
+
+msgid "Rectangle Tool"
+msgstr ""
+
+msgid "Ellipse Tool"
+msgstr ""
 
 msgid "Switch Colors"
 msgstr "Rekleri Değiştir"
@@ -1655,9 +1762,6 @@ msgid "Tiled In Y Axis"
 msgstr "Y yörüngesinde döşendi"
 
 msgid "Create a new palette"
-msgstr ""
-
-msgid "Create New Palette"
 msgstr ""
 
 msgid "Comment:"

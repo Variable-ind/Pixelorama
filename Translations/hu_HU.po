@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
-"PO-Revision-Date: 2021-04-16 18:10\n"
+"PO-Revision-Date: 2021-06-29 21:11\n"
 
 msgid "OK"
 msgstr "Ok"
@@ -30,6 +30,9 @@ msgstr "Kérlek, erősítsd meg..."
 msgid "File Name:"
 msgstr "Fájlnév:"
 
+msgid "Project Name:"
+msgstr "Projekt neve:"
+
 msgid "Image Size"
 msgstr "Képméret"
 
@@ -39,8 +42,8 @@ msgstr "Vászon mérete"
 msgid "Frame Size"
 msgstr "Keretméret"
 
-msgid "Size"
-msgstr ""
+msgid "Size:"
+msgstr "Méret:"
 
 msgid "Width:"
 msgstr "Szélesség:"
@@ -56,6 +59,9 @@ msgstr "Fájl"
 
 msgid "Edit"
 msgstr "Szerkeszt"
+
+msgid "Select"
+msgstr "Kiválasztás"
 
 msgid "View"
 msgstr "Nézet"
@@ -126,6 +132,9 @@ msgstr "Beillesztés"
 msgid "Delete"
 msgstr "Törlés"
 
+msgid "New Brush"
+msgstr "Új ecset"
+
 msgid "Scale Image"
 msgstr "Kép átméretezése"
 
@@ -147,8 +156,11 @@ msgstr ""
 msgid "Rotate Image"
 msgstr "Kép forgatása"
 
-msgid "Clear Selection"
-msgstr "Kijelölés törlése"
+msgid "Clear"
+msgstr "Törlés"
+
+msgid "Invert"
+msgstr "Invertálás"
 
 msgid "Flip"
 msgstr "Átfordítás"
@@ -422,6 +434,9 @@ msgstr "Témák"
 msgid "Canvas"
 msgstr "Vászon"
 
+msgid "Selection"
+msgstr ""
+
 msgid "Shortcuts"
 msgstr "Gyorsbillentyűk"
 
@@ -488,7 +503,28 @@ msgstr "Világos"
 msgid "Purple"
 msgstr "Lila"
 
+msgid "Theme"
+msgstr "Téma"
+
+msgid "Icon color from:"
+msgstr ""
+
+msgid "Icon color:"
+msgstr "Ikon színe:"
+
+msgid "Tool button size:"
+msgstr ""
+
+msgid "Small"
+msgstr "Kicsi"
+
+msgid "Big"
+msgstr "Nagy"
+
 msgid "Only affect selection"
+msgstr ""
+
+msgid "Selected cels"
 msgstr ""
 
 msgid "Current cel"
@@ -677,8 +713,8 @@ msgstr "Arab"
 msgid "Turkish"
 msgstr "Török"
 
-msgid "Norwegian"
-msgstr "Norvég"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Korean"
 msgstr "Koreai"
@@ -691,6 +727,9 @@ msgstr "Román"
 
 msgid "Japanese"
 msgstr "Japán"
+
+msgid "Ukrainian"
+msgstr ""
 
 msgid "Development Team"
 msgstr "Fejlesztő csapat"
@@ -737,17 +776,41 @@ msgstr "Mentés és kilépés"
 msgid "Exit without saving"
 msgstr "Kilépés mentés nélkül"
 
-msgid "Utility Tools"
-msgstr "Segédprogramok"
-
 msgid "Rectangular Selection\n\n"
 "%s for left mouse button\n"
-"%s for right mouse button\n\n"
-"Press %s to move the content"
-msgstr "Téglalap alakú kijelölés\n\n"
-"%s a bal egérgombbal\n"
-"%s a jobb egérgombbal\n\n"
-"A %s gombot a tartalom mozgatáshoz"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Elliptical Selection\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Polygonal Selection\n"
+"Double-click to connect the last point to the starting point\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Select By Color\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Magic Wand\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Lasso / Free Select Tool\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
+
+msgid "Move\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr ""
 
 msgid "Zoom\n\n"
 "%s for left mouse button\n"
@@ -769,9 +832,6 @@ msgstr "Színválasztó\n"
 "Válasz egy színt egy pixeléből a sprite-nak\n\n"
 "%s a bal egérgombbal\n"
 "%s a jobb egérgombbal"
-
-msgid "Draw Tools"
-msgstr "Rajzeszözök"
 
 msgid "Pencil\n\n"
 "%s for left mouse button\n"
@@ -798,18 +858,25 @@ msgstr "Vödör\n\n"
 "%s a bal egérgombbal\n"
 "%s a jobb egérgombbal"
 
-msgid "Lighten/Darken\n\n"
+msgid "Shading Tool\n\n"
 "%s for left mouse button\n"
 "%s for right mouse button"
-msgstr "Világosítás/Sötétítés\n\n"
-"%s a bal egérgombbal\n"
-"%s a jobb egérgombbal"
+msgstr ""
+
+msgid "Line Tool\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button\n\n"
+"Hold %s to snap the angle of the line\n"
+"Hold %s to center the shape on the click origin\n"
+"Hold %s to displace the shape's origin"
+msgstr ""
 
 msgid "Rectangle Tool\n\n"
 "%s for left mouse button\n"
 "%s for right mouse button\n\n"
 "Hold %s to create a 1:1 shape\n"
 "Hold %s to center the shape on the click origin\n"
+"Hold %s to displace the shape's origin"
 msgstr ""
 
 msgid "Ellipse Tool\n\n"
@@ -817,13 +884,14 @@ msgid "Ellipse Tool\n\n"
 "%s for right mouse button\n\n"
 "Hold %s to create a 1:1 shape\n"
 "Hold %s to center the shape on the click origin\n"
+"Hold %s to displace the shape's origin"
 msgstr ""
 
 msgid "Rectangle"
-msgstr ""
+msgstr "Téglalap"
 
 msgid "Ellipse"
-msgstr ""
+msgstr "Ellipszis"
 
 msgid "Choose a color for the left tool"
 msgstr "Szín kiválasztása a bal eszközhöz"
@@ -900,7 +968,7 @@ msgid "Rectangular grid width:"
 msgstr ""
 
 msgid "Sets how far apart are vertical lines of the rectangular grid"
-msgstr ""
+msgstr "Beállítja, hogy a rács függőleges vonalai milyen távolságra legyenek egymástól"
 
 msgid "Rectangular grid height:"
 msgstr ""
@@ -992,6 +1060,15 @@ msgstr ""
 msgid "The transparent checker follow the zoom level of canvas"
 msgstr "Az átlátszó négyzetháló követi a vászon nagyítási szintjét"
 
+msgid "Animated selection borders"
+msgstr ""
+
+msgid "Border color 1:"
+msgstr "Szegély szín 1:"
+
+msgid "Border color 2:"
+msgstr "Szegély szín 2:"
+
 msgid "Only custom preset can be modified"
 msgstr "Csak az egyedi beállítások módosíthatók"
 
@@ -1037,11 +1114,14 @@ msgstr "Keverés helyett felülírja a színt. Ez az opció csak nem teljesen á
 msgid "Pixel Perfect"
 msgstr "Pixel Perfect"
 
+msgid "Fill inside"
+msgstr ""
+
 msgid "Makes lines smooth by removing the extra pixels on the edges"
 msgstr "A vonalakat simává teszi azáltal, hogy eltávolítja a széleken lévő extra képpontokat"
 
 msgid "Fill Shape"
-msgstr ""
+msgstr "Alakzat kitöltése"
 
 msgid "Fills the drawn shape with color, instead of drawing a hollow shape"
 msgstr ""
@@ -1529,6 +1609,24 @@ msgstr "Egyéni"
 msgid "Rectangular Selection"
 msgstr "Téglalap alakú kijelölés"
 
+msgid "Elliptical Selection"
+msgstr ""
+
+msgid "Polygonal Selection"
+msgstr ""
+
+msgid "Select By Color"
+msgstr ""
+
+msgid "Magic Wand"
+msgstr ""
+
+msgid "Lasso / Free Select Tool"
+msgstr ""
+
+msgid "Move"
+msgstr ""
+
 msgid "Zoom"
 msgstr "Nagyít/kicsinyít"
 
@@ -1547,8 +1645,17 @@ msgstr "Radír"
 msgid "Bucket"
 msgstr "Vödör"
 
-msgid "Lighten/Darken"
-msgstr "Világosítás/Sötétítés"
+msgid "Shading Tool"
+msgstr ""
+
+msgid "Line Tool"
+msgstr ""
+
+msgid "Rectangle Tool"
+msgstr ""
+
+msgid "Ellipse Tool"
+msgstr ""
 
 msgid "Switch Colors"
 msgstr "Színek cserélése"
@@ -1663,35 +1770,32 @@ msgstr ""
 msgid "Create a new palette"
 msgstr ""
 
-msgid "Create New Palette"
-msgstr ""
-
 msgid "Comment:"
-msgstr ""
+msgstr "Megjegyzés:"
 
 msgid "Empty"
-msgstr ""
+msgstr "Üres"
 
 msgid "From Current Palette"
-msgstr ""
+msgstr "Jelenlegi palettából"
 
 msgid "From Current Sprite"
-msgstr ""
+msgstr "Az aktuális képből"
 
 msgid "From Current Selection"
 msgstr ""
 
 msgid "Add a new color"
-msgstr ""
+msgstr "Új szín hozzáadása"
 
 msgid "Remove a selected color"
-msgstr ""
+msgstr "Kiválasztott szín törlése"
 
 msgid "Palette with the same name and path already exists!"
 msgstr ""
 
 msgid "Palette name is required!"
-msgstr ""
+msgstr "Palettanév megadása szükséges!"
 
 msgid "Reducing palette size will reset positions of colors. Colors that don't fit in new palette size will be lost!"
 msgstr ""

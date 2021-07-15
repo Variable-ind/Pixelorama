@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
-"PO-Revision-Date: 2021-04-16 19:21\n"
+"PO-Revision-Date: 2021-06-29 22:50\n"
 
 msgid "OK"
 msgstr "OK"
@@ -30,6 +30,9 @@ msgstr "Per favore conferma..."
 msgid "File Name:"
 msgstr "Nome File:"
 
+msgid "Project Name:"
+msgstr "Nome Progetto:"
+
 msgid "Image Size"
 msgstr "Dimensione dell'immagine"
 
@@ -39,8 +42,8 @@ msgstr "Dimensione Canvas"
 msgid "Frame Size"
 msgstr "Dimensione Frame"
 
-msgid "Size"
-msgstr "Dimensione"
+msgid "Size:"
+msgstr "Dimensione:"
 
 msgid "Width:"
 msgstr "Larghezza:"
@@ -56,6 +59,9 @@ msgstr "File"
 
 msgid "Edit"
 msgstr "Modifica"
+
+msgid "Select"
+msgstr "Selezione"
 
 msgid "View"
 msgstr "Vista"
@@ -126,6 +132,9 @@ msgstr "Incolla"
 msgid "Delete"
 msgstr "Elimina"
 
+msgid "New Brush"
+msgstr "Nuovo Pennello"
+
 msgid "Scale Image"
 msgstr "Scala l'immagine"
 
@@ -147,8 +156,11 @@ msgstr "Centralizza Immagine"
 msgid "Rotate Image"
 msgstr "Ruota Immagine"
 
-msgid "Clear Selection"
-msgstr "Pulisci selezione"
+msgid "Clear"
+msgstr "Cancella"
+
+msgid "Invert"
+msgstr "Inverti"
 
 msgid "Flip"
 msgstr "Rifletti"
@@ -422,6 +434,9 @@ msgstr "Temi"
 msgid "Canvas"
 msgstr "Canvas"
 
+msgid "Selection"
+msgstr "Selezione"
+
 msgid "Shortcuts"
 msgstr "Scorciatoie da tastiera"
 
@@ -488,8 +503,29 @@ msgstr "Chiaro"
 msgid "Purple"
 msgstr "Viola"
 
+msgid "Theme"
+msgstr "Tema"
+
+msgid "Icon color from:"
+msgstr "Colore icona da:"
+
+msgid "Icon color:"
+msgstr "Colore dell'icona:"
+
+msgid "Tool button size:"
+msgstr "Dimensione del pulsante dello strumento:"
+
+msgid "Small"
+msgstr "Piccolo"
+
+msgid "Big"
+msgstr "Grande"
+
 msgid "Only affect selection"
 msgstr "Influire solo sulla selezione"
+
+msgid "Selected cels"
+msgstr "Celle selezionate"
 
 msgid "Current cel"
 msgstr "Pacchetto corrente"
@@ -677,8 +713,8 @@ msgstr "Arabo"
 msgid "Turkish"
 msgstr "Turco"
 
-msgid "Norwegian"
-msgstr "Norvegese"
+msgid "Norwegian Bokmål"
+msgstr "Bokmål norvegese"
 
 msgid "Korean"
 msgstr "Coreano"
@@ -691,6 +727,9 @@ msgstr "Rumeno"
 
 msgid "Japanese"
 msgstr "Giapponese"
+
+msgid "Ukrainian"
+msgstr "Ucraino"
 
 msgid "Development Team"
 msgstr "Team di sviluppo"
@@ -737,17 +776,56 @@ msgstr "Salva ed esci"
 msgid "Exit without saving"
 msgstr "Esci senza salvare"
 
-msgid "Utility Tools"
-msgstr "Strumenti di utilità"
-
 msgid "Rectangular Selection\n\n"
 "%s for left mouse button\n"
-"%s for right mouse button\n\n"
-"Press %s to move the content"
-msgstr "Selezione Rettangolare\n\n"
+"%s for right mouse button"
+msgstr "Selezione rettangolare\n\n"
 "%s per il tasto sinistro del mouse\n"
-"%s per il tasto destro del mouse\n\n"
-"Premi %s per muovere il contenuto"
+"%s per il tasto destro del mouse"
+
+msgid "Elliptical Selection\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr "Selezione ellittica\n\n"
+"%s per il pulsante sinistro del mouse\n"
+"%s per il tasto destro del mouse"
+
+msgid "Polygonal Selection\n"
+"Double-click to connect the last point to the starting point\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr "Selezione poligonale\n"
+"Doppio clic per collegare l'ultimo punto al punto di partenza\n\n"
+"%s per il tasto sinistro del mouse\n"
+"%s per il pulsante destro del mouse"
+
+msgid "Select By Color\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr "Seleziona per colore\n\n"
+"%s per il pulsante sinistro del mouse\n"
+"%s per il tasto destro del mouse"
+
+msgid "Magic Wand\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr "Bacchetta Magica\n\n"
+"%s per il tasto sinistro del mouse\n"
+"%s per il tasto destro del mouse"
+
+msgid "Lasso / Free Select Tool\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr "Lasso / Strumento di selezione gratuita\n\n"
+"%s per il tasto sinistro del mouse\n"
+"%s per il tasto destro del mouse"
+
+msgid "Move\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button"
+msgstr "Muovi\n\n"
+"%s per il tasto sinistro del mouse\n"
+"%s per il pulsante destro del mouse"
 
 msgid "Zoom\n\n"
 "%s for left mouse button\n"
@@ -771,9 +849,6 @@ msgstr "Selettore colore\n"
 "Seleziona un colore da un pixel dello sprite\n\n"
 "%s per il tasto sinistro del mouse\n"
 "%s per il tasto destro del mouse"
-
-msgid "Draw Tools"
-msgstr "Strumenti di disegno"
 
 msgid "Pencil\n\n"
 "%s for left mouse button\n"
@@ -800,34 +875,51 @@ msgstr "Secchio\n\n"
 "%s per il tasto sinistro del mouse\n"
 "%s per il tasto destro del mouse"
 
-msgid "Lighten/Darken\n\n"
+msgid "Shading Tool\n\n"
 "%s for left mouse button\n"
 "%s for right mouse button"
-msgstr "Schiarisci/Scurisci\n\n"
+msgstr "Strumento ombreggiatura\n\n"
+"%s per il pulsante sinistro del mouse\n"
+"%s per il pulsante destro del mouse"
+
+msgid "Line Tool\n\n"
+"%s for left mouse button\n"
+"%s for right mouse button\n\n"
+"Hold %s to snap the angle of the line\n"
+"Hold %s to center the shape on the click origin\n"
+"Hold %s to displace the shape's origin"
+msgstr "Strumento linea\n\n"
 "%s per il tasto sinistro del mouse\n"
-"%s per il tasto destro del mouse"
+"%s per il tasto destro del mouse\n\n"
+"Tieni premuto %s per agganciare l'angolo della riga\n"
+"Tieni premuto %s per centrare la forma sull'origine del clic\n"
+"Tieni premuto %s per spostare l'origine della forma"
 
 msgid "Rectangle Tool\n\n"
 "%s for left mouse button\n"
 "%s for right mouse button\n\n"
 "Hold %s to create a 1:1 shape\n"
 "Hold %s to center the shape on the click origin\n"
+"Hold %s to displace the shape's origin"
 msgstr "Strumento rettangolo\n\n"
 "%s per il tasto sinistro del mouse\n"
-"%s per il tasto destro del mouse\n\n"
+"%s per il pulsante destro del mouse\n\n"
 "Tieni premuto %s per creare una forma 1:1\n"
 "Tieni premuto %s per centrare la forma sull'origine del clic\n"
+"Tieni premuto %s per spostare l'origine della forma"
 
 msgid "Ellipse Tool\n\n"
 "%s for left mouse button\n"
 "%s for right mouse button\n\n"
 "Hold %s to create a 1:1 shape\n"
 "Hold %s to center the shape on the click origin\n"
-msgstr "Strumento rettangolo\n\n"
+"Hold %s to displace the shape's origin"
+msgstr "Strumento Ellisse\n\n"
 "%s per il tasto sinistro del mouse\n"
-"%s per il tasto destro del mouse\n\n"
+"%s per il pulsante destro del mouse\n\n"
 "Tieni premuto %s per creare una forma 1:1\n"
 "Tieni premuto %s per centrare la forma sull'origine del clic\n"
+"Tieni premuto %s per spostare l'origine della forma"
 
 msgid "Rectangle"
 msgstr "Rettangolo"
@@ -1002,6 +1094,15 @@ msgstr "Segui il Livello di Zoom del canvas"
 msgid "The transparent checker follow the zoom level of canvas"
 msgstr "Il checker trasparente segue il livello di zoom del canvas"
 
+msgid "Animated selection borders"
+msgstr "Bordi selezione animati"
+
+msgid "Border color 1:"
+msgstr "Colore bordo 1:"
+
+msgid "Border color 2:"
+msgstr "Colore bordo 2:"
+
 msgid "Only custom preset can be modified"
 msgstr "Solo il preset personalizzato può essere modificato"
 
@@ -1046,6 +1147,9 @@ msgstr "Sovrascrive il colore invece di sfumarlo. Questa opzione è rilevante so
 
 msgid "Pixel Perfect"
 msgstr "Pixel Perfect"
+
+msgid "Fill inside"
+msgstr "Riempi all'interno"
 
 msgid "Makes lines smooth by removing the extra pixels on the edges"
 msgstr "Rende le linee lisce rimuovendo i pixel aggiuntivi sui bordi"
@@ -1539,6 +1643,24 @@ msgstr "Personalizzato"
 msgid "Rectangular Selection"
 msgstr "Selezione rettangolare"
 
+msgid "Elliptical Selection"
+msgstr "Selezione Ellittica"
+
+msgid "Polygonal Selection"
+msgstr "Selezione Poligonale"
+
+msgid "Select By Color"
+msgstr "Seleziona Per Colore"
+
+msgid "Magic Wand"
+msgstr "Bacchetta Magica"
+
+msgid "Lasso / Free Select Tool"
+msgstr "Lasso / Strumento di selezione libera"
+
+msgid "Move"
+msgstr "Muovi"
+
 msgid "Zoom"
 msgstr "Zoom"
 
@@ -1557,8 +1679,17 @@ msgstr "Gomma"
 msgid "Bucket"
 msgstr "Secchio"
 
-msgid "Lighten/Darken"
-msgstr "Schiarisci/Scurisci"
+msgid "Shading Tool"
+msgstr "Strumento Ombreggiatura"
+
+msgid "Line Tool"
+msgstr "Strumento Linea"
+
+msgid "Rectangle Tool"
+msgstr "Rettangolo"
+
+msgid "Ellipse Tool"
+msgstr "Strumento Ellissi"
 
 msgid "Switch Colors"
 msgstr "Inverti Colori"
@@ -1672,9 +1803,6 @@ msgstr "Piastrellato Nell'Asse Y"
 
 msgid "Create a new palette"
 msgstr "Crea una nuova tavolozza"
-
-msgid "Create New Palette"
-msgstr "Crea Nuova Tavolozza"
 
 msgid "Comment:"
 msgstr "Commento:"

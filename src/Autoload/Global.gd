@@ -7,6 +7,9 @@ enum Direction {UP, DOWN, LEFT, RIGHT}
 enum ThemeTypes {DARK, BLUE, CARAMEL, LIGHT}
 enum TileMode {NONE, BOTH, X_AXIS, Y_AXIS}
 enum PanelLayout {AUTO, WIDESCREEN, TALLSCREEN}
+enum IconColorFrom {THEME, CUSTOM}
+enum ButtonSize {SMALL, BIG}
+
 # Stuff for arrowkey-based canvas movements nyaa ^.^
 const low_speed_move_rate := 150.0
 const medium_speed_move_rate := 750.0
@@ -34,9 +37,9 @@ var key_move_press_time := [0.0, 0.0, 0.0, 0.0]
 var layers_changed_skip := false
 var can_draw := false
 var has_focus := false
-var cursor_image = preload("res://assets/graphics/cursor_icons/cursor.png")
-var left_cursor_tool_texture := ImageTexture.new()
-var right_cursor_tool_texture := ImageTexture.new()
+var cursor_image = preload("res://assets/graphics/cursor.png")
+var left_cursor_tool_texture := StreamTexture.new()
+var right_cursor_tool_texture := StreamTexture.new()
 
 var image_clipboard : Image
 var play_only_tags := true
@@ -47,10 +50,16 @@ var default_clear_color := Color.gray
 # Preferences
 var pressure_sensitivity_mode = PressureSensitivity.NONE
 var open_last_project := false
+var smooth_zoom := true
+
 var shrink := 1.0
 var dim_on_popup := true
-var smooth_zoom := true
 var theme_type : int = ThemeTypes.DARK
+var modulate_icon_color := Color.gray
+var icon_color_from : int = IconColorFrom.THEME
+var custom_icon_color := Color.gray
+var tool_button_size : int = ButtonSize.SMALL
+
 var default_image_width := 64
 var default_image_height := 64
 var default_fill_color := Color(0, 0, 0, 0)
@@ -72,6 +81,11 @@ var checker_color_2 := Color(0.34, 0.35, 0.34, 1)
 var checker_follow_movement := false
 var checker_follow_scale := false
 var tilemode_opacity := 1.0
+
+var selection_animated_borders := true
+var selection_border_color_1 := Color.white
+var selection_border_color_2 := Color.black
+
 var fps_limit_focus := true
 var fps_limit := 0
 
@@ -197,27 +211,27 @@ func _ready() -> void:
 	image_clipboard = Image.new()
 	Input.set_custom_mouse_cursor(cursor_image, Input.CURSOR_CROSS, Vector2(15, 15))
 
-	var root = get_tree().get_root()
-	control = find_node_by_name(root, "Control")
+	var root : Node = get_tree().get_root()
+	control = root.get_node("Control")
 
-	top_menu_container = find_node_by_name(control, "TopMenuContainer")
-	left_cursor = find_node_by_name(root, "LeftCursor")
-	right_cursor = find_node_by_name(root, "RightCursor")
-	canvas = find_node_by_name(root, "Canvas")
+	top_menu_container = control.find_node("TopMenuContainer")
+	left_cursor = control.find_node("LeftCursor")
+	right_cursor = control.find_node("RightCursor")
+	canvas = control.find_node("Canvas")
 
-	tabs = find_node_by_name(root, "Tabs")
-	main_viewport = find_node_by_name(root, "ViewportContainer")
-	second_viewport = find_node_by_name(root, "ViewportContainer2")
-	small_preview_viewport = find_node_by_name(root, "PreviewViewportContainer")
-	camera = find_node_by_name(main_viewport, "Camera2D")
-	camera2 = find_node_by_name(root, "Camera2D2")
-	camera_preview = find_node_by_name(root, "CameraPreview")
-	horizontal_ruler = find_node_by_name(root, "HorizontalRuler")
-	vertical_ruler = find_node_by_name(root, "VerticalRuler")
-	transparent_checker = find_node_by_name(root, "TransparentChecker")
+	tabs = control.find_node("Tabs")
+	main_viewport = control.find_node("ViewportContainer")
+	second_viewport = control.find_node("ViewportContainer2")
+	small_preview_viewport = control.find_node("PreviewViewportContainer")
+	camera = main_viewport.find_node("Camera2D")
+	camera2 = control.find_node("Camera2D2")
+	camera_preview = control.find_node("CameraPreview")
+	horizontal_ruler = control.find_node("HorizontalRuler")
+	vertical_ruler = control.find_node("VerticalRuler")
+	transparent_checker = control.find_node("TransparentChecker")
 
-	cursor_position_label = find_node_by_name(root, "CursorPosition")
-	zoom_level_label = find_node_by_name(root, "ZoomLevel")
+	cursor_position_label = control.find_node("CursorPosition")
+	zoom_level_label = control.find_node("ZoomLevel")
 
 	tool_panel = control.find_node("ToolPanel")
 	right_panel = control.find_node("RightPanel")
@@ -259,70 +273,57 @@ func _ready() -> void:
 	panel_layout_submenu.hide_on_checkable_item_selection = false
 	panel_layout_submenu.set_item_checked(panel_layout, true)
 
-	new_image_dialog = find_node_by_name(root, "CreateNewImage")
-	open_sprites_dialog = find_node_by_name(root, "OpenSprite")
-	save_sprites_dialog = find_node_by_name(root, "SaveSprite")
-	save_sprites_html5_dialog = find_node_by_name(root, "SaveSpriteHTML5")
-	export_dialog = find_node_by_name(root, "ExportDialog")
-	preferences_dialog = find_node_by_name(root, "PreferencesDialog")
-	unsaved_changes_dialog = find_node_by_name(root, "UnsavedCanvasDialog")
+	new_image_dialog = control.find_node("CreateNewImage")
+	open_sprites_dialog = control.find_node("OpenSprite")
+	save_sprites_dialog = control.find_node("SaveSprite")
+	save_sprites_html5_dialog = control.find_node("SaveSpriteHTML5")
+	export_dialog = control.find_node("ExportDialog")
+	preferences_dialog = control.find_node("PreferencesDialog")
+	unsaved_changes_dialog = control.find_node("UnsavedCanvasDialog")
 
-	color_switch_button = find_node_by_name(root, "ColorSwitch")
+	color_switch_button = control.find_node("ColorSwitch")
 
-	brushes_popup = find_node_by_name(root, "BrushesPopup")
-	patterns_popup = find_node_by_name(root, "PatternsPopup")
+	brushes_popup = control.find_node("BrushesPopup")
+	patterns_popup = control.find_node("PatternsPopup")
 
-	animation_timeline = find_node_by_name(root, "AnimationTimeline")
-	frame_properties = find_node_by_name(root, "FrameProperties")
+	animation_timeline = control.find_node("AnimationTimeline")
+	frame_properties = control.find_node("FrameProperties")
 
-	layers_container = find_node_by_name(animation_timeline, "LayersContainer")
-	frames_container = find_node_by_name(animation_timeline, "FramesContainer")
-	animation_timer = find_node_by_name(animation_timeline, "AnimationTimer")
-	frame_ids = find_node_by_name(animation_timeline, "FrameIDs")
-	current_frame_mark_label = find_node_by_name(control, "CurrentFrameMark")
-	onion_skinning_button = find_node_by_name(animation_timeline, "OnionSkinning")
-	loop_animation_button = find_node_by_name(animation_timeline, "LoopAnim")
-	play_forward = find_node_by_name(animation_timeline, "PlayForward")
-	play_backwards = find_node_by_name(animation_timeline, "PlayBackwards")
-	tag_container = find_node_by_name(animation_timeline, "TagContainer")
-	tag_dialog = find_node_by_name(animation_timeline, "FrameTagDialog")
+	layers_container = animation_timeline.find_node("LayersContainer")
+	frames_container = animation_timeline.find_node("FramesContainer")
+	animation_timer = animation_timeline.find_node("AnimationTimer")
+	frame_ids = animation_timeline.find_node("FrameIDs")
+	current_frame_mark_label = control.find_node("CurrentFrameMark")
+	onion_skinning_button = animation_timeline.find_node("OnionSkinning")
+	loop_animation_button = animation_timeline.find_node("LoopAnim")
+	play_forward = animation_timeline.find_node("PlayForward")
+	play_backwards = animation_timeline.find_node("PlayBackwards")
+	tag_container = animation_timeline.find_node("TagContainer")
+	tag_dialog = animation_timeline.find_node("FrameTagDialog")
 
-	remove_frame_button = find_node_by_name(animation_timeline, "DeleteFrame")
-	move_left_frame_button = find_node_by_name(animation_timeline, "MoveLeft")
-	move_right_frame_button = find_node_by_name(animation_timeline, "MoveRight")
+	remove_frame_button = animation_timeline.find_node("DeleteFrame")
+	move_left_frame_button = animation_timeline.find_node("MoveLeft")
+	move_right_frame_button = animation_timeline.find_node("MoveRight")
 
-	remove_layer_button = find_node_by_name(animation_timeline, "RemoveLayer")
-	move_up_layer_button = find_node_by_name(animation_timeline, "MoveUpLayer")
-	move_down_layer_button = find_node_by_name(animation_timeline, "MoveDownLayer")
-	merge_down_layer_button = find_node_by_name(animation_timeline, "MergeDownLayer")
+	remove_layer_button = animation_timeline.find_node("RemoveLayer")
+	move_up_layer_button = animation_timeline.find_node("MoveUpLayer")
+	move_down_layer_button = animation_timeline.find_node("MoveDownLayer")
+	merge_down_layer_button = animation_timeline.find_node("MergeDownLayer")
 
-	layer_opacity_slider = find_node_by_name(animation_timeline, "OpacitySlider")
-	layer_opacity_spinbox = find_node_by_name(animation_timeline, "OpacitySpinBox")
+	layer_opacity_slider = animation_timeline.find_node("OpacitySlider")
+	layer_opacity_spinbox = animation_timeline.find_node("OpacitySpinBox")
 
-	preview_zoom_slider = find_node_by_name(root, "PreviewZoomSlider")
+	preview_zoom_slider = control.find_node("PreviewZoomSlider")
 
-	palette_panel = find_node_by_name(root, "PalettePanel")
+	palette_panel = control.find_node("PalettePanel")
 
-	error_dialog = find_node_by_name(root, "ErrorDialog")
-	quit_dialog = find_node_by_name(root, "QuitDialog")
-	quit_and_save_dialog = find_node_by_name(root, "QuitAndSaveDialog")
+	error_dialog = control.find_node("ErrorDialog")
+	quit_dialog = control.find_node("QuitDialog")
+	quit_and_save_dialog = control.find_node("QuitAndSaveDialog")
 
 	projects.append(Project.new())
 	projects[0].layers.append(Layer.new())
 	current_project = projects[0]
-
-
-# Thanks to https://godotengine.org/qa/17524/how-to-find-an-instanced-scene-by-its-name
-func find_node_by_name(root : Node, node_name : String) -> Node:
-	if root.get_name() == node_name:
-		return root
-	for child in root.get_children():
-		if child.get_name() == node_name:
-			return child
-		var found = find_node_by_name(child, node_name)
-		if found:
-			return found
-	return null
 
 
 func notification_label(text : String) -> void:
@@ -448,16 +449,12 @@ func disable_button(button : BaseButton, disable : bool) -> void:
 		button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 
 	if button is Button:
-		var theme := theme_type
-		if theme == ThemeTypes.CARAMEL:
-			theme = ThemeTypes.DARK
 		for c in button.get_children():
 			if c is TextureRect:
-				var normal_file_name = c.texture.resource_path.get_file().trim_suffix(".png").replace("_disabled", "")
 				if disable:
-					change_button_texturerect(c, "%s_disabled.png" % normal_file_name)
+					c.modulate.a = 0.5
 				else:
-					change_button_texturerect(c, "%s.png" % normal_file_name)
+					c.modulate.a = 1
 				break
 
 
@@ -468,8 +465,7 @@ func change_button_texturerect(texture_button : TextureRect, new_file_name : Str
 
 
 func update_hint_tooltips() -> void:
-	var root = control
-	var tool_buttons = root.find_node("ToolButtons")
+	var tool_buttons = control.find_node("ToolButtons")
 
 	var rect_select : BaseButton = tool_buttons.find_node("RectSelect")
 	rect_select.hint_tooltip = tr("""Rectangular Selection
@@ -486,6 +482,7 @@ func update_hint_tooltips() -> void:
 
 	var polygon_select : BaseButton = tool_buttons.find_node("PolygonSelect")
 	polygon_select.hint_tooltip = tr("""Polygonal Selection
+Double-click to connect the last point to the starting point
 
 %s for left mouse button
 %s for right mouse button""") % [InputMap.get_action_list("left_polygon_select_tool")[0].as_text(), InputMap.get_action_list("right_polygon_select_tool")[0].as_text()]
@@ -519,26 +516,26 @@ func update_hint_tooltips() -> void:
 %s for right mouse button""") % [InputMap.get_action_list("left_move_tool")[0].as_text(), InputMap.get_action_list("right_move_tool")[0].as_text()]
 
 
-	var zoom_tool : BaseButton = find_node_by_name(root, "Zoom")
+	var zoom_tool : BaseButton = tool_buttons.find_node("Zoom")
 	zoom_tool.hint_tooltip = tr("""Zoom
 
 %s for left mouse button
 %s for right mouse button""") % [InputMap.get_action_list("left_zoom_tool")[0].as_text(), InputMap.get_action_list("right_zoom_tool")[0].as_text()]
 
-	var pan_tool : BaseButton = find_node_by_name(root, "Pan")
+	var pan_tool : BaseButton = tool_buttons.find_node("Pan")
 	pan_tool.hint_tooltip = tr("""Pan
 
 %s for left mouse button
 %s for right mouse button""") % [InputMap.get_action_list("left_pan_tool")[0].as_text(), InputMap.get_action_list("right_pan_tool")[0].as_text()]
 
-	var color_picker : BaseButton = find_node_by_name(root, "ColorPicker")
+	var color_picker : BaseButton = tool_buttons.find_node("ColorPicker")
 	color_picker.hint_tooltip = tr("""Color Picker
 Select a color from a pixel of the sprite
 
 %s for left mouse button
 %s for right mouse button""") % [InputMap.get_action_list("left_colorpicker_tool")[0].as_text(), InputMap.get_action_list("right_colorpicker_tool")[0].as_text()]
 
-	var pencil : BaseButton = find_node_by_name(root, "Pencil")
+	var pencil : BaseButton = tool_buttons.find_node("Pencil")
 	pencil.hint_tooltip = tr("""Pencil
 
 %s for left mouse button
@@ -546,7 +543,7 @@ Select a color from a pixel of the sprite
 
 Hold %s to make a line""") % [InputMap.get_action_list("left_pencil_tool")[0].as_text(), InputMap.get_action_list("right_pencil_tool")[0].as_text(), "Shift"]
 
-	var eraser : BaseButton = find_node_by_name(root, "Eraser")
+	var eraser : BaseButton = tool_buttons.find_node("Eraser")
 	eraser.hint_tooltip = tr("""Eraser
 
 %s for left mouse button
@@ -554,19 +551,19 @@ Hold %s to make a line""") % [InputMap.get_action_list("left_pencil_tool")[0].as
 
 Hold %s to make a line""") % [InputMap.get_action_list("left_eraser_tool")[0].as_text(), InputMap.get_action_list("right_eraser_tool")[0].as_text(), "Shift"]
 
-	var bucket : BaseButton = find_node_by_name(root, "Bucket")
+	var bucket : BaseButton = tool_buttons.find_node("Bucket")
 	bucket.hint_tooltip = tr("""Bucket
 
 %s for left mouse button
 %s for right mouse button""") % [InputMap.get_action_list("left_fill_tool")[0].as_text(), InputMap.get_action_list("right_fill_tool")[0].as_text()]
 
-	var ld : BaseButton = find_node_by_name(root, "LightenDarken")
-	ld.hint_tooltip = tr("""Lighten/Darken
+	var ld : BaseButton = tool_buttons.find_node("Shading")
+	ld.hint_tooltip = tr("""Shading Tool
 
 %s for left mouse button
-%s for right mouse button""") % [InputMap.get_action_list("left_lightdark_tool")[0].as_text(), InputMap.get_action_list("right_lightdark_tool")[0].as_text()]
+%s for right mouse button""") % [InputMap.get_action_list("left_shading_tool")[0].as_text(), InputMap.get_action_list("right_shading_tool")[0].as_text()]
 
-	var linetool : BaseButton = find_node_by_name(root, "LineTool")
+	var linetool : BaseButton = tool_buttons.find_node("LineTool")
 	linetool.hint_tooltip = tr("""Line Tool
 
 %s for left mouse button
@@ -576,34 +573,35 @@ Hold %s to snap the angle of the line
 Hold %s to center the shape on the click origin
 Hold %s to displace the shape's origin""") % [InputMap.get_action_list("left_linetool_tool")[0].as_text(), InputMap.get_action_list("right_linetool_tool")[0].as_text(), "Shift", "Ctrl", "Alt"]
 
-
-	var recttool : BaseButton = find_node_by_name(root, "RectangleTool")
+	var recttool : BaseButton = tool_buttons.find_node("RectangleTool")
 	recttool.hint_tooltip = tr("""Rectangle Tool
 
 %s for left mouse button
 %s for right mouse button
 
 Hold %s to create a 1:1 shape
-Hold %s to center the shape on the click origin""") % [InputMap.get_action_list("left_rectangletool_tool")[0].as_text(), InputMap.get_action_list("right_rectangletool_tool")[0].as_text(), "Shift", "Ctrl" ]
+Hold %s to center the shape on the click origin
+Hold %s to displace the shape's origin""") % [InputMap.get_action_list("left_rectangletool_tool")[0].as_text(), InputMap.get_action_list("right_rectangletool_tool")[0].as_text(), "Shift", "Ctrl", "Alt"]
 
-	var ellipsetool : BaseButton = find_node_by_name(root, "EllipseTool")
+	var ellipsetool : BaseButton = tool_buttons.find_node("EllipseTool")
 	ellipsetool.hint_tooltip = tr("""Ellipse Tool
 
 %s for left mouse button
 %s for right mouse button
 
 Hold %s to create a 1:1 shape
-Hold %s to center the shape on the click origin""") % [InputMap.get_action_list("left_ellipsetool_tool")[0].as_text(), InputMap.get_action_list("right_ellipsetool_tool")[0].as_text(), "Shift", "Ctrl" ]
+Hold %s to center the shape on the click origin
+Hold %s to displace the shape's origin""") % [InputMap.get_action_list("left_ellipsetool_tool")[0].as_text(), InputMap.get_action_list("right_ellipsetool_tool")[0].as_text(), "Shift", "Ctrl", "Alt"]
 
-	var color_switch : BaseButton = find_node_by_name(root, "ColorSwitch")
+	var color_switch : BaseButton = control.find_node("ColorSwitch")
 	color_switch.hint_tooltip = tr("""Switch left and right colors
 (%s)""") % InputMap.get_action_list("switch_colors")[0].as_text()
 
-	var first_frame : BaseButton = find_node_by_name(root, "FirstFrame")
+	var first_frame : BaseButton = control.find_node("FirstFrame")
 	first_frame.hint_tooltip = tr("""Jump to the first frame
 (%s)""") % InputMap.get_action_list("go_to_first_frame")[0].as_text()
 
-	var previous_frame : BaseButton = find_node_by_name(root, "PreviousFrame")
+	var previous_frame : BaseButton = control.find_node("PreviousFrame")
 	previous_frame.hint_tooltip = tr("""Go to the previous frame
 (%s)""") % InputMap.get_action_list("go_to_previous_frame")[0].as_text()
 
@@ -613,11 +611,11 @@ Hold %s to center the shape on the click origin""") % [InputMap.get_action_list(
 	play_forward.hint_tooltip = tr("""Play the animation forward (from beginning to end)
 (%s)""") % InputMap.get_action_list("play_forward")[0].as_text()
 
-	var next_frame : BaseButton = find_node_by_name(root, "NextFrame")
+	var next_frame : BaseButton = control.find_node("NextFrame")
 	next_frame.hint_tooltip = tr("""Go to the next frame
 (%s)""") % InputMap.get_action_list("go_to_next_frame")[0].as_text()
 
-	var last_frame : BaseButton = find_node_by_name(root, "LastFrame")
+	var last_frame : BaseButton = control.find_node("LastFrame")
 	last_frame.hint_tooltip = tr("""Jump to the last frame
 (%s)""") % InputMap.get_action_list("go_to_last_frame")[0].as_text()
 
@@ -662,11 +660,15 @@ func update_recent_projects_submenu() -> void:
 	for project in recent_projects:
 		recent_projects_submenu.add_item(project.get_file())
 
+
 func use_osx_shortcuts() -> void:
 	var inputmap := InputMap
 
 	for action in inputmap.get_actions():
 		var event : InputEvent = inputmap.get_action_list(action)[0]
+
+		if event.is_action("show_pixel_grid"):
+			event.shift = true
 
 		if event.control:
 			event.control = false

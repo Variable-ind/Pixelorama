@@ -149,7 +149,7 @@ boot_splash/bg_color=Color( 0.145098, 0.145098, 0.164706, 1 )
 config/icon="res://assets/graphics/icons/icon.png"
 config/macos_native_icon="res://assets/graphics/icons/icon.icns"
 config/windows_native_icon="res://assets/graphics/icons/icon.ico"
-config/Version="v0.9-dev"
+config/Version="v0.9-beta"
 
 [audio]
 
@@ -188,7 +188,7 @@ texture={
 "compress/lossy_quality": 0.7,
 "compress/mode": 0,
 "compress/normal_map": 0,
-"detect_3d": true,
+"detect_3d": false,
 "flags/anisotropic": false,
 "flags/filter": false,
 "flags/mipmaps": false,
@@ -284,12 +284,12 @@ paste={
 "events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":true,"meta":false,"command":true,"pressed":false,"scancode":86,"unicode":0,"echo":false,"script":null)
  ]
 }
-left_lightdark_tool={
+left_shading_tool={
 "deadzone": 0.5,
 "events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":85,"unicode":0,"echo":false,"script":null)
  ]
 }
-right_lightdark_tool={
+right_shading_tool={
 "deadzone": 0.5,
 "events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":true,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":85,"unicode":0,"echo":false,"script":null)
  ]
@@ -596,10 +596,15 @@ right_polygon_select_tool={
 "events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":true,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":75,"unicode":0,"echo":false,"script":null)
  ]
 }
+new_brush={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":true,"meta":false,"command":true,"pressed":false,"scancode":66,"unicode":0,"echo":false,"script":null)
+ ]
+}
 
 [locale]
 
-translations=PoolStringArray( "res://Translations/zh_TW.po", "res://Translations/pt_BR.po", "res://Translations/de_DE.po", "res://Translations/el_GR.po", "res://Translations/en_US.po", "res://Translations/fr_FR.po", "res://Translations/it_IT.po", "res://Translations/pl_PL.po", "res://Translations/ru_RU.po", "res://Translations/es_ES.po", "res://Translations/zh_CN.po", "res://Translations/lv_LV.po", "res://Translations/eo_UY.po", "res://Translations/cs_CZ.po", "res://Translations/id_ID.po", "res://Translations/hu_HU.po", "res://Translations/ro_RO.po", "res://Translations/ko_KR.po", "res://Translations/tr_TR.po", "res://Translations/ja_JP.po" )
+translations=PoolStringArray( "res://Translations/zh_TW.po", "res://Translations/pt_BR.po", "res://Translations/de_DE.po", "res://Translations/el_GR.po", "res://Translations/en_US.po", "res://Translations/fr_FR.po", "res://Translations/it_IT.po", "res://Translations/pl_PL.po", "res://Translations/ru_RU.po", "res://Translations/es_ES.po", "res://Translations/zh_CN.po", "res://Translations/lv_LV.po", "res://Translations/eo_UY.po", "res://Translations/cs_CZ.po", "res://Translations/id_ID.po", "res://Translations/hu_HU.po", "res://Translations/ro_RO.po", "res://Translations/ko_KR.po", "res://Translations/tr_TR.po", "res://Translations/ja_JP.po", "res://Translations/nb_NO.po", "res://Translations/uk_UA.po" )
 locale_filter=[ 0, [  ] ]
 
 [logging]
