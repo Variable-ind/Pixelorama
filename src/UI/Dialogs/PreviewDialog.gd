@@ -32,6 +32,8 @@ onready var new_frame_options = $VBoxContainer/HBoxContainer/NewFrameOptions
 onready var replace_frame_options = $VBoxContainer/HBoxContainer/ReplaceFrameOptions
 onready var new_layer_options = $VBoxContainer/HBoxContainer/NewLayerOptions
 onready var new_brush_options = $VBoxContainer/HBoxContainer/NewBrushOptions
+onready var repeat_options = $VBoxContainer/Repeat
+onready var offset_options = $VBoxContainer/OffsetOptions
 onready var new_brush_name = $VBoxContainer/HBoxContainer/NewBrushOptions/BrushName
 
 onready var import_options: OptionButton = $VBoxContainer/HBoxContainer/ImportOption
@@ -115,13 +117,24 @@ func _on_PreviewDialog_confirmed() -> void:
 
 		elif current_import_option == ImageImportOptions.SPRITESHEET_LAYER:
 			var frame_index: int = spritesheet_lay_opt.get_node("AtFrameSpinbox").value - 1
+			var pos_x: int = offset_options.get_node("VBoxContainer/Position/PositionXSpinbox").value
+			var pos_y: int = offset_options.get_node("VBoxContainer/Position/PositionYSpinbox").value
+			var vel_x: int = offset_options.get_node("VBoxContainer/Velocity/VelocityXSpinbox").value
+			var vel_y: int = offset_options.get_node("VBoxContainer/Velocity/VelocityYSpinbox").value
+			var acc_x: int = offset_options.get_node("VBoxContainer/Acceleration/AccelerationXSpinbox").value
+			var acc_y: int = offset_options.get_node("VBoxContainer/Acceleration/AccelerationYSpinbox").value
+			var repeat_times: int = repeat_options.get_node("RepeatSpinbox").value
 			OpenSave.open_image_as_spritesheet_layer(
 				path,
 				image,
 				path.get_basename().get_file(),
 				spritesheet_horizontal,
 				spritesheet_vertical,
-				frame_index
+				frame_index,
+				Vector2(pos_x, pos_y),
+				Vector2(vel_x, vel_y),
+				Vector2(acc_x, acc_y),
+				repeat_times
 			)
 
 		elif current_import_option == ImageImportOptions.NEW_FRAME:
@@ -198,6 +211,27 @@ func synchronize() -> void:
 					dialog.spritesheet_lay_opt.get_node("AtFrameSpinbox").value = (spritesheet_lay_opt.get_node(
 						"AtFrameSpinbox"
 					).value)
+					dialog.repeat_options.get_node("RepeatSpinbox").value = (repeat_options.get_node(
+						"RepeatSpinbox"
+					).value)
+					dialog.offset_options.get_node("VBoxContainer/Position/PositionXSpinbox").value = (offset_options.get_node(
+						"VBoxContainer/Position/PositionXSpinbox"
+					).value)
+					dialog.offset_options.get_node("VBoxContainer/Position/PositionYSpinbox").value = (offset_options.get_node(
+						"VBoxContainer/Position/PositionYSpinbox"
+					).value)
+					dialog.offset_options.get_node("VBoxContainer/Velocity/VelocityXSpinbox").value = (offset_options.get_node(
+						"VBoxContainer/Velocity/VelocityXSpinbox"
+					).value)
+					dialog.offset_options.get_node("VBoxContainer/Velocity/VelocityYSpinbox").value = (offset_options.get_node(
+						"VBoxContainer/Velocity/VelocityYSpinbox"
+					).value)
+					dialog.offset_options.get_node("VBoxContainer/Acceleration/AccelerationXSpinbox").value = (offset_options.get_node(
+						"VBoxContainer/Acceleration/AccelerationXSpinbox"
+					).value)
+					dialog.offset_options.get_node("VBoxContainer/Acceleration/AccelerationYSpinbox").value = (offset_options.get_node(
+						"VBoxContainer/Acceleration/AccelerationYSpinbox"
+					).value)
 
 			elif id == ImageImportOptions.NEW_FRAME:
 				dialog.new_frame_options.get_node("AtLayerSpinbox").value = (new_frame_options.get_node(
@@ -234,6 +268,8 @@ func _on_ImportOption_item_selected(id: int) -> void:
 	replace_frame_options.visible = false
 	new_layer_options.visible = false
 	new_brush_options.visible = false
+	repeat_options.visible = false
+	offset_options.visible = false
 	texture_rect.get_child(0).visible = false
 	texture_rect.get_child(1).visible = false
 	rect_size.x = 550
@@ -249,6 +285,8 @@ func _on_ImportOption_item_selected(id: int) -> void:
 		frame_size_label.visible = true
 		spritesheet_tab_options.visible = true
 		spritesheet_lay_opt.visible = true
+		repeat_options.visible = true
+		offset_options.visible = true
 		texture_rect.get_child(0).visible = true
 		texture_rect.get_child(1).visible = true
 		rect_size.x = spritesheet_lay_opt.rect_size.x

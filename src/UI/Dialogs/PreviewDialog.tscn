@@ -4,15 +4,12 @@
 
 [node name="PreviewDialog" type="ConfirmationDialog"]
 margin_right = 550.0
-margin_bottom = 410.0
+margin_bottom = 394.0
 rect_min_size = Vector2( 550, 70 )
 popup_exclusive = true
 window_title = "Import Options"
 resizable = true
 script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 anchor_right = 1.0
@@ -21,13 +18,10 @@ margin_left = 8.0
 margin_top = 8.0
 margin_right = -8.0
 margin_bottom = -36.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="CenterContainer" type="CenterContainer" parent="VBoxContainer"]
 margin_right = 534.0
-margin_bottom = 324.0
+margin_bottom = 300.0
 size_flags_vertical = 3
 __meta__ = {
 "_edit_use_anchors_": false
@@ -35,9 +29,8 @@ __meta__ = {
 
 [node name="TextureRect" type="TextureRect" parent="VBoxContainer/CenterContainer"]
 margin_left = 117.0
-margin_top = 12.0
 margin_right = 417.0
-margin_bottom = 312.0
+margin_bottom = 300.0
 rect_min_size = Vector2( 300, 300 )
 expand = true
 stretch_mode = 6
@@ -52,6 +45,11 @@ __meta__ = {
 
 [node name="VerticalLines" type="Control" parent="VBoxContainer/CenterContainer/TextureRect"]
 
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+margin_top = 304.0
+margin_right = 534.0
+margin_bottom = 308.0
+
 [node name="ApplyAll" type="CheckBox" parent="VBoxContainer"]
 visible = false
 margin_top = 304.0
@@ -60,9 +58,9 @@ margin_bottom = 324.0
 text = "Apply to all"
 
 [node name="SizeContainer" type="HBoxContainer" parent="VBoxContainer"]
-margin_top = 328.0
+margin_top = 312.0
 margin_right = 534.0
-margin_bottom = 342.0
+margin_bottom = 326.0
 custom_constants/separation = 32
 
 [node name="ImageSizeLabel" type="Label" parent="VBoxContainer/SizeContainer"]
@@ -72,15 +70,15 @@ text = "Image Size: 64×64"
 
 [node name="FrameSizeLabel" type="Label" parent="VBoxContainer/SizeContainer"]
 visible = false
-margin_left = 149.0
-margin_right = 266.0
+margin_left = 150.0
+margin_right = 268.0
 margin_bottom = 14.0
 text = "Frame size: 64×64"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
-margin_top = 346.0
+margin_top = 330.0
 margin_right = 534.0
-margin_bottom = 366.0
+margin_bottom = 350.0
 
 [node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
 margin_top = 3.0
@@ -97,8 +95,8 @@ text = "New tab"
 
 [node name="SpritesheetTabOptions" type="HBoxContainer" parent="VBoxContainer/HBoxContainer"]
 visible = false
-margin_left = 155.0
-margin_right = 533.0
+margin_left = 311.0
+margin_right = 689.0
 margin_bottom = 24.0
 
 [node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/SpritesheetTabOptions"]
@@ -261,6 +259,157 @@ text = "Brush name:"
 margin_left = 85.0
 margin_right = 143.0
 margin_bottom = 24.0
+
+[node name="Repeat" type="HBoxContainer" parent="VBoxContainer"]
+visible = false
+margin_top = 354.0
+margin_right = 534.0
+margin_bottom = 378.0
+size_flags_horizontal = 3
+alignment = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/Repeat"]
+margin_left = 326.0
+margin_top = 5.0
+margin_right = 456.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 130, 0 )
+text = "Repeat Animation:"
+align = 2
+
+[node name="RepeatSpinbox" type="SpinBox" parent="VBoxContainer/Repeat"]
+margin_left = 460.0
+margin_right = 534.0
+margin_bottom = 24.0
+min_value = -100000.0
+max_value = 100000.0
+allow_greater = true
+allow_lesser = true
+
+[node name="OffsetOptions" type="HBoxContainer" parent="VBoxContainer"]
+visible = false
+margin_top = 354.0
+margin_right = 534.0
+margin_bottom = 434.0
+size_flags_horizontal = 3
+
+[node name="Spacer" type="Control" parent="VBoxContainer/OffsetOptions"]
+margin_right = 6.0
+margin_bottom = 80.0
+size_flags_horizontal = 3
+
+[node name="VSeparator" type="VSeparator" parent="VBoxContainer/OffsetOptions"]
+margin_left = 10.0
+margin_right = 14.0
+margin_bottom = 80.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/OffsetOptions"]
+margin_left = 18.0
+margin_right = 304.0
+margin_bottom = 80.0
+
+[node name="Position" type="HBoxContainer" parent="VBoxContainer/OffsetOptions/VBoxContainer"]
+margin_right = 286.0
+margin_bottom = 24.0
+
+[node name="Label" type="Label" parent="VBoxContainer/OffsetOptions/VBoxContainer/Position"]
+margin_top = 5.0
+margin_right = 130.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 130, 0 )
+text = "Position (x, y):"
+align = 2
+
+[node name="PositionXSpinbox" type="SpinBox" parent="VBoxContainer/OffsetOptions/VBoxContainer/Position"]
+margin_left = 134.0
+margin_right = 208.0
+margin_bottom = 24.0
+min_value = -100000.0
+max_value = 100000.0
+allow_greater = true
+allow_lesser = true
+
+[node name="PositionYSpinbox" type="SpinBox" parent="VBoxContainer/OffsetOptions/VBoxContainer/Position"]
+margin_left = 212.0
+margin_right = 286.0
+margin_bottom = 24.0
+min_value = -100000.0
+max_value = 100000.0
+allow_greater = true
+allow_lesser = true
+
+[node name="Velocity" type="HBoxContainer" parent="VBoxContainer/OffsetOptions/VBoxContainer"]
+margin_top = 28.0
+margin_right = 286.0
+margin_bottom = 52.0
+
+[node name="Label" type="Label" parent="VBoxContainer/OffsetOptions/VBoxContainer/Velocity"]
+margin_top = 5.0
+margin_right = 130.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 130, 0 )
+text = "Velocity (x, y):"
+align = 2
+
+[node name="VelocityXSpinbox" type="SpinBox" parent="VBoxContainer/OffsetOptions/VBoxContainer/Velocity"]
+margin_left = 134.0
+margin_right = 208.0
+margin_bottom = 24.0
+min_value = -100000.0
+max_value = 100000.0
+allow_greater = true
+allow_lesser = true
+
+[node name="VelocityYSpinbox" type="SpinBox" parent="VBoxContainer/OffsetOptions/VBoxContainer/Velocity"]
+margin_left = 212.0
+margin_right = 286.0
+margin_bottom = 24.0
+min_value = -100000.0
+max_value = 100000.0
+allow_greater = true
+allow_lesser = true
+
+[node name="Acceleration" type="HBoxContainer" parent="VBoxContainer/OffsetOptions/VBoxContainer"]
+margin_top = 56.0
+margin_right = 286.0
+margin_bottom = 80.0
+
+[node name="Label" type="Label" parent="VBoxContainer/OffsetOptions/VBoxContainer/Acceleration"]
+margin_top = 5.0
+margin_right = 130.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 130, 0 )
+text = "Acceleration (x, y):"
+align = 2
+
+[node name="AccelerationXSpinbox" type="SpinBox" parent="VBoxContainer/OffsetOptions/VBoxContainer/Acceleration"]
+margin_left = 134.0
+margin_right = 208.0
+margin_bottom = 24.0
+min_value = -100000.0
+max_value = 100000.0
+allow_greater = true
+allow_lesser = true
+
+[node name="AccelerationYSpinbox" type="SpinBox" parent="VBoxContainer/OffsetOptions/VBoxContainer/Acceleration"]
+margin_left = 212.0
+margin_right = 286.0
+margin_bottom = 24.0
+min_value = -100000.0
+max_value = 100000.0
+allow_greater = true
+allow_lesser = true
+
+[node name="VSeparator2" type="VSeparator" parent="VBoxContainer/OffsetOptions"]
+margin_left = 308.0
+margin_right = 312.0
+margin_bottom = 80.0
+
+[node name="Spacer2" type="Control" parent="VBoxContainer/OffsetOptions"]
+margin_left = 528.0
+margin_right = 534.0
+margin_bottom = 80.0
+size_flags_horizontal = 3
 
 [connection signal="about_to_show" from="." to="." method="_on_PreviewDialog_about_to_show"]
 [connection signal="confirmed" from="." to="." method="_on_PreviewDialog_confirmed"]
