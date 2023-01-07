@@ -1,0 +1,129 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://src/UI/Nodes/TransparentChecker.tscn" type="PackedScene" id=1]
+[ext_resource path="res://src/UI/Nodes/CollapsibleContainer.tscn" type="PackedScene" id=2]
+[ext_resource path="res://src/UI/Dialogs/ImageEffects/RemovePixels.gd" type="Script" id=3]
+
+[node name="RemovePixels" type="ConfirmationDialog"]
+margin_right = 376.0
+margin_bottom = 529.0
+rect_min_size = Vector2( 172, 60.2 )
+window_title = "Mirror Image"
+resizable = true
+script = ExtResource( 3 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 368.0
+margin_bottom = 493.0
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="VBoxContainer"]
+margin_right = 360.0
+margin_bottom = 399.0
+size_flags_vertical = 3
+
+[node name="Preview" type="TextureRect" parent="VBoxContainer/AspectRatioContainer"]
+margin_top = 19.5
+margin_right = 360.0
+margin_bottom = 379.5
+rect_min_size = Vector2( 200, 200 )
+expand = true
+stretch_mode = 5
+
+[node name="TransparentChecker" parent="VBoxContainer/AspectRatioContainer/Preview" instance=ExtResource( 1 )]
+show_behind_parent = true
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = 0.0
+margin_bottom = 0.0
+
+[node name="OptionsContainer" type="VBoxContainer" parent="VBoxContainer"]
+margin_top = 403.0
+margin_right = 360.0
+margin_bottom = 485.0
+alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer/OptionsContainer"]
+margin_right = 360.0
+margin_bottom = 4.0
+
+[node name="Label" type="Label" parent="VBoxContainer/OptionsContainer"]
+margin_top = 8.0
+margin_right = 360.0
+margin_bottom = 22.0
+size_flags_horizontal = 3
+size_flags_vertical = 5
+text = "Remove pixels that satisfy following conditions:"
+valign = 1
+autowrap = true
+
+[node name="CollapsibleContainer" parent="VBoxContainer/OptionsContainer" instance=ExtResource( 2 )]
+margin_top = 26.0
+margin_right = 360.0
+margin_bottom = 46.0
+text = "Conditions"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/OptionsContainer/CollapsibleContainer"]
+visible = false
+margin_top = 24.0
+margin_right = 360.0
+margin_bottom = 118.0
+
+[node name="AddCondition" type="Button" parent="VBoxContainer/OptionsContainer/CollapsibleContainer/HBoxContainer"]
+margin_right = 94.0
+margin_bottom = 94.0
+rect_min_size = Vector2( 94, 94 )
+
+[node name="Label" type="Label" parent="VBoxContainer/OptionsContainer/CollapsibleContainer/HBoxContainer/AddCondition"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "Add New Condition"
+align = 1
+valign = 1
+autowrap = true
+clip_text = true
+
+[node name="VSeparator" type="VSeparator" parent="VBoxContainer/OptionsContainer/CollapsibleContainer/HBoxContainer"]
+margin_right = 4.0
+margin_bottom = 40.0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/OptionsContainer/CollapsibleContainer/HBoxContainer"]
+margin_left = 106.0
+margin_right = 360.0
+margin_bottom = 94.0
+size_flags_horizontal = 3
+scroll_vertical_enabled = false
+
+[node name="PixelConditionContainer" type="HBoxContainer" parent="VBoxContainer/OptionsContainer/CollapsibleContainer/HBoxContainer/ScrollContainer"]
+unique_name_in_owner = true
+
+[node name="HSeparator2" type="HSeparator" parent="VBoxContainer/OptionsContainer"]
+margin_top = 50.0
+margin_right = 360.0
+margin_bottom = 54.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/OptionsContainer"]
+margin_top = 58.0
+margin_right = 360.0
+margin_bottom = 82.0
+
+[node name="SelectionCheckBox" type="CheckBox" parent="VBoxContainer/OptionsContainer/HBoxContainer"]
+margin_right = 178.0
+margin_bottom = 24.0
+mouse_default_cursor_shape = 2
+size_flags_horizontal = 3
+pressed = true
+text = "Only affect selection"
+
+[node name="AffectOptionButton" type="OptionButton" parent="VBoxContainer/OptionsContainer/HBoxContainer"]
+margin_left = 182.0
+margin_right = 360.0
+margin_bottom = 24.0
+mouse_default_cursor_shape = 2
+size_flags_horizontal = 3
+text = "Selected cels"
+items = [ "Selected cels", null, false, 0, null, "Current frame", null, false, 1, null, "All frames", null, false, 2, null, "All projects", null, false, 3, null ]
+selected = 0
+
+[connection signal="pressed" from="VBoxContainer/OptionsContainer/CollapsibleContainer/HBoxContainer/AddCondition" to="." method="_on_AddCondition_pressed"]
