@@ -406,3 +406,11 @@ func _on_Layers_item_selected(id: int) -> void:
 	Export.export_layers = id
 	Export.process_data()
 	set_preview()
+
+
+func _on_Separator_text_changed(new_text: String, idx: int) -> void:
+	Export.separator[idx] = new_text
+	var first: String = Export.separator[0]
+	var middle: String = Export.separator[1]
+	var last: String = Export.separator[2]
+	$"%SeparatorPreview".text = "project name"+ first + "tagname" + middle + "1" + last

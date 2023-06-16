@@ -313,7 +313,7 @@ text = "Advanced options"
 visible = false
 margin_top = 24.0
 margin_right = 516.0
-margin_bottom = 44.0
+margin_bottom = 90.0
 columns = 2
 
 [node name="InterpolationLabel" type="Label" parent="VBoxContainer/VSplitContainer/VBoxContainer/CollapsibleContainer/GridContainer"]
@@ -335,12 +335,58 @@ text = "Nearest"
 items = [ "Nearest", null, false, 0, null, "Bilinear", null, false, 1, null, "Cubic", null, false, 2, null, "Trilinear", null, false, 3, null, "Lanczos", null, false, 4, null ]
 selected = 0
 
+[node name="SeparatorLabel" type="Label" parent="VBoxContainer/VSplitContainer/VBoxContainer/CollapsibleContainer/GridContainer"]
+margin_top = 24.0
+margin_right = 256.0
+margin_bottom = 66.0
+size_flags_vertical = 5
+text = "Separator:"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/VSplitContainer/VBoxContainer/CollapsibleContainer/GridContainer"]
+margin_left = 260.0
+margin_top = 24.0
+margin_right = 516.0
+margin_bottom = 66.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/VSplitContainer/VBoxContainer/CollapsibleContainer/GridContainer/VBoxContainer"]
+margin_right = 256.0
+margin_bottom = 24.0
+alignment = 1
+
+[node name="First" type="LineEdit" parent="VBoxContainer/VSplitContainer/VBoxContainer/CollapsibleContainer/GridContainer/VBoxContainer/HBoxContainer"]
+margin_left = 37.0
+margin_right = 95.0
+margin_bottom = 24.0
+text = "_"
+align = 1
+
+[node name="Middle" type="LineEdit" parent="VBoxContainer/VSplitContainer/VBoxContainer/CollapsibleContainer/GridContainer/VBoxContainer/HBoxContainer"]
+margin_left = 99.0
+margin_right = 157.0
+margin_bottom = 24.0
+text = "_"
+align = 1
+
+[node name="Last" type="LineEdit" parent="VBoxContainer/VSplitContainer/VBoxContainer/CollapsibleContainer/GridContainer/VBoxContainer/HBoxContainer"]
+margin_left = 161.0
+margin_right = 219.0
+margin_bottom = 24.0
+align = 1
+
+[node name="SeparatorPreview" type="LineEdit" parent="VBoxContainer/VSplitContainer/VBoxContainer/CollapsibleContainer/GridContainer/VBoxContainer"]
+unique_name_in_owner = true
+margin_top = 28.0
+margin_right = 256.0
+margin_bottom = 42.0
+text = "project name_tagname_1"
+align = 1
+
 [node name="MultipleAnimationsDirectories" type="CheckBox" parent="VBoxContainer/VSplitContainer/VBoxContainer/CollapsibleContainer" groups=["ExportImageOptions"]]
 unique_name_in_owner = true
 visible = false
-margin_top = 48.0
+margin_top = 94.0
 margin_right = 516.0
-margin_bottom = 72.0
+margin_bottom = 118.0
 hint_tooltip = "Creates multiple files but every file is stored in different folder that corresponds to its frame tag"
 mouse_default_cursor_shape = 2
 text = "Create new folder for each frame tag"
@@ -446,6 +492,9 @@ __meta__ = {
 [connection signal="item_selected" from="VBoxContainer/VSplitContainer/VBoxContainer/FilePath/FileFormat" to="." method="_on_FileFormat_item_selected"]
 [connection signal="meta_clicked" from="VBoxContainer/VSplitContainer/VBoxContainer/GifWarning" to="." method="_on_GifWarning_meta_clicked"]
 [connection signal="item_selected" from="VBoxContainer/VSplitContainer/VBoxContainer/CollapsibleContainer/GridContainer/Interpolation" to="." method="_on_Interpolation_item_selected"]
+[connection signal="text_changed" from="VBoxContainer/VSplitContainer/VBoxContainer/CollapsibleContainer/GridContainer/VBoxContainer/HBoxContainer/First" to="." method="_on_Separator_text_changed" binds= [ 0 ]]
+[connection signal="text_changed" from="VBoxContainer/VSplitContainer/VBoxContainer/CollapsibleContainer/GridContainer/VBoxContainer/HBoxContainer/Middle" to="." method="_on_Separator_text_changed" binds= [ 1 ]]
+[connection signal="text_changed" from="VBoxContainer/VSplitContainer/VBoxContainer/CollapsibleContainer/GridContainer/VBoxContainer/HBoxContainer/Last" to="." method="_on_Separator_text_changed" binds= [ 2 ]]
 [connection signal="toggled" from="VBoxContainer/VSplitContainer/VBoxContainer/CollapsibleContainer/MultipleAnimationsDirectories" to="." method="_on_MultipleAnimationsDirectories_toggled"]
 [connection signal="dir_selected" from="Popups/PathDialog" to="." method="_on_FileDialog_dir_selected"]
 [connection signal="confirmed" from="Popups/FileExistsAlert" to="." method="_on_FileExistsAlert_confirmed"]
