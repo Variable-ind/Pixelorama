@@ -28,6 +28,7 @@ var number_of_frames := 1
 var direction: int = AnimationDirection.FORWARD
 var resize := 100
 var interpolation := 0  # Image.Interpolation
+var separator: PoolStringArray = ["_", "_", ""]
 var new_dir_for_each_frame_tag := false  # we don't need to store this after export
 
 # Export coroutine signal
@@ -378,6 +379,9 @@ func is_single_file_format(project := Global.current_project) -> bool:
 
 func create_export_path(multifile: bool, project: Project, frame: int = 0) -> String:
 	var path := project.file_name
+	var first: String = separator[0]
+	var middle: String = separator[1]
+	var last: String = separator[2]
 	# Only append frame number when there are multiple files exported
 	if multifile:
 		var frame_tag_and_start_id := get_proccessed_image_animation_tag_and_start_id(
@@ -400,10 +404,12 @@ func create_export_path(multifile: bool, project: Project, frame: int = 0) -> St
 				)
 			else:
 				# Add frame tag if frame has one
+				last = last.strip_edges(false, true)
 				# (frame - start_id + 1) Makes frames id to start from 1 in each frame tag
-				path += "_" + frame_tag_dir + "_" + String(frame - start_id + 1)
+				path += first + frame_tag_dir + middle + String(frame - start_id + 1) + last
 		else:
-			path += "_" + String(frame)
+			middle = middle.strip_edges(false, true)
+			path += first + String(frame) + middle
 
 	return project.directory_path.plus_file(path + file_format_string(project.file_format))
 
