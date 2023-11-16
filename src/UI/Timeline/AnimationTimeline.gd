@@ -268,7 +268,7 @@ func delete_frames(indices := []) -> void:
 
 
 func _on_CopyFrame_pressed() -> void:
-	# Do not select new cels, If they are copied.
+	# do not select new cels, we use a seperate logic in case frames are copied
 	copy_frames([], -1, false)
 
 
