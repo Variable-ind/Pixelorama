@@ -2,9 +2,11 @@ class_name ShaderImageEffect
 extends RefCounted
 ## Helper class to generate image effects using shaders
 
-signal done
+signal done  ## Emits after [method generate_image] is finished
 
 
+## Applies a [param shader] with parameters [param params] to an [Image] [param img],
+## And also scales it to [param size]
 func generate_image(img: Image, shader: Shader, params: Dictionary, size: Vector2i) -> void:
 	# duplicate shader before modifying code to avoid affecting original resource
 	shader = shader.duplicate()
@@ -45,5 +47,7 @@ func generate_image(img: Image, shader: Shader, params: Dictionary, size: Vector
 	RenderingServer.free_rid(mat_rid)
 	RenderingServer.free_rid(texture)
 	viewport_texture.convert(Image.FORMAT_RGBA8)
+	print(img.get_size())
 	img.copy_from(viewport_texture)
+	print(img.get_size())
 	done.emit()
