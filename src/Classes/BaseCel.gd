@@ -88,7 +88,7 @@ func load_image_data_from_pxo(_file: FileAccess, _project_size: Vector2i) -> voi
 	return
 
 
-## Used to perform cleanup after a cel is removed.
+## Used internally to perform cleanup after a cel is removed.
 func on_remove() -> void:
 	pass
 

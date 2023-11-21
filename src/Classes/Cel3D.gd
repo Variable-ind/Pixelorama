@@ -1,8 +1,17 @@
 class_name Cel3D
 extends BaseCel
+## A class for the properties of cels in a Layer3D.
+##
+## The term "cel" comes from "celluloid" (https://en.wikipedia.org/wiki/Cel).
+## This class is responsible for storing properties of 3D objects of cel.
 
-signal selected_object(object)
+
+signal selected_object(object)  ## emits whenever value of [member selected] is changed
+## Emits whenever a scene property changes
+## (or more precisely, when [method _scene_property_changed] gets called).
 signal scene_property_changed
+## Emits whenever a [Cel3DObject] is added or removed through [member _add_object_node] or
+## [member _remove_object_node] respectively.
 signal objects_changed
 
 var size: Vector2i  ## Size of the image rendered by the cel.
@@ -82,6 +91,7 @@ func _get_image_texture() -> Texture2D:
 	return image_texture
 
 
+## Returns a curated [Dictionary] containing the scene properties.
 func serialize_scene_properties() -> Dictionary:
 	if not is_instance_valid(camera):
 		return {}
@@ -95,6 +105,8 @@ func serialize_scene_properties() -> Dictionary:
 	}
 
 
+## Sets the scene properties according to a curated [Dictionary]
+## obtained from [method serialize_scene_properties].
 func deserialize_scene_properties() -> void:
 	camera.transform = scene_properties["camera_transform"]
 	camera.projection = scene_properties["camera_projection"]
@@ -113,6 +125,7 @@ func _update_objects_transform(id: int) -> void:  # Called by undo/redo
 	object.deserialize(properties)
 
 
+## Returns a [Cel3DObject] using the [param id] from this cel's objects.
 func get_object_from_id(id: int) -> Cel3DObject:
 	for child in parent_node.get_children():
 		if not child is Cel3DObject:
@@ -122,6 +135,7 @@ func get_object_from_id(id: int) -> Cel3DObject:
 	return null
 
 
+## Used internally to re-scale the cel content if the project is scaled.
 func size_changed(new_size: Vector2i) -> void:
 	size = new_size
 	viewport.size = size
@@ -166,10 +180,13 @@ func _remove_object_node(id: int) -> void:  ## Called by undo/redo
 # Overridden methods
 
 
+## Returns a render of the cel's content.
+## It's meant for read-only usage of image data, such as copying selections or color picking.
 func get_image() -> Image:
 	return viewport.get_texture().get_image()
 
 
+## Returns a curated [Dictionary] containing the cel data.
 func serialize() -> Dictionary:
 	var dict := super.serialize()
 	var scene_properties_str := {}
@@ -183,6 +200,7 @@ func serialize() -> Dictionary:
 	return dict
 
 
+## Sets the cel data according to a curated [Dictionary] obtained from [method serialize].
 func deserialize(dict: Dictionary) -> void:
 	if dict.has("pxo_version"):
 		if dict["pxo_version"] == 2:  # It's a 0.x project convert it to 1.0 format
@@ -285,11 +303,13 @@ func convert_0x_to_1x(dict: Dictionary) -> void:
 		objects_copy_str[object_id_as_str] = var_to_str(objects_copy_str[object_id_as_str])
 
 
+## Used internally to perform cleanup after a cel is removed.
 func on_remove() -> void:
 	if is_instance_valid(viewport):
 		viewport.queue_free()
 
 
+## Used to save cel image/thumbnail during saving of a pxo file.
 func save_image_data_to_pxo(file: FileAccess) -> void:
 	file.store_buffer(get_image().get_data())
 
@@ -299,9 +319,11 @@ func load_image_data_from_pxo(file: FileAccess, project_size: Vector2i) -> void:
 	file.get_buffer(project_size.x * project_size.y * 4)
 
 
+## Returns an instance of the cel button that will be added to the timeline.
 func instantiate_cel_button() -> Node:
 	return Global.cel_3d_button_node.instantiate()
 
 
+## Returns to get the type of the cel class.
 func get_class_name() -> String:
 	return "Cel3D"
