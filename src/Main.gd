@@ -153,6 +153,7 @@ func _show_splash_screen() -> void:
 
 		$Dialogs/SplashDialog.popup_centered()  # Splash screen
 		modulate = Color(0.5, 0.5, 0.5)
+		Global.dialog_open(true)
 	else:
 		Global.can_draw = true
 
