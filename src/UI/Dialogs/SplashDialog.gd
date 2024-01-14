@@ -112,3 +112,10 @@ func _on_ChangeArtBtnLeft_pressed():
 
 func _on_ChangeArtBtnRight_pressed():
 	change_artwork(1)
+
+
+func _check_first_time() -> void:
+	if !visible:
+		if Global.config_cache.get_value("data", "first_time", true):
+			#Global.config_cache.set_value("data", "first_time", false)
+			get_parent().get_node("FirstSetUp").popup_centered()

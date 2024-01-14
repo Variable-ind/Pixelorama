@@ -1,12 +1,160 @@
-[gd_scene load_steps=2 format=3 uid="uid://b3ot0s0uiil52"]
+[gd_scene load_steps=4 format=3 uid="uid://b3ot0s0uiil52"]
 
 [ext_resource type="Script" path="res://src/UI/Dialogs/FirstSetUp.gd" id="1_ehppt"]
+[ext_resource type="Texture2D" uid="uid://b47r0c6auaqk6" path="res://assets/graphics/icons/icon.png" id="2_frh5j"]
+[ext_resource type="Script" path="res://src/UI/Nodes/ValueSlider.gd" id="3_yixyw"]
 
-[node name="FirstSetUp" type="Window"]
+[node name="FirstSetUp" type="AcceptDialog"]
+title = "First time Setup"
 position = Vector2i(0, 36)
 size = Vector2i(715, 480)
-visible = false
+visible = true
+ok_button_text = "Cancel"
 script = ExtResource("1_ehppt")
 
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 707.0
+offset_bottom = 431.0
+
+[node name="Title" type="Label" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_type_variation = &"HeaderSmall"
+text = "Set the display scale and font size"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="UI" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/UI"]
+layout_mode = 2
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/UI/VBoxContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+texture = ExtResource("2_frh5j")
+stretch_mode = 4
+
+[node name="Label" type="Label" parent="VBoxContainer/UI/VBoxContainer"]
+layout_mode = 2
+theme_type_variation = &"HeaderSmall"
+text = "Pixelorama"
+horizontal_alignment = 1
+
+[node name="PanelContainer" type="Panel" parent="VBoxContainer/UI"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Setups" type="VBoxContainer" parent="VBoxContainer/UI/PanelContainer"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Hello User" type="RichTextLabel" parent="VBoxContainer/UI/PanelContainer/Setups"]
+custom_minimum_size = Vector2(439, 92)
+layout_mode = 2
+text = "It Looks like you are opening pixelorama for the first time
+
+Let's set the important settings first..."
+scroll_active = false
+
+[node name="Set Interface Scales" type="VBoxContainer" parent="VBoxContainer/UI/PanelContainer/Setups"]
+visible = false
+layout_mode = 2
+
+[node name="InterfaceOptions" type="GridContainer" parent="VBoxContainer/UI/PanelContainer/Setups/Set Interface Scales"]
+layout_mode = 2
+columns = 2
+
+[node name="ShrinkLabel" type="Label" parent="VBoxContainer/UI/PanelContainer/Setups/Set Interface Scales/InterfaceOptions"]
+layout_mode = 2
+text = "Display scale:"
+
+[node name="ShrinkContainer" type="HBoxContainer" parent="VBoxContainer/UI/PanelContainer/Setups/Set Interface Scales/InterfaceOptions"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ShrinkSlider" type="TextureProgressBar" parent="VBoxContainer/UI/PanelContainer/Setups/Set Interface Scales/InterfaceOptions/ShrinkContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+mouse_default_cursor_shape = 2
+theme_type_variation = &"ValueSlider"
+min_value = 0.5
+max_value = 4.0
+step = 0.25
+value = 1.0
+nine_patch_stretch = true
+stretch_margin_left = 3
+stretch_margin_top = 3
+stretch_margin_right = 3
+stretch_margin_bottom = 3
+script = ExtResource("3_yixyw")
+
+[node name="ShrinkApplyButton" type="Button" parent="VBoxContainer/UI/PanelContainer/Setups/Set Interface Scales/InterfaceOptions/ShrinkContainer"]
+layout_mode = 2
+mouse_default_cursor_shape = 2
+text = "Apply"
+
+[node name="FontSizeLabel" type="Label" parent="VBoxContainer/UI/PanelContainer/Setups/Set Interface Scales/InterfaceOptions"]
+layout_mode = 2
+text = "Font size:"
+
+[node name="FontSizeContainer" type="HBoxContainer" parent="VBoxContainer/UI/PanelContainer/Setups/Set Interface Scales/InterfaceOptions"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FontSizeSlider" type="TextureProgressBar" parent="VBoxContainer/UI/PanelContainer/Setups/Set Interface Scales/InterfaceOptions/FontSizeContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 2
+mouse_default_cursor_shape = 2
+theme_type_variation = &"ValueSlider"
+min_value = 4.0
+max_value = 32.0
+value = 6.0
+allow_greater = true
+nine_patch_stretch = true
+stretch_margin_left = 3
+stretch_margin_top = 3
+stretch_margin_right = 3
+stretch_margin_bottom = 3
+script = ExtResource("3_yixyw")
+
+[node name="FontSizeApply" type="Button" parent="VBoxContainer/UI/PanelContainer/Setups/Set Interface Scales/InterfaceOptions/FontSizeContainer"]
+layout_mode = 2
+text = "Apply"
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer/UI/PanelContainer/Setups/Set Interface Scales"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/UI/PanelContainer/Setups/Set Interface Scales"]
+custom_minimum_size = Vector2(439, 49)
+layout_mode = 2
+text = "You can change these later by going to:
+Edit > Preferences > Interface > (Display Scale, Font size)"
+autowrap_mode = 2
+
+[node name="ProgressBar" type="ProgressBar" parent="VBoxContainer"]
+layout_mode = 2
+
 [connection signal="close_requested" from="." to="." method="_on_close_requested"]
+[connection signal="custom_action" from="." to="." method="_on_custom_action"]
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
+[connection signal="value_changed" from="VBoxContainer/UI/PanelContainer/Setups/Set Interface Scales/InterfaceOptions/ShrinkContainer/ShrinkSlider" to="." method="_on_shrink_slider_value_changed"]
+[connection signal="pressed" from="VBoxContainer/UI/PanelContainer/Setups/Set Interface Scales/InterfaceOptions/ShrinkContainer/ShrinkApplyButton" to="." method="_on_shrink_apply_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/UI/PanelContainer/Setups/Set Interface Scales/InterfaceOptions/FontSizeContainer/FontSizeApply" to="." method="_on_font_size_apply_pressed"]
