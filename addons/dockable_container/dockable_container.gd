@@ -19,6 +19,8 @@ export(Resource) var layout = Layout.new() setget set_layout, get_layout
 # restore layout to its default later.
 export(bool) var clone_layout_on_ready = true
 
+var windows: Control
+
 var _layout = Layout.new()
 var _panel_container = Container.new()
 var _split_container = Container.new()
@@ -34,6 +36,8 @@ var _layout_dirty = false
 
 
 func _ready() -> void:
+	windows = Control.new()
+	get_parent().call_deferred("add_child", windows)
 	set_process_input(false)
 	_panel_container.name = "_panel_container"
 	.add_child(_panel_container)
@@ -52,6 +56,47 @@ func _ready() -> void:
 		set_layout(null)
 	elif clone_layout_on_ready and not Engine.editor_hint:
 		set_layout(_layout.clone())
+
+
+func toggle_floating(_id: int, tab_container: TabContainer):
+	var node_name = tab_container.get_tab_title(tab_container.current_tab)
+	var node = find_node(node_name)
+	if node:
+		convert_to_window(node)
+
+
+func convert_to_window(node: Node):
+	var old_layout = get_layout().clone()
+	remove_child(node)
+	node.rect_global_position = Vector2.ZERO
+	var window = WindowDialog.new()
+	window.window_title = node.name
+	window.rect_min_size = node.rect_min_size
+	window.rect_size = node.rect_size
+	window.rect_position = OS.get_screen_size() / 2 - window.rect_size / 2
+	window.popup_exclusive = true
+	window.resizable = true
+	window.add_child(node)
+	windows.add_child(window)
+	window.show()
+	window.connect("visibility_changed", self, "_convert_to_pannel", [node, old_layout])
+	window.connect("item_rect_changed", self, "_change_content_rect", [node])
+
+
+func _change_content_rect(content):
+	content.rect_size = content.get_parent().rect_size
+	content.rect_position = Vector2.ZERO
+
+
+func _convert_to_pannel(content, old_layout):
+	var window = content.get_parent()
+	if window.visible:
+		return
+	content.get_parent().remove_child(content)
+	add_child(content)
+	window.queue_free()
+	yield(get_tree(), "idle_frame")
+	Global.top_menu_container.ui.layout = old_layout
 
 
 func _notification(what: int) -> void:
@@ -183,11 +228,17 @@ func get_tab_align() -> int:
 func set_tabs_visible(value: bool) -> void:
 	_tabs_visible = value
 	for i in range(1, _panel_container.get_child_count()):
-		var panel = _panel_container.get_child(i)
+		var panel: TabContainer = _panel_container.get_child(i)
 		if panel.get_tab_count() >= 2:
 			panel.tabs_visible = true
 		else:
 			panel.tabs_visible = value
+		if !panel.get_popup():
+			var list = PopupMenu.new()
+			list.add_item("Make Floating")
+			list.connect("id_pressed", self, "toggle_floating", [panel])
+			.add_child(list)
+			panel.set_popup(list)
 	queue_sort()
 
 
