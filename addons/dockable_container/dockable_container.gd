@@ -46,9 +46,11 @@ const DragNDropPanel := preload("drag_n_drop_panel.gd")
 ## restore layout to its default later.
 @export var clone_layout_on_ready := true
 
+
 var _layout := DockableLayout.new()
 var _panel_container := Container.new()
 var _split_container := Container.new()
+var _windows_container := Container.new()
 var _drag_n_drop_panel := DragNDropPanel.new()
 var _drag_panel: DockablePanel
 var _tab_align := TabBar.ALIGNMENT_CENTER
@@ -68,6 +70,8 @@ func _init() -> void:
 
 func _ready() -> void:
 	set_process_input(false)
+	_windows_container.name = "_windows_container"
+	get_parent().call_deferred("add_child", _windows_container)
 	_panel_container.name = "_panel_container"
 	add_child(_panel_container)
 	move_child(_panel_container, 0)
@@ -155,6 +159,46 @@ func _drop_data(_position: Vector2, data) -> void:
 	queue_sort()
 
 
+func toggle_floating(_id: int, tab_container: TabContainer):
+	var node_name = tab_container.get_tab_title(tab_container.current_tab)
+	var node = find_child(node_name)
+	if node:
+		convert_to_window(node)
+
+
+func convert_to_window(node: Control):
+	var old_layout = layout.clone()
+	remove_child(node)
+	node.global_position = Vector2.ZERO
+	var window = Window.new()
+	window.title = node.name
+	window.min_size = node.get_minimum_size()
+	window.size = node.size
+	window.position = DisplayServer.window_get_size() / 2 - window.size / 2
+	window.unresizable = false
+	window.wrap_controls = true
+	window.add_child(node)
+	_windows_container.add_child(window)
+	window.show()
+	window.visibility_changed.connect(_convert_to_pannel.bind(node, old_layout))
+	window.close_requested.connect(_convert_to_pannel.bind(node, old_layout))
+	window.get_viewport().size_changed.connect(_change_content_rect.bind(node))
+
+
+func _change_content_rect(content):
+	content.size = content.get_parent().size
+	content.position = Vector2.ZERO
+
+
+func _convert_to_pannel(content, old_layout):
+	var window: Window = content.get_window()
+	content.get_parent().remove_child(content)
+	add_child(content)
+	window.queue_free()
+	await  get_tree().process_frame
+	Global.top_menu_container.ui.layout = old_layout
+
+
 func set_control_as_current_tab(control: Control) -> void:
 	assert(
 		control.get_parent_control() == self,
@@ -201,6 +245,13 @@ func set_tabs_visible(value: bool) -> void:
 			panel.tabs_visible = true
 		else:
 			panel.tabs_visible = value
+		if panel is TabContainer:  # which is always the case (but just in case)
+			if !panel.get_popup():
+				var options = PopupMenu.new()
+				options.add_item("Make Floating")
+				options.id_pressed.connect(toggle_floating.bind(panel))
+				add_child(options)
+				panel.set_popup(options)
 
 
 func get_tabs_visible() -> bool:
