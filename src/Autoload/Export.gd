@@ -131,9 +131,6 @@ func process_animation(project := Global.current_project) -> void:
 	processed_images.clear()
 	durations.clear()
 	var frames := calculate_frames(project)
-	printerr(
-		"The frames were originally ", project.frames.size(), " and we now have ", frames.size()
-	)
 	for frame in frames:
 		var image := Image.new()
 		image.create(project.size.x, project.size.y, false, Image.FORMAT_RGBA8)
@@ -145,42 +142,28 @@ func process_animation(project := Global.current_project) -> void:
 func calculate_frames(project := Global.current_project) -> Array:
 	var frames := []
 	if frame_current_tag > 1:  # Specific tag
-		printerr("entering Specific tag")
 		var frame_start: int = project.animation_tags[frame_current_tag - 2].from
 		var frame_end: int = project.animation_tags[frame_current_tag - 2].to
 		frames = project.frames.slice(frame_start - 1, frame_end - 1, 1, true)
-		printerr("caught frames:", frames.size())
 	elif frame_current_tag == 1:  # Selected frames
-		printerr("entering Selected frames (Oh boy...)")
-		var visited = [] ## the visited array is for debugging purpose
+		var visited = []
 		for cel in project.selected_cels:
-			print("Selected cels are:", project.selected_cels)
-			## the visited code is for debugging purpose
 			if !cel[0] in visited: ## if a frame isn't visited before
 				visited.append(cel[0])
 			else:
-				printerr("Found Duplicate: ", cel[0], "Isolating")
+				# Found Duplicate (frame is already added)
 				continue
-			print("appending frame", cel[0])
 			frames.append(project.frames[cel[0]])
-		printerr("caught frames:",frames.size())
 	else:  # All frames
-		printerr("entering All frames")
 		frames = project.frames.duplicate()
-		printerr("caught frames:",frames.size())
 
 	if direction == AnimationDirection.BACKWARDS:
-		printerr("entering AnimationDirection.BACKWARDS")
 		frames.invert()
-		printerr("caught frames:",frames.size())
 	elif direction == AnimationDirection.PING_PONG:
-		printerr("entering AnimationDirection.BACKWARDS")
 		var inverted_frames := frames.duplicate()
 		inverted_frames.invert()
 		inverted_frames.remove(0)
 		frames.append_array(inverted_frames)
-		printerr("caught frames:",frames.size())
-	printerr("finished, frames caught so far ", frames.size())
 	return frames
 
 
