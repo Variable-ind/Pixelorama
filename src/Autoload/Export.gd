@@ -132,6 +132,9 @@ func process_animation(project := Global.current_project) -> void:
 	durations.clear()
 	var frames := calculate_frames(project)
 	for frame in frames:
+		printerr(
+			"The frames were originally ", project.frames.size(), " and we now have ", frames.size()
+		)
 		var image := Image.new()
 		image.create(project.size.x, project.size.y, false, Image.FORMAT_RGBA8)
 		blend_layers(image, frame)
