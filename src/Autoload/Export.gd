@@ -145,22 +145,31 @@ func process_animation(project := Global.current_project) -> void:
 func calculate_frames(project := Global.current_project) -> Array:
 	var frames := []
 	if frame_current_tag > 1:  # Specific tag
+		printerr("entering Specific tag")
 		var frame_start: int = project.animation_tags[frame_current_tag - 2].from
 		var frame_end: int = project.animation_tags[frame_current_tag - 2].to
 		frames = project.frames.slice(frame_start - 1, frame_end - 1, 1, true)
 	elif frame_current_tag == 1:  # Selected frames
+		printerr("entering Selected frames")
 		for cel in project.selected_cels:
 			frames.append(project.frames[cel[0]])
 	else:  # All frames
+		printerr("entering All frames")
+		printerr(frames.size())
 		frames = project.frames.duplicate()
 
 	if direction == AnimationDirection.BACKWARDS:
+		printerr("entering AnimationDirection.BACKWARDS")
 		frames.invert()
+		printerr(frames.size())
 	elif direction == AnimationDirection.PING_PONG:
+		printerr("entering AnimationDirection.BACKWARDS")
 		var inverted_frames := frames.duplicate()
 		inverted_frames.invert()
 		inverted_frames.remove(0)
 		frames.append_array(inverted_frames)
+		printerr(frames.size())
+	printerr("finished ", frames.size())
 	return frames
 
 

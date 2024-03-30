@@ -405,6 +405,7 @@ func _on_MultipleAnimationsDirectories_toggled(button_pressed: bool) -> void:
 
 
 func _on_Frames_item_selected(id: int) -> void:
+	printerr("selected: ", id)
 	Export.frame_current_tag = id
 	Export.process_data()
 	set_preview()
