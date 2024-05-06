@@ -209,21 +209,7 @@ func commit_undo() -> void:
 		layer = project.current_layer
 
 	project.undos += 1
-	for image in redo_data:
-		var compressed_data = redo_data[image]
-		var buffer_size = compressed_data["data"].size()
-		compressed_data["data"] = compressed_data["data"].compress()
-		project.undo_redo.add_do_method(
-			Global, "undo_redo_draw_op", image, compressed_data, buffer_size
-		)
-		image.unlock()
-	for image in _undo_data:
-		var compressed_data = _undo_data[image]
-		var buffer_size = compressed_data["data"].size()
-		compressed_data["data"] = compressed_data["data"].compress()
-		project.undo_redo.add_undo_method(
-			Global, "undo_redo_draw_op", image, compressed_data, buffer_size
-		)
+	Global.undo_redo_compress_images(redo_data, _undo_data, project)
 	project.undo_redo.add_do_method(Global, "undo_or_redo", false, frame, layer)
 	project.undo_redo.add_undo_method(Global, "undo_or_redo", true, frame, layer)
 	project.undo_redo.commit_action()
@@ -446,7 +432,7 @@ func remove_unselected_parts_of_brush(brush: Image, dst: Vector2) -> Image:
 	for x in size.x:
 		for y in size.y:
 			var pos := Vector2(x, y) + dst
-			if !project.selection_map.is_pixel_selected(pos):
+			if !project.can_pixel_get_drawn(pos):
 				new_brush.set_pixel(x, y, Color(0))
 	new_brush.unlock()
 	return new_brush
@@ -715,7 +701,7 @@ func _pick_color(position: Vector2) -> void:
 			image.lock()
 			color = image.get_pixelv(position)
 			image.unlock()
-			if color != Color(0, 0, 0, 0):
+			if not is_zero_approx(color.a):
 				break
 	var button := BUTTON_LEFT if Tools._slots[BUTTON_LEFT].tool_node == self else BUTTON_RIGHT
 	Tools.assign_color(color, button, false)

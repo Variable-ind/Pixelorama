@@ -221,7 +221,6 @@ onready var layer_opacity_slider: ValueSlider = animation_timeline.find_node("Op
 onready var tile_mode_offset_dialog: AcceptDialog = control.find_node("TileModeOffsetsDialog")
 onready var open_sprites_dialog: FileDialog = control.find_node("OpenSprite")
 onready var save_sprites_dialog: FileDialog = control.find_node("SaveSprite")
-onready var save_sprites_html5_dialog: ConfirmationDialog = control.find_node("SaveSpriteHTML5")
 onready var export_dialog: AcceptDialog = control.find_node("ExportDialog")
 onready var preferences_dialog: AcceptDialog = control.find_node("PreferencesDialog")
 onready var error_dialog: AcceptDialog = control.find_node("ErrorDialog")
@@ -480,7 +479,8 @@ func undo_or_redo(
 			"Center Frames",
 			"Merge Layer",
 			"Link Cel",
-			"Unlink Cel"
+			"Unlink Cel",
+			"Replaced Cel"
 		]
 	):
 		if layer_index > -1 and frame_index > -1:
@@ -539,7 +539,7 @@ func _renderer_changed(value: int) -> void:
 	ProjectSettings.set_initial_value("rendering/quality/driver/driver_name", "GLES2")
 	var renderer_name := OS.get_video_driver_name(renderer)
 	ProjectSettings.set_setting("rendering/quality/driver/driver_name", renderer_name)
-	ProjectSettings.save_custom(OVERRIDE_FILE)
+	ProjectSettings.save_custom(root_directory.plus_file(OVERRIDE_FILE))
 
 
 func _tablet_driver_changed(value: int) -> void:
@@ -548,7 +548,7 @@ func _tablet_driver_changed(value: int) -> void:
 		return
 	var tablet_driver_name := OS.get_tablet_driver_name(tablet_driver)
 	ProjectSettings.set_setting("display/window/tablet_driver", tablet_driver_name)
-	ProjectSettings.save_custom(OVERRIDE_FILE)
+	ProjectSettings.save_custom(root_directory.plus_file(OVERRIDE_FILE))
 
 
 func dialog_open(open: bool) -> void:
@@ -619,5 +619,35 @@ func convert_dictionary_values(dict: Dictionary) -> void:
 			dict[key] = str2var("Vector3" + dict[key])
 
 
-func undo_redo_draw_op(image: Object, compressed_image_data: Dictionary, buffer_size: int) -> void:
-	image["data"]["data"] = compressed_image_data["data"].decompress(buffer_size)
+func undo_redo_compress_images(
+	redo_data: Dictionary, undo_data: Dictionary, project := current_project
+) -> void:
+	for image in redo_data:
+		if not image is Image:
+			continue
+		var new_image: Dictionary = redo_data[image]
+		var new_size := Vector2(new_image["width"], new_image["height"])
+		var buffer_size: int = new_image["data"].size()
+		var compressed_data: PoolByteArray = new_image["data"].compress()
+		project.undo_redo.add_do_method(
+			self, "undo_redo_draw_op", image, new_size, compressed_data, buffer_size
+		)
+		image.unlock()
+	for image in undo_data:
+		if not image is Image:
+			continue
+		var new_image: Dictionary = undo_data[image]
+		var new_size := Vector2(new_image["width"], new_image["height"])
+		var buffer_size: int = new_image["data"].size()
+		var compressed_data: PoolByteArray = new_image["data"].compress()
+		project.undo_redo.add_undo_method(
+			self, "undo_redo_draw_op", image, new_size, compressed_data, buffer_size
+		)
+
+
+func undo_redo_draw_op(
+	image: Image, new_size: Vector2, compressed_image_data: PoolByteArray, buffer_size: int
+) -> void:
+	var decompressed := compressed_image_data.decompress(buffer_size)
+	image.crop(new_size.x, new_size.y)
+	image.data["data"] = decompressed

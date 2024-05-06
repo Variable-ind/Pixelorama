@@ -52,7 +52,7 @@ func draw_preview() -> void:
 		var canvas: Node2D = Global.canvas.previews
 		var position := canvas.position
 		var scale := canvas.scale
-		var temp_rect = _rect
+		var temp_rect := _rect
 		if Global.mirror_view:
 			position.x = position.x + Global.current_project.size.x
 			temp_rect.position.x = Global.current_project.size.x - temp_rect.position.x
@@ -77,9 +77,7 @@ func apply_selection(_position: Vector2) -> void:
 			Global.canvas.selection.commit_undo("Select", undo_data)
 
 	if _rect.size != Vector2.ZERO:
-		var selection_map_copy := SelectionMap.new()
-		selection_map_copy.copy_from(project.selection_map)
-		set_ellipse(selection_map_copy, _rect.position)
+		set_ellipse(project.selection_map, _rect.position)
 
 		# Handle mirroring
 		if Tools.horizontal_mirror:
@@ -90,7 +88,7 @@ func apply_selection(_position: Vector2) -> void:
 				+ 1
 			)
 			mirror_x_rect.end.x = Global.current_project.x_symmetry_point - _rect.end.x + 1
-			set_ellipse(selection_map_copy, mirror_x_rect.abs().position)
+			set_ellipse(project.selection_map, mirror_x_rect.abs().position)
 			if Tools.vertical_mirror:
 				var mirror_xy_rect := mirror_x_rect
 				mirror_xy_rect.position.y = (
@@ -99,7 +97,7 @@ func apply_selection(_position: Vector2) -> void:
 					+ 1
 				)
 				mirror_xy_rect.end.y = Global.current_project.y_symmetry_point - _rect.end.y + 1
-				set_ellipse(selection_map_copy, mirror_xy_rect.abs().position)
+				set_ellipse(project.selection_map, mirror_xy_rect.abs().position)
 		if Tools.vertical_mirror:
 			var mirror_y_rect := _rect
 			mirror_y_rect.position.y = (
@@ -108,16 +106,16 @@ func apply_selection(_position: Vector2) -> void:
 				+ 1
 			)
 			mirror_y_rect.end.y = Global.current_project.y_symmetry_point - _rect.end.y + 1
-			set_ellipse(selection_map_copy, mirror_y_rect.abs().position)
+			set_ellipse(project.selection_map, mirror_y_rect.abs().position)
 
-		project.selection_map = selection_map_copy
 		Global.canvas.selection.big_bounding_rectangle = project.selection_map.get_used_rect()
 		Global.canvas.selection.commit_undo("Select", undo_data)
 
 
 func set_ellipse(selection_map: SelectionMap, position: Vector2) -> void:
-	var project: Project = Global.current_project
 	var bitmap_size: Vector2 = selection_map.get_size()
+	var previous_selection_map := SelectionMap.new()  # Used for intersect
+	previous_selection_map.copy_from(selection_map)
 	if _intersect:
 		selection_map.clear()
 	var points := _get_shape_points_filled(_rect.size)
@@ -126,7 +124,7 @@ func set_ellipse(selection_map: SelectionMap, position: Vector2) -> void:
 		if pos.x < 0 or pos.y < 0 or pos.x >= bitmap_size.x or pos.y >= bitmap_size.y:
 			continue
 		if _intersect:
-			if project.selection_map.is_pixel_selected(pos):
+			if previous_selection_map.is_pixel_selected(pos):
 				selection_map.select_pixel(pos, true)
 		else:
 			selection_map.select_pixel(pos, !_subtract)

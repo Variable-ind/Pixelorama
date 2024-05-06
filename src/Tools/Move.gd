@@ -1,13 +1,12 @@
 extends BaseTool
 
-var _undo_data := {}
 var _start_pos: Vector2
 var _offset: Vector2
-
 # Used to check if the state of content transformation has been changed
 # while draw_move() is being called. For example, pressing Enter while still moving content
 var _content_transformation_check := false
 var _snap_to_grid := false  # Mouse Click + Ctrl
+var _undo_data := {}
 
 onready var selection_node: Node2D = Global.canvas.selection
 
@@ -134,16 +133,10 @@ func commit_undo(action: String) -> void:
 
 	project.undos += 1
 	project.undo_redo.create_action(action)
-	for image in redo_data:
-		project.undo_redo.add_do_property(image, "data", redo_data[image])
-		image.unlock()
-	for image in _undo_data:
-		project.undo_redo.add_undo_property(image, "data", _undo_data[image])
+	Global.undo_redo_compress_images(redo_data, _undo_data, project)
 	project.undo_redo.add_do_method(Global, "undo_or_redo", false, frame, layer)
 	project.undo_redo.add_undo_method(Global, "undo_or_redo", true, frame, layer)
 	project.undo_redo.commit_action()
-
-	_undo_data.clear()
 
 
 func _get_undo_data() -> Dictionary:
@@ -155,7 +148,7 @@ func _get_undo_data() -> Dictionary:
 			cels.append(project.frames[cel_index[0]].cels[cel_index[1]])
 	else:
 		for frame in project.frames:
-			var cel: PixelCel = frame.cels[project.current_layer]
+			var cel: BaseCel = frame.cels[project.current_layer]
 			cels.append(cel)
 	for cel in cels:
 		if not cel is PixelCel:

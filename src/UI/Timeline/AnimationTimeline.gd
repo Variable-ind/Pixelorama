@@ -301,6 +301,7 @@ func copy_frames(indices := [], destination := -1, select_new_cels := true) -> v
 		)
 	project.undos += 1
 	project.undo_redo.create_action("Add Frame")
+	var last_focus_cels = []
 	for f in indices:
 		var src_frame: Frame = project.frames[f]
 		var new_frame := Frame.new()
@@ -308,6 +309,8 @@ func copy_frames(indices := [], destination := -1, select_new_cels := true) -> v
 
 		new_frame.duration = src_frame.duration
 		for l in range(project.layers.size()):
+			if [f, l] in project.selected_cels:
+				last_focus_cels.append([copied_indices[indices.find(f)], l])
 			var src_cel: BaseCel = project.frames[f].cels[l]  # Cel we're copying from, the source
 			var new_cel: BaseCel
 			var selected_id := -1
@@ -347,9 +350,34 @@ func copy_frames(indices := [], destination := -1, select_new_cels := true) -> v
 				tag.to += 1
 	project.undo_redo.add_do_method(Global, "undo_or_redo", false)
 	project.undo_redo.add_undo_method(Global, "undo_or_redo", true)
+	# Note: temporarily set the selected cels to an empty array (needed for undo/redo)
+	project.undo_redo.add_do_property(Global.current_project, "selected_cels", [])
+	project.undo_redo.add_undo_property(Global.current_project, "selected_cels", [])
 	project.undo_redo.add_do_method(project, "add_frames", copied_frames, copied_indices)
 	project.undo_redo.add_undo_method(project, "remove_frames", copied_indices)
 	project.undo_redo.add_do_method(project, "change_cel", copied_indices[0])
+	if select_all_cels:
+		# Select all the new frames so that it is easier to move/offset collectively if user wants
+		# To ease animation workflow, new current frame is the first copied frame instead of the last
+		var all_new_cels = []
+		var range_start: int = copied_indices[-1]
+		var range_end = copied_indices[0]
+		var frame_diff_sign = sign(range_end - range_start)
+		if frame_diff_sign == 0:
+			frame_diff_sign = 1
+		for i in range(range_start, range_end + frame_diff_sign, frame_diff_sign):
+			for j in range(0, Global.current_project.layers.size()):
+				var frame_layer := [i, j]
+				if !all_new_cels.has(frame_layer):
+					all_new_cels.append(frame_layer)
+		project.undo_redo.add_do_property(Global.current_project, "selected_cels", all_new_cels)
+		project.undo_redo.add_do_method(project, "change_cel", range_end)
+	else:
+		project.undo_redo.add_do_property(Global.current_project, "selected_cels", last_focus_cels)
+		project.undo_redo.add_do_method(project, "change_cel", copied_indices[0])
+	project.undo_redo.add_undo_property(
+		Global.current_project, "selected_cels", project.selected_cels
+	)
 	project.undo_redo.add_undo_method(project, "change_cel", project.current_frame)
 	project.undo_redo.add_do_property(project, "animation_tags", new_animation_tags)
 	project.undo_redo.add_undo_property(project, "animation_tags", project.animation_tags)
@@ -571,16 +599,20 @@ func play_animation(play: bool, forward_dir: bool) -> void:
 
 func _on_NextFrame_pressed() -> void:
 	var project := Global.current_project
+	project.selected_cels.clear()
 	if project.current_frame < project.frames.size() - 1:
-		project.selected_cels.clear()
 		project.change_cel(project.current_frame + 1, -1)
+	else:
+		project.change_cel(0, -1)
 
 
 func _on_PreviousFrame_pressed() -> void:
 	var project := Global.current_project
+	project.selected_cels.clear()
 	if project.current_frame > 0:
-		project.selected_cels.clear()
 		project.change_cel(project.current_frame - 1, -1)
+	else:
+		project.change_cel(project.frames.size() - 1, -1)
 
 
 func _on_LastFrame_pressed() -> void:
@@ -872,8 +904,11 @@ func _on_MergeDownLayer_pressed() -> void:
 			project.undo_redo.add_do_property(bottom_cel, "image", bottom_image)
 			project.undo_redo.add_undo_property(bottom_cel, "image", bottom_cel.image)
 		else:
-			project.undo_redo.add_do_property(bottom_cel.image, "data", bottom_image.data)
-			project.undo_redo.add_undo_property(bottom_cel.image, "data", bottom_cel.image.data)
+			Global.undo_redo_compress_images(
+				{bottom_cel.image: bottom_image.data},
+				{bottom_cel.image: bottom_cel.image.data},
+				project
+			)
 
 	project.undo_redo.add_do_method(project, "remove_layers", [top_layer.index])
 	project.undo_redo.add_undo_method(

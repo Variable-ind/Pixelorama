@@ -97,8 +97,8 @@ func commit_action(cel: Image, _project: Project = Global.current_project) -> vo
 		var selection_rectangle: Rect2 = _project.selection_map.get_used_rect()
 		selection_size = selection_rectangle.size
 
-		var selection: Image = _project.selection_map
-		selection_tex.create_from_image(selection, 0)
+		var selection := _project.selection_map
+		selection_tex.create_from_image(selection.return_cropped_copy(_project.size), 0)
 
 		if !_type_is_shader():
 			image.lock()
@@ -181,10 +181,11 @@ func commit_action(cel: Image, _project: Project = Global.current_project) -> vo
 		URD:
 			DrawingAlgos.fake_rotsprite(image, angle, pivot)
 
-	if _project.has_selection and selection_checkbox.pressed and !_type_is_shader():
-		cel.blend_rect(image, Rect2(Vector2.ZERO, image.get_size()), Vector2.ZERO)
-	else:
-		cel.blit_rect(image, Rect2(Vector2.ZERO, image.get_size()), Vector2.ZERO)
+	if not _type_is_shader():
+		if _project.has_selection and selection_checkbox.pressed:
+			cel.blend_rect(image, Rect2(Vector2.ZERO, image.get_size()), Vector2.ZERO)
+		else:
+			cel.blit_rect(image, Rect2(Vector2.ZERO, image.get_size()), Vector2.ZERO)
 
 
 func _type_is_shader() -> bool:
@@ -309,7 +310,7 @@ func _on_Indicator_gui_input(event: InputEvent) -> void:
 		drag_pivot = false
 	if drag_pivot:
 		var img_size := preview_image.get_size()
-		var mouse_pos := get_local_mouse_position() - pivot_indicator.rect_position
+		var mouse_pos := pivot_indicator.get_local_mouse_position()
 		var ratio := img_size / pivot_indicator.rect_size
 		# we need to set the scale according to the larger side
 		var conversion_scale: float

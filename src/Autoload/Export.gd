@@ -147,7 +147,9 @@ func calculate_frames(project := Global.current_project) -> Array:
 		frames = project.frames.slice(frame_start - 1, frame_end - 1, 1, true)
 	elif frame_current_tag == 1:  # Selected frames
 		for cel in project.selected_cels:
-			frames.append(project.frames[cel[0]])
+			var frame: Frame = project.frames[cel[0]]
+			if not frames.has(frame):
+				frames.append(frame)
 	else:  # All frames
 		frames = project.frames.duplicate()
 
@@ -441,7 +443,7 @@ func blend_layers(
 	if export_layers == 0:
 		blend_all_layers(image, frame, origin, project)
 	elif export_layers == 1:
-		blend_selected_cels(image, frame, origin, project)
+		blend_selected_cels(image, frame, origin, project, true)
 	else:
 		var layer: BaseLayer = project.layers[export_layers - 2]
 		var layer_image := Image.new()
@@ -482,12 +484,25 @@ func blend_all_layers(
 
 # Blends selected cels of the given frame into passed image starting from the origin position
 func blend_selected_cels(
-	image: Image, frame: Frame, origin := Vector2(0, 0), project := Global.current_project
+	image: Image,
+	frame: Frame,
+	origin := Vector2.ZERO,
+	project := Global.current_project,
+	include_layers := false
 ) -> void:
 	for cel_ind in frame.cels.size():
-		var test_array := [project.current_frame, cel_ind]
-		if not test_array in project.selected_cels:
-			continue
+		if include_layers:
+			var layer_is_selected := false
+			for selected_cel in project.selected_cels:
+				if cel_ind == selected_cel[1]:
+					layer_is_selected = true
+					break
+			if not layer_is_selected:
+				continue
+		else:
+			var test_array := [project.frames.find(frame), cel_ind]
+			if not test_array in project.selected_cels:
+				continue
 		if frame.cels[cel_ind] is GroupCel:
 			continue
 		if not project.layers[cel_ind].is_visible_in_hierarchy():
