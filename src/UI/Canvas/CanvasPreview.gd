@@ -9,6 +9,9 @@ var h_frames := 1
 var v_frames := 1
 var start_sprite_sheet_frame := 1
 var end_sprite_sheet_frame := 1
+## Size of the final image being rendered by preview
+## This property can change depemding on mode
+var render_size := Vector2i.ZERO
 var frame_index := 0:
 	set(value):
 		frame_index = value
@@ -34,6 +37,7 @@ func _draw() -> void:
 	var project := Global.current_project
 	match mode:
 		Mode.TIMELINE:
+			render_size = project.size
 			if frame_index >= project.frames.size():
 				frame_index = project.current_frame
 			if animation_timer.is_stopped():
@@ -61,7 +65,8 @@ func _draw() -> void:
 			if frame_index >= end_sprite_sheet_frame:
 				frame_index = start_sprite_sheet_frame - 1
 			var src_rect := slices[frame_index]
-			var rect := Rect2(Vector2.ZERO, src_rect.size)
+			render_size = src_rect.size
+			var rect := Rect2(Vector2.ZERO, render_size)
 			# If we just use the first cel and it happens to be a GroupCel
 			# nothing will get drawn
 			var cel_to_draw := Global.current_project.find_first_drawable_cel()

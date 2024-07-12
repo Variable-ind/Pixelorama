@@ -1,11 +1,11 @@
 extends PanelContainer
 
-@onready var preview_zoom_slider := $VBox/HBox/VBoxContainer/PreviewZoomSlider as VSlider
-@onready var canvas_preview := $"%CanvasPreview" as Node2D
-@onready var camera := $"%CameraPreview" as CanvasCamera
-@onready var play_button := $"%PlayButton" as Button
-@onready var start_frame := $"%StartFrame" as ValueSlider
-@onready var end_frame := $"%EndFrame" as ValueSlider
+@onready var preview_zoom_slider := %PreviewZoomSlider as VSlider
+@onready var canvas_preview := %CanvasPreview as Node2D
+@onready var camera := %CameraPreview as CanvasCamera
+@onready var play_button := %PlayButton as Button
+@onready var start_frame := %StartFrame as ValueSlider
+@onready var end_frame := %EndFrame as ValueSlider
 
 
 func _ready() -> void:
@@ -43,12 +43,12 @@ func _on_OptionButton_item_selected(index: int) -> void:
 	play_button.button_pressed = false
 	canvas_preview.mode = index
 	if index == 0:
-		$VBox/Animation/VBoxContainer/Options.visible = false
+		$Sections/VBox/Animation/Options.visible = false
 		canvas_preview.transparent_checker.fit_rect(
 			Rect2(Vector2.ZERO, Global.current_project.size)
 		)
 	else:
-		$VBox/Animation/VBoxContainer/Options.visible = true
+		$Sections/VBox/Animation/Options.visible = true
 	canvas_preview.queue_redraw()
 
 
@@ -90,3 +90,7 @@ func _on_PreviewViewportContainer_mouse_entered() -> void:
 
 func _on_PreviewViewportContainer_mouse_exited() -> void:
 	camera.set_process_input(false)
+
+
+func _on_fit_pressed() -> void:
+	camera.fit_to_frame(canvas_preview.render_size)
