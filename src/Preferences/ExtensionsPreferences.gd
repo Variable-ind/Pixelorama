@@ -4,7 +4,11 @@ extends VBoxContainer
 @export var add_extension_file_dialog: FileDialog
 
 @onready var extensions := Global.control.get_node("Extensions") as Extensions
-@onready var extension_list := $InstalledExtensions as ItemList
+@onready var extension_list := %InstalledExtensions as ItemList
+@onready var extension_descriptions := %InstalledDescriptions as ItemList
+@onready var extension_versions := %InstalledVersions as ItemList
+@onready var extension_authors := %InstalledAuthors as ItemList
+@onready var extension_licenses := %InstalledLicenses as ItemList
 @onready var enable_button := $HBoxContainer/EnableButton as Button
 @onready var uninstall_button := $HBoxContainer/UninstallButton as Button
 @onready var enable_confirmation := %EnableExtensionConfirmation as ConfirmationDialog
@@ -25,8 +29,11 @@ func _ready() -> void:
 
 func _extension_loaded(extension: Extensions.Extension, extension_name: String) -> void:
 	extension_list.add_item(extension.display_name)
+	extension_descriptions.add_item(extension.description)
+	extension_versions.add_item(extension.version)
+	extension_authors.add_item(extension.author)
+	extension_licenses.add_item(extension.license)
 	var item_count := extension_list.get_item_count() - 1
-	extension_list.set_item_tooltip(item_count, extension.description)
 	extension_list.set_item_metadata(item_count, extension_name)
 
 
@@ -40,12 +47,23 @@ func _extension_uninstalled(extension_name: String) -> void:
 		print("Failed to find extension %s" % extension_name)
 		return
 	extension_list.remove_item(item)
+	extension_descriptions.remove_item(item)
+	extension_versions.remove_item(item)
+	extension_authors.remove_item(item)
+	extension_licenses.remove_item(item)
 	enable_button.disabled = true
 	uninstall_button.disabled = true
 
 
 func _on_InstalledExtensions_item_selected(index: int) -> void:
 	extensions.extension_selected = index
+	for child in $ExtensionsList.get_children():
+		if child is ItemList:
+			child.item_selected.disconnect(_on_InstalledExtensions_item_selected)
+			if not child.is_selected(index):
+				child.select(index)
+			#child.release_focus()
+			child.item_selected.connect(_on_InstalledExtensions_item_selected)
 	var file_name: String = extension_list.get_item_metadata(extensions.extension_selected)
 	var extension: Extensions.Extension = extensions.extensions[file_name]
 	if extension.enabled:
@@ -60,6 +78,11 @@ func _on_InstalledExtensions_item_selected(index: int) -> void:
 
 
 func _on_InstalledExtensions_empty_clicked(_position: Vector2, _button_index: int) -> void:
+	for child in $ExtensionsList.get_children():
+		if child is ItemList:
+			child.item_selected.disconnect(_on_InstalledExtensions_empty_clicked)
+			child.deselect_all()
+			child.item_selected.connect(_on_InstalledExtensions_empty_clicked)
 	enable_button.disabled = true
 	uninstall_button.disabled = true
 
