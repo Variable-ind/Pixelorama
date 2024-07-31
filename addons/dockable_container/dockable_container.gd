@@ -253,10 +253,10 @@ func set_layout(value: DockableLayout) -> void:
 		_layout.changed.disconnect(queue_sort)
 	_layout = value
 	_layout.changed.connect(queue_sort)
-	#if _windows_container.is_inside_tree():
 	for window in _windows_container.get_children():
-		if not window.name in _layout.windows:
-			window.hide()  ## Removes the window
+		if not window.name in _layout.windows and window is FloatingWindow:
+			window.prevent_data_erasure = true  ## we don't want to delete data
+			window.close_requested.emit()  ## Removes the window
 			continue
 	for window in _layout.windows.keys():
 		var panel = find_child(window, false)
@@ -369,7 +369,6 @@ func _untrack_node(node: Node) -> void:
 
 func _resort() -> void:
 	assert(_panel_container, "FIXME: resorting without _panel_container")
-
 	if _panel_container.get_index() != 0:
 		move_child(_panel_container, 0)
 	if _drag_n_drop_panel.get_index() < get_child_count() - 1:
@@ -391,7 +390,6 @@ func _resort() -> void:
 
 	_untrack_children_after(_panel_container, _current_panel_index)
 	_untrack_children_after(_split_container, _current_split_index)
-
 
 
 ## Calculate DockablePanel and SplitHandle minimum sizes, skipping empty

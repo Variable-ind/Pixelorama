@@ -4,7 +4,8 @@ extends Window
 signal data_changed
 
 var window_content: Control
-var _is_initialized: bool
+var _is_initialized: bool = false
+var prevent_data_erasure: bool = false
 
 
 func _input(event: InputEvent) -> void:
@@ -56,5 +57,5 @@ func destroy():
 
 
 func _exit_tree() -> void:
-	if _is_initialized:
+	if _is_initialized and !prevent_data_erasure:
 		data_changed.emit(name, {})
