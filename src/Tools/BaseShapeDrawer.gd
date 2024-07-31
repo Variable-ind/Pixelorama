@@ -153,37 +153,40 @@ func draw_end(pos: Vector2i) -> void:
 
 
 func draw_preview() -> void:
+	var canvas := Global.canvas.previews_sprite
 	if _drawing:
-		var canvas: CanvasItem = Global.canvas.previews
-		var indicator := BitMap.new()
 		var rect := _get_result_rect(_start, _dest)
 		var points := _get_points(rect.size)
-		var t_offset := _thickness - 1
-		var t_offsetv := Vector2i(t_offset, t_offset)
-		indicator.create(rect.size + t_offsetv)
-		for point in points:
-			indicator.set_bitv(point, 1)
-
-		var transform_pos := (
-			rect.position - t_offsetv + Vector2i((Vector2(0.5, 0.5) * (t_offset - 1)).ceil())
+		var image := Image.create(
+			Global.current_project.size.x, Global.current_project.size.y, false, Image.FORMAT_LA8
 		)
-		canvas.draw_set_transform(transform_pos, canvas.rotation, canvas.scale)
-
-		for line in _create_polylines(indicator):
-			canvas.draw_polyline(PackedVector2Array(line), Color.BLACK)
-
-		canvas.draw_set_transform(canvas.position, canvas.rotation, canvas.scale)
+		var thickness_vector := (
+			rect.position - Vector2i((Vector2(0.5, 0.5) * (_thickness - 1)).ceil())
+		)
+		for point in points:
+			var draw_pos := point + thickness_vector
+			if Rect2i(Vector2i.ZERO, image.get_size()).has_point(draw_pos):
+				image.set_pixelv(draw_pos, Color.WHITE)
+		var texture := ImageTexture.create_from_image(image)
+		canvas.texture = texture
+	else:
+		canvas.texture = null
 
 
 func _draw_shape(origin: Vector2i, dest: Vector2i) -> void:
 	var rect := _get_result_rect(origin, dest)
 	var points := _get_points(rect.size)
 	prepare_undo("Draw Shape")
+	var images := _get_selected_draw_images()
+	var thickness_vector := rect.position - Vector2i((Vector2(0.5, 0.5) * (_thickness - 1)).ceil())
 	for point in points:
 		# Reset drawer every time because pixel perfect sometimes breaks the tool
 		_drawer.reset()
 		# Draw each point offsetted based on the shape's thickness
-		draw_tool(rect.position + point - Vector2i((Vector2(0.5, 0.5) * (_thickness - 1)).ceil()))
+		var draw_pos := point + thickness_vector
+		if Global.current_project.can_pixel_get_drawn(draw_pos):
+			for image in images:
+				_drawer.set_pixel(image, draw_pos, tool_slot.color)
 
 	commit_undo()
 

@@ -121,24 +121,24 @@ func draw_end(pos: Vector2i) -> void:
 
 
 func draw_preview() -> void:
+	var previews := Global.canvas.previews_sprite
 	if not _drawing:
+		previews.texture = null
 		return
-	var canvas: Node2D = Global.canvas.previews
-	var pos := canvas.position
-	var canvas_scale := canvas.scale
-	if Global.mirror_view:  # This fixes previewing in mirror mode
-		pos.x = pos.x + Global.current_project.size.x
-		canvas_scale.x = -1
-
 	var points := _bezier()
-	canvas.draw_set_transform(pos, canvas.rotation, canvas_scale)
-	var indicator := _fill_bitmap_with_points(points, Global.current_project.size)
+	var image := Image.create(
+		Global.current_project.size.x, Global.current_project.size.y, false, Image.FORMAT_LA8
+	)
+	for point in points:
+		var draw_point := point
+		if Global.mirror_view:  # This fixes previewing in mirror mode
+			draw_point.x = image.get_width() - point.x - 1
+		if Rect2i(Vector2i.ZERO, image.get_size()).has_point(draw_point):
+			image.set_pixelv(draw_point, Color.WHITE)
+	var texture := ImageTexture.create_from_image(image)
+	previews.texture = texture
 
-	for line in _create_polylines(indicator):
-		canvas.draw_polyline(PackedVector2Array(line), Color.BLACK)
-
-	canvas.draw_set_transform(canvas.position, canvas.rotation, canvas.scale)
-
+	var canvas := Global.canvas.previews
 	var circle_radius := Vector2.ONE * (5.0 / Global.camera.zoom.x)
 	if _is_hovering_first_position(_last_mouse_position) and _curve.point_count > 1:
 		var circle_center := _curve.get_point_position(0)
@@ -166,11 +166,12 @@ func draw_preview() -> void:
 func _draw_shape() -> void:
 	var points := _bezier()
 	prepare_undo("Draw Shape")
+	var images := _get_selected_draw_images()
 	for point in points:
 		# Reset drawer every time because pixel perfect sometimes breaks the tool
 		_drawer.reset()
 		# Draw each point offsetted based on the shape's thickness
-		draw_tool(point)
+		_draw_pixel(point, images)
 	if _fill:
 		var v := Vector2i()
 		var image_size := Global.current_project.size
@@ -179,9 +180,15 @@ func _draw_shape() -> void:
 			for y in image_size.y:
 				v.y = y
 				if Geometry2D.is_point_in_polygon(v, points):
-					draw_tool(v)
+					_draw_pixel(v, images)
 	_clear()
 	commit_undo()
+
+
+func _draw_pixel(point: Vector2i, images: Array[Image]) -> void:
+	if Global.current_project.can_pixel_get_drawn(point):
+		for image in images:
+			_drawer.set_pixel(image, point, tool_slot.color)
 
 
 func _clear() -> void:
