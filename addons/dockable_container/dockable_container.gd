@@ -2,6 +2,9 @@
 class_name DockableContainer
 extends Container
 
+signal window_created
+signal window_closed
+
 const SplitHandle := preload("split_handle.gd")
 const DockablePanel := preload("dockable_panel.gd")
 const DragNDropPanel := preload("drag_n_drop_panel.gd")
@@ -30,6 +33,8 @@ const DragNDropPanel := preload("drag_n_drop_panel.gd")
 		for i in range(1, _panel_container.get_child_count()):
 			var panel := _panel_container.get_child(i) as DockablePanel
 			panel.show_tabs = _tabs_visible
+			if panel is TabContainer:  # which is always the case (but confirming just in case)
+				_add_floating_options(panel)
 ## If [code]true[/code] and a panel only has one tab, it keeps that tab hidden even if
 ## [member tabs_visible] is [code]true[/code].
 ## Only takes effect is [member tabs_visible] is [code]true[/code].
@@ -41,6 +46,8 @@ const DragNDropPanel := preload("drag_n_drop_panel.gd")
 		for i in range(1, _panel_container.get_child_count()):
 			var panel := _panel_container.get_child(i) as DockablePanel
 			panel.hide_single_tab = _hide_single_tab
+			if panel is TabContainer:  # which is always the case (but confirming just in case)
+				_add_floating_options(panel)
 @export var rearrange_group := 0
 @export var layout := DockableLayout.new():
 	get:
@@ -54,6 +61,7 @@ const DragNDropPanel := preload("drag_n_drop_panel.gd")
 
 var _layout := DockableLayout.new()
 var _panel_container := Container.new()
+var _windows_container := Container.new()
 var _split_container := Container.new()
 var _drag_n_drop_panel := DragNDropPanel.new()
 var _drag_panel: DockablePanel
@@ -80,6 +88,9 @@ func _ready() -> void:
 	_split_container.name = "_split_container"
 	_split_container.mouse_filter = MOUSE_FILTER_PASS
 	_panel_container.add_child(_split_container)
+	#if not _windows_container.get_parent():
+	_windows_container.name = "_windows_container"
+	get_parent().call_deferred("add_child", _windows_container)
 
 	_drag_n_drop_panel.name = "_drag_n_drop_panel"
 	_drag_n_drop_panel.mouse_filter = MOUSE_FILTER_PASS
@@ -161,6 +172,53 @@ func _drop_data(_position: Vector2, data) -> void:
 	queue_sort()
 
 
+func _add_floating_options(tabcontainer: TabContainer):
+	if !tabcontainer.get_popup():
+		var options = PopupMenu.new()
+		options.add_item("Make Floating")
+		options.id_pressed.connect(toggle_floating.bind(tabcontainer))
+		_windows_container.add_child(options)
+		tabcontainer.set_popup(options)
+
+
+## required when converting a window back to panel
+func _refresh_tabs_visible():
+	if tabs_visible:
+		tabs_visible = false
+		await get_tree().process_frame
+		await get_tree().process_frame
+		tabs_visible = true
+
+
+func toggle_floating(_id: int, tab_container: TabContainer):
+	var node_name = tab_container.get_tab_title(tab_container.current_tab)
+	var node = find_child(node_name, false)
+	if node:
+		convert_to_window(node)
+
+
+func convert_to_window(content: Control):
+	var old_owner = content.owner
+	var data = {}
+	if content.name in layout.windows:
+		data = layout.windows[content.name]
+	var window := FloatingWindow.new(content, data)
+	_windows_container.add_child(window)
+	window.show()
+	_refresh_tabs_visible()
+	window.close_requested.connect(_convert_to_pannel.bind(window, old_owner))
+	window.data_changed.connect(layout.save_window_properties)
+
+
+func _convert_to_pannel(window: FloatingWindow, old_owner: Node):
+	var content = window.window_content
+	window.remove_child(content)
+	window.destroy()
+	add_child(content)
+	content.owner = old_owner
+	_refresh_tabs_visible()
+
+
 func set_control_as_current_tab(control: Control) -> void:
 	assert(
 		control.get_parent_control() == self,
@@ -195,6 +253,16 @@ func set_layout(value: DockableLayout) -> void:
 		_layout.changed.disconnect(queue_sort)
 	_layout = value
 	_layout.changed.connect(queue_sort)
+	#if _windows_container.is_inside_tree():
+	for window in _windows_container.get_children():
+		if not window.name in _layout.windows:
+			window.hide()  ## Removes the window
+			continue
+	for window in _layout.windows.keys():
+		var panel = find_child(window, false)
+		## only those windows get created which were not previously created
+		if panel:
+			convert_to_window(panel)
 	_layout_dirty = true
 	queue_sort()
 
@@ -301,6 +369,7 @@ func _untrack_node(node: Node) -> void:
 
 func _resort() -> void:
 	assert(_panel_container, "FIXME: resorting without _panel_container")
+
 	if _panel_container.get_index() != 0:
 		move_child(_panel_container, 0)
 	if _drag_n_drop_panel.get_index() < get_child_count() - 1:
@@ -322,6 +391,7 @@ func _resort() -> void:
 
 	_untrack_children_after(_panel_container, _current_panel_index)
 	_untrack_children_after(_split_container, _current_split_index)
+
 
 
 ## Calculate DockablePanel and SplitHandle minimum sizes, skipping empty
