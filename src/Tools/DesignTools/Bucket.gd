@@ -446,13 +446,13 @@ func _compute_segments_for_image(
 
 func _color_segments(image: Image) -> void:
 	if _fill_with == FillWith.COLOR or _pattern == null:
-		var color: Color = tool_slot.color
+		var color_str = tool_slot.color.to_html()
 		# short circuit for flat colors
 		for c in _allegro_image_segments.size():
 			var p := _allegro_image_segments[c]
 			for px in range(p.left_position, p.right_position + 1):
 				# We don't have to check again whether the point being processed is within the bounds
-				image.set_pixel(px, p.y, color)
+				image.set_pixel(px, p.y, Color(color_str))
 	else:
 		# shortcircuit tests for patternfills
 		var pattern_size := _pattern.image.get_size()
