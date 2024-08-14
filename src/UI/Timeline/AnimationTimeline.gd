@@ -793,6 +793,8 @@ func add_layer(type := 0) -> void:
 			l = PixelLayer.new(project)
 		Global.LayerTypes.GROUP:
 			l = GroupLayer.new(project)
+		Global.LayerTypes.VECTOR:
+			l = VectorLayer.new(project)
 		Global.LayerTypes.THREE_D:
 			l = Layer3D.new(project)
 			SteamManager.set_achievement("ACH_3D_LAYER")

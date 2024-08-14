@@ -13,7 +13,7 @@ signal project_switched  ## Emitted whenever you switch to some other project ta
 signal cel_switched  ## Emitted whenever you select a different cel.
 signal project_data_changed(project: Project)  ## Emitted when project data is modified.
 
-enum LayerTypes { PIXEL, GROUP, THREE_D }
+enum LayerTypes { PIXEL, GROUP, VECTOR, THREE_D }
 enum GridTypes { CARTESIAN, ISOMETRIC, ALL }
 ## ## Used to tell whether a color is being taken from the current theme,
 ## or if it is a custom color.
