@@ -1,148 +1,139 @@
 class_name VectorCel
 extends BaseCel
+# A class for the properties of cels in VectorLayers.
+# The term "cel" comes from "celluloid" (https://en.wikipedia.org/wiki/Cel).
+# The "vshapes" variable stores the cel's content, VectorShapes
 
-signal selected_object(object: Cel3DObject)
-signal scene_property_changed
-signal objects_changed
+var vshapes := [] # Array[VectorBaseShape]
 
-var size: Vector2i  ## Size of the image rendered by the cel.
-## Keys are the ids of all [Cel3DObject]'s present in the scene, and their corresponding values
-## point to a [Dictionary] containing the properties of that [Cel3DObject].
-var object_properties := {}
-## The currently selected [Cel3DObject].
-var selected: Cel3DObject = null:
-	set(value):
-		if value == selected:
-			return
-		if is_instance_valid(selected):  # Unselect previous object if we selected something else
-			selected.deselect()
-		selected = value
-		if is_instance_valid(selected):  # Select new object
-			selected.select()
-		selected_object.emit(value)
-var current_object_id := 0  ## Its value never decreases.
+func _init(_vshapes := [], _opacity := 1.0, _image_texture: ImageTexture = null) -> void:
+	vshapes = _vshapes
+
+	if _image_texture:
+		image_texture = _image_texture
+	else:
+		# TODO: Can we prevent an extra update_texture when opening files (since it can't be deserialized until it has all cels)
+		# TODO: Is it possible to use the viewport texture directly?
+		image_texture = ImageTexture.new()
+		update_texture()
+	opacity = _opacity
+	process_test_tools()
 
 
-## Class Constructor (used as [code]Cel3D.new(size, from_pxo, object_prop, scene_prop)[/code])
-func _init(_size: Vector2i, from_pxo := false, _object_prop := {}, _scene_prop := {}) -> void:
-	size = _size
-	object_properties = _object_prop
-	_add_nodes()
-	if not from_pxo:
-		if object_properties.is_empty():
-			var transform := Transform3D()
-			transform.origin = Vector3(-2.5, 0, 0)
-			object_properties[0] = {"type": Cel3DObject.Type.DIR_LIGHT, "transform": transform}
-			_add_object_node(0)
-		current_object_id = object_properties.size()
+func process_test_tools():  # TODO: This method should be removed once integration with actual tools begins
+	# Selection Test Loop:
+	var prev_mouse_pos := Vector2.ZERO
+	while(true):
+		await Global.get_tree().process_frame
+
+		if not Global.current_project.frames[Global.current_project.current_frame].cels.has(self):
+			continue
+
+		var tmp_transform = Global.canvas.get_canvas_transform().affine_inverse()
+		var tmp_position = Global.main_viewport.get_local_mouse_position()
+		var mouse_pos = tmp_transform.basis_xform(tmp_position) + tmp_transform.origin
+
+		var selected_index := -1
+		for s in vshapes.size():
+			if vshapes[s].has_point(mouse_pos):
+				selected_index = s
+		if selected_index < 0:
+			print("Can't select")
+			continue
+		print("Selected shape ", selected_index)
+
+		if Input.is_key_pressed(KEY_M):
+			vshapes[selected_index].pos += mouse_pos - prev_mouse_pos
+			vshapes[selected_index].pos = vshapes[selected_index].pos.snapped(Vector2.ONE)
+			update_texture()
+		if Input.is_action_just_released("copy"):
+			var copy = vshapes[selected_index].get_script().new()
+			copy.deserialize(vshapes[selected_index].serialize())
+			copy.font = vshapes[selected_index].font.duplicate(true)
+			vshapes.append(copy)
+			update_texture()
+		if Input.is_action_just_released("delete"):
+			vshapes.remove_at(selected_index)
+			update_texture()
+		if Input.is_key_pressed(KEY_R):
+			vshapes[selected_index].text = str(int(randf_range(100000, 9999999)))
+			vshapes[selected_index].color.h = randf_range(0, 1)
+			vshapes[selected_index].outline_color.h = randf_range(0, 1)
+			vshapes[selected_index].font_size = randf_range(8, 16)
+			vshapes[selected_index].outline_size = randf_range(0, 4)
+			vshapes[selected_index].antialiased = bool(round(randf_range(0, 1)))
+			update_texture()
+		prev_mouse_pos = mouse_pos
 
 
-func _add_nodes() -> void:
-	var world := World3D.new()
-	world.environment = Environment.new()
-	world.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	for object in object_properties:
-		_add_object_node(object)
-	image_texture #= viewport.get_texture()
+func get_content():
+	return vshapes
 
 
-func _get_image_texture() -> Texture2D:
-	return image_texture
+func set_content(content, texture: ImageTexture = null) -> void:
+	vshapes = content
+	if is_instance_valid(texture):
+		image_texture = texture
+		if Vector2i(image_texture.get_size()) != Global.current_project.size:
+			update_texture()
+	else:
+		update_texture()
 
 
-func _update_objects_transform(id: int) -> void:  # Called by undo/redo
-	var properties: Dictionary = object_properties[id]
-	var object := get_object_from_id(id)
-	if not object:
-		print("Object with id %s not found" % id)
-		return
-	object.deserialize(properties)
+func create_empty_content():
+	return []
 
 
-func get_object_from_id(id: int) -> Cel3DObject:
-	#for child in parent_node.get_children():
-		#if not child is Cel3DObject:
-			#continue
-		#if child.id == id:
-			#return child
-	return null
-
-
-func size_changed(new_size: Vector2i) -> void:
-	size = new_size
-	#viewport.size = size
-	#image_texture = viewport.get_texture()
-
-
-func _add_object_node(id: int) -> void:
-	pass
-	#if not object_properties.has(id):
-		#print("Object id not found.")
-		#return
-	#var node3d := Cel3DObject.new()
-	#node3d.id = id
-	#node3d.cel = self
-	#parent_node.add_child(node3d)
-	#if object_properties[id].has("id"):
-		#node3d.deserialize(object_properties[id])
-	#else:
-		#if object_properties[id].has("transform"):
-			#node3d.transform = object_properties[id]["transform"]
-		#if object_properties[id].has("file_path"):
-			#node3d.file_path = object_properties[id]["file_path"]
-		#if object_properties[id].has("type"):
-			#node3d.type = object_properties[id]["type"]
-		#object_properties[id] = node3d.serialize()
-	#objects_changed.emit()
-
-
-func _remove_object_node(id: int) -> void:  ## Called by undo/redo
-	return
-	#var object := get_object_from_id(id)
-	#if is_instance_valid(object):
-		#if selected == object:
-			#selected = null
-		#object.queue_free()
-	#objects_changed.emit()
-
-
-# Overridden methods
+func copy_content():
+	var copy_vshapes := []
+	for vshape in vshapes:
+		var copy = vshape.get_script().new()
+		copy.deserialize(vshape.serialize())
+	return copy_vshapes
 
 
 func get_image() -> Image:
-	return
-	#return viewport.get_texture().get_image()
+	return image_texture.get_image()
 
 
-func serialize() -> Dictionary:
-	var dict := super.serialize()
-	var object_properties_str := {}
-	for prop in object_properties:
-		object_properties_str[prop] = var_to_str(object_properties[prop])
-	dict["object_properties"] = object_properties_str
-	return dict
+func update_texture() -> void:
+	if vshapes.is_empty():
+		# TODO: Color picker doesn't work when its a tiny image like this. Maybe it can can based on percentage? Or just have to use large full size
+		var image = Image.create(1, 1, false, Image.FORMAT_RGBA8)
+		image_texture = ImageTexture.create_from_image(image)
+		return
+	var start_msec := Time.get_ticks_msec()  # For benchmark
 
+	# TODO: Check if simply creating/setting up a viewport/canvas is slow. It may be worth keeping one around in Global or Project to share.
 
-func deserialize(dict: Dictionary) -> void:
-	super.deserialize(dict)
-	var objects_copy_str: Dictionary = dict["object_properties"]
-	for object_id_as_str in objects_copy_str:
-		if typeof(object_id_as_str) != TYPE_STRING:  # failsafe in case something has gone wrong
-			return
-		var id := int(object_id_as_str)
-		if current_object_id < id:
-			current_object_id = id
-		object_properties[id] = str_to_var(objects_copy_str[object_id_as_str])
-	current_object_id += 1
-	for object in object_properties:
-		_add_object_node(object)
+	var vp := RenderingServer.viewport_create()
+	var canvas := RenderingServer.canvas_create()
+	RenderingServer.viewport_attach_canvas(vp, canvas)
+	RenderingServer.viewport_set_size(vp, Global.current_project.size.x, Global.current_project.size.y)
+	RenderingServer.viewport_set_disable_3d(vp, true)
+	RenderingServer.viewport_set_active(vp, true)
+	RenderingServer.viewport_set_transparent_background(vp, true)
 
+	var ci_rid := RenderingServer.canvas_item_create()
+	RenderingServer.viewport_set_canvas_transform(vp, canvas, Transform3D())
+	RenderingServer.canvas_item_set_parent(ci_rid, canvas)
 
-func on_remove() -> void:
-	return
-	#if is_instance_valid(viewport):
-		#viewport.queue_free()
+	for vshape in vshapes:
+		vshape.draw(ci_rid)
 
+	RenderingServer.viewport_set_update_mode(vp, RenderingServer.VIEWPORT_UPDATE_ONCE)
+	RenderingServer.force_draw(false)
+	var viewport_texture := RenderingServer.texture_2d_get(RenderingServer.viewport_get_texture(vp))
+	RenderingServer.free_rid(vp)
+	RenderingServer.free_rid(canvas)
+	RenderingServer.free_rid(ci_rid)
 
-func get_class_name() -> String:
-	return "VectorCel"
+	# Perhaps texture_set_proxy will allow for faster updates to image_texture?
+
+	# TODO: This should be able to be made faster:
+	var shader_effect := ShaderImageEffect.new()
+	shader_effect.generate_image(viewport_texture, preload("res://src/Shaders/VectorRenderColorCorrect.gdshader"), {}, Global.current_project.size)
+
+	viewport_texture.convert(Image.FORMAT_RGBA8)
+	image_texture.create_from_image(viewport_texture, 0)
+	print("VectorCel update time (msec): ", Time.get_ticks_msec() - start_msec)
