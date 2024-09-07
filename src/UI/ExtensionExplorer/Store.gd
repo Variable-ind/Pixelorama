@@ -16,6 +16,7 @@ var extension_path: String  ## The path where extensions will be stored (obtaine
 var custom_links_remaining: int  ## Remaining custom links to be processed
 var redirects: Array[String]
 var faulty_custom_links: Array[String]
+var show_updater := false
 
 # node references used in this script
 @onready var content: VBoxContainer = $"%Content"
@@ -29,6 +30,7 @@ var faulty_custom_links: Array[String]
 @onready var faulty_links_label: Label = %FaultyLinks
 @onready var custom_link_error: AcceptDialog = %ErrorCustom
 @onready var error_get_info: AcceptDialog = %Error
+@onready var update_manager: Window = %UpdateManager
 
 
 func _ready() -> void:
@@ -38,9 +40,14 @@ func _ready() -> void:
 	extension_path = ProjectSettings.globalize_path(Extensions.EXTENSIONS_PATH)
 	# tell the downloader where to download the store information
 	store_info_downloader.download_file = extension_path.path_join(STORE_INFORMATION_FILE)
+	start_search()
 
 
 func _on_Store_about_to_show() -> void:
+	start_search()
+
+
+func start_search() -> void:
 	# Clear old tags
 	search_manager.available_tags = PackedStringArray()
 	for tag in search_manager.tag_list.get_children():
@@ -86,6 +93,8 @@ func _on_StoreInformation_request_completed(
 	else:
 		printerr("Unable to get info from remote repository.")
 		error_getting_info(result)
+	if show_updater:
+		update_manager.popup_centered()
 
 
 func close_progress() -> void:
@@ -106,6 +115,8 @@ func close_progress() -> void:
 				faulty_links_label.text = ""
 				for link in faulty_custom_links:
 					faulty_links_label.text += str(link, "\n")
+				if not visible:
+					return
 				custom_link_error.popup_centered()
 
 
@@ -125,11 +136,17 @@ func _on_CopyCommand_pressed() -> void:
 func add_entry(info: Dictionary) -> void:
 	var entry := EXTENSION_ENTRY_TSCN.instantiate()
 	content.add_child(entry)
-	entry.set_info(info, extension_path)
+	var is_update = entry.set_info(info, extension_path)
+	if is_update and info.has("name") and info.has("version"):
+		show_updater = true
+		update_manager.add_queue(info)
 
 
 ## Gets called when data couldn't be fetched from remote repository
 func error_getting_info(result: int) -> void:
+	if not visible:
+		close_progress()
+		return
 	# Shows a popup if error is from main link (i-e MainStore)
 	# Popups for errors in custom_links are handled in close_progress()
 	if custom_links_remaining == custom_store_links.custom_links.size():

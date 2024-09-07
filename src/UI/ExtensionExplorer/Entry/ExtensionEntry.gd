@@ -25,7 +25,7 @@ var is_update := false  ## An update instead of download
 @onready var alert_dialog := %Alert as AcceptDialog
 
 
-func set_info(info: Dictionary, extension_path: String) -> void:
+func set_info(info: Dictionary, extension_path: String) -> bool:
 	if "name" in info.keys() and "version" in info.keys():
 		ext_name.text = str(info["name"], "-v", info["version"])
 		# check for updates
@@ -58,6 +58,7 @@ func set_info(info: Dictionary, extension_path: String) -> void:
 	# Adding a tiny delay to prevent sending bulk requests
 	request_delay.wait_time = randf() * 2
 	request_delay.start()
+	return is_update
 
 
 func _on_RequestDelay_timeout() -> void:

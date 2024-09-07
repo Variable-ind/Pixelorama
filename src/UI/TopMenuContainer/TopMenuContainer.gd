@@ -83,6 +83,17 @@ class Dialog:
 		var is_file_dialog := node is FileDialog
 		Global.dialog_open(true, is_file_dialog)
 
+	## Loads up the dialog but keeps it hidden
+	func start_up() -> void:
+		if not is_instance_valid(node):
+			var scene := load(scene_path)
+			if not scene is PackedScene:
+				return
+			node = scene.instantiate()
+			if not is_instance_valid(node):
+				return
+			Global.control.get_node("Dialogs").add_child(node)
+
 
 func _ready() -> void:
 	Global.project_switched.connect(_project_switched)
@@ -95,6 +106,7 @@ func _ready() -> void:
 	_setup_effects_menu()
 	_setup_select_menu()
 	_setup_help_menu()
+	preferences_dialog.start_up()
 
 
 func _notification(what: int) -> void:

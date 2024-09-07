@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://chy5d42l72crk"]
+[gd_scene load_steps=6 format=3 uid="uid://chy5d42l72crk"]
 
 [ext_resource type="Script" path="res://src/UI/ExtensionExplorer/Store.gd" id="1_pwcwi"]
 [ext_resource type="Script" path="res://src/UI/ExtensionExplorer/Subscripts/SearchManager.gd" id="2_uqsvm"]
 [ext_resource type="Script" path="res://src/UI/ExtensionExplorer/Subscripts/CustomStoreLinks.gd" id="3_dk1xf"]
 [ext_resource type="Texture2D" uid="uid://d1urikaf1lxwl" path="res://assets/graphics/timeline/new_frame.png" id="4_ntl7p"]
+[ext_resource type="Script" path="res://src/UI/ExtensionExplorer/UpdateManager.gd" id="5_uq0oe"]
 
 [node name="Store" type="Window"]
 title = "Explore Online"
@@ -24,9 +25,11 @@ offset_left = 7.0
 offset_top = 8.0
 offset_right = -7.0
 offset_bottom = -8.0
+current_tab = 0
 
 [node name="Store" type="MarginContainer" parent="TabContainer"]
 layout_mode = 2
+metadata/_tab_index = 0
 
 [node name="StoreMainContainer" type="HSplitContainer" parent="TabContainer/Store"]
 layout_mode = 2
@@ -68,6 +71,7 @@ size_flags_horizontal = 3
 [node name="Options" type="MarginContainer" parent="TabContainer"]
 visible = false
 layout_mode = 2
+metadata/_tab_index = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="TabContainer/Options"]
 layout_mode = 2
@@ -219,6 +223,38 @@ text = "Unable to get info from remote repository."
 unique_name_in_owner = true
 layout_mode = 2
 
+[node name="UpdateManager" type="ConfirmationDialog" parent="."]
+unique_name_in_owner = true
+title = "Update Manager"
+size = Vector2i(688, 465)
+wrap_controls = false
+ok_button_text = "Update Now"
+cancel_button_text = "Remind me Later"
+script = ExtResource("5_uq0oe")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UpdateManager"]
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 678.0
+offset_bottom = 408.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UpdateManager/VBoxContainer"]
+layout_mode = 2
+
+[node name="Header" type="Label" parent="UpdateManager/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_type_variation = &"HeaderSmall"
+text = "Updates are Available"
+
+[node name="HSeparator" type="HSeparator" parent="UpdateManager/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="RichTextLabel" parent="UpdateManager/VBoxContainer"]
+layout_mode = 2
+text = "The following extensions can now be updated. It is recommended for extensions to always stay updated, so that they don't cause any conflicts with newer Pixelorama releases."
+fit_content = true
+
 [connection signal="about_to_popup" from="." to="." method="_on_Store_about_to_show"]
 [connection signal="close_requested" from="." to="." method="_on_close_requested"]
 [connection signal="text_changed" from="TabContainer/Store/StoreMainContainer/Parameters/SearchManager" to="TabContainer/Store/StoreMainContainer/Parameters/SearchManager" method="_on_SearchManager_text_changed"]
@@ -228,3 +264,4 @@ layout_mode = 2
 [connection signal="timeout" from="ProgressContainer/UpdateTimer" to="." method="_on_UpdateTimer_timeout"]
 [connection signal="request_completed" from="StoreInformationDownloader" to="." method="_on_StoreInformation_request_completed"]
 [connection signal="pressed" from="Error/Content/HBoxContainer/CopyCommand" to="." method="_on_CopyCommand_pressed"]
+[connection signal="confirmed" from="UpdateManager" to="UpdateManager" method="_on_confirmed"]
