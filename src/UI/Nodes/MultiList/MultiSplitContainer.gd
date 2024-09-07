@@ -2,6 +2,7 @@ class_name MultiSplitContainer
 extends GridContainer
 
 const DRAG_THRESHOLD := 5
+const PAUSE_DRAG_THRESHOLD := 5
 
 var drag_split_index: int = -1
 var drag_started := false:
@@ -14,6 +15,7 @@ var drag_started := false:
 var splits: Array[float]
 var max_size_x: float:
 	set(value):
+		_pause_offset = value
 		max_size_x = value
 		var ch = get_children()
 		ch.reverse()
@@ -26,7 +28,7 @@ var max_size_x: float:
 			else: break
 var _old_splits: Array[float]
 var _old_min_sizes: Array[float]
-
+var _pause_offset: float = INF
 
 func _init() -> void:
 	sort_children.connect(set_up_information)
@@ -51,6 +53,10 @@ func _gui_input(event: InputEvent) -> void:
 			## NOTE: simply using event.position.x - splits[drag_split_index] often resulted
 			## in wrong sign
 			var offset = event.position.x - _old_splits[drag_split_index]
+			if offset > _pause_offset:
+				return
+			else:
+				_pause_offset = max_size_x
 			var new_min_size = _old_min_sizes[drag_split_index] + offset
 			var split_child := get_child(drag_split_index)
 			split_child.custom_minimum_size.x = maxf(0, new_min_size)
@@ -72,6 +78,8 @@ func _gui_input(event: InputEvent) -> void:
 				## split_child.custom_minimum_size.x -= offset
 				## but it doesn'tseem to work
 				while size.x > max_size_x and try <= abs(offset):
+					if size.x - max_size_x >= PAUSE_DRAG_THRESHOLD:
+						_pause_offset = offset
 					split_child.custom_minimum_size.x -= 1
 					size.x = max_size_x
 					try += 1
