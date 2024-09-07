@@ -85,6 +85,10 @@ func _on_readme_button_pressed() -> void:
 
 
 func _on_Download_pressed() -> void:
+	start_download()
+
+
+func start_download() -> void:
 	down_button.disabled = true
 	extension_downloader.download_file = download_path
 	extension_downloader.request(download_link)

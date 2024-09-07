@@ -139,7 +139,7 @@ func add_entry(info: Dictionary) -> void:
 	var is_update = entry.set_info(info, extension_path)
 	if is_update and info.has("name") and info.has("version"):
 		show_updater = true
-		update_manager.add_queue(info)
+		update_manager.add_queue(info, entry)
 
 
 ## Gets called when data couldn't be fetched from remote repository
