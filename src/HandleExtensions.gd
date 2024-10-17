@@ -159,7 +159,11 @@ func _load_extension(extension_file_or_folder_name: StringName, internal := fals
 		var supported_api_versions = extension_json["supported_api_versions"]
 		if typeof(supported_api_versions) == TYPE_ARRAY:
 			supported_api_versions = PackedInt32Array(supported_api_versions)
-			if not ExtensionsApi.get_api_version() in supported_api_versions:
+			var current_api = ExtensionsApi.get_api_version()
+			if (
+				not current_api in supported_api_versions
+				and not floor(current_api) in supported_api_versions
+			):
 				var err_text := (
 					"The extension %s will not work on this version of Pixelorama \n"
 					% file_name_no_ext
@@ -175,6 +179,25 @@ func _load_extension(extension_file_or_folder_name: StringName, internal := fals
 					# Don't put it in faulty, it's merely incompatible
 					DirAccess.remove_absolute(EXTENSIONS_PATH.path_join("Faulty.txt"))
 				return
+			else:
+				var minor_find_array: Array[int] = [
+					supported_api_versions.find(current_api),
+					supported_api_versions.find(floor(current_api))
+				]
+				minor_find_array.erase(-1)
+				# NOTE: minor_find_array[0] is the version listed in supported_api_versions
+				# That is the closest to current version.
+				var closest_minor_version: float = supported_api_versions[minor_find_array[0]]
+				# We now check if the minor version extension uses is ahead of behind the
+				# minor version pixelorama uses.
+				if closest_minor_version > current_api:
+					# Pixelorama is attempting to open an extension made for later versions.
+					# It may be using some methods not yet present in pixelorama so it's best
+					# to avoid loading it
+					
+					## TODO: Provide a warning that displays the text above and gives a
+					## Load Anyway button. and save the action taken in preferences for next reload
+					pass
 
 	var extension := Extension.new()
 	extension.serialize(extension_json)
