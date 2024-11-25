@@ -9,6 +9,20 @@ var grid_preferences: Array[GridPreference] = [
 	GridPreference.new("grid_color", "GridColor", "color", Color.BLACK),
 ]
 
+# We should use pre defined initial grid colors instead of random colors
+const INITIAL_GRID_COLORS := [
+	Color.BLACK,
+	Color.WHITE,
+	Color.YELLOW,
+	Color.GREEN,
+	Color.BLUE,
+	Color.GRAY,
+	Color.ORANGE,
+	Color.PINK,
+	Color.SIENNA,
+	Color.CORAL,
+]
+
 var grid_selected: int = 0:
 	set(key):
 		grid_selected = key
@@ -109,17 +123,37 @@ func _on_grid_pref_value_changed(value, pref: GridPreference, button: RestoreDef
 
 
 func _on_grids_count_value_changed(value: float) -> void:
-	var grid_idx = int(value - 1)
 	var grids: Dictionary = Global.config_cache.get_value(
 		"preferences", "grids", {0: create_default_properties()}
 	)
+	var grid_idx := int(value - 1)
 	if grid_idx >= grids_select_container.get_child_count():
-		for key in range(grids_select_container.get_child_count(), grid_idx + 1):
+		# Add missing grids
+		for key in range(grids_select_container.get_child_count(), value):
 			if not grids.has(key):
-				grids[key] = create_default_properties()
+				var new_grid := create_default_properties()
+				if grids.has(key - 1): # failsafe
+					var last_grid = grids[key - 1]
+					# This small bit of code is there to make ui look a little neater
+					# Reasons:
+					# - Usually user intends to make the next grid twice the size.
+					# - Having all grids being same size initially may cause confusion for some
+					# users when they try to change color of a middle grid not seeing it's changing
+					# (due to being covered by grids above it).
+					if (
+						new_grid.has("grid_size")
+						and new_grid.has("isometric_grid_size")
+						and new_grid.has("grid_color")
+					):
+						new_grid["grid_size"] = last_grid["grid_size"] * 2
+						new_grid["isometric_grid_size"] = last_grid["isometric_grid_size"] * 2
+						if grid_idx < INITIAL_GRID_COLORS.size():
+							new_grid["grid_color"] = INITIAL_GRID_COLORS[grid_idx]
+				grids[key] = new_grid
 			add_remove_select_button(key)
 	else:
-		for key: int in range(grid_idx + 1, grids.size()):
+		# Remove extra grids
+		for key: int in range(value, grids.size()):
 			grids.erase(key)
 			add_remove_select_button(key, true)
 	Global.update_grids(grids)
@@ -161,3 +195,6 @@ func update_pref_ui(grid_data: Dictionary):
 		if grid_data.has(key):
 			var node := get_node(pref.node_path)
 			node.set(pref.value_type, grid_data[key])
+			if pref.value_type == "color":
+				# the signal doesn't seem to be emitted automatically
+				node.color_changed.emit(grid_data[key])
