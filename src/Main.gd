@@ -169,6 +169,12 @@ func _init() -> void:
 		DirAccess.make_dir_recursive_absolute("user://backups")
 	Global.shrink = _get_auto_display_scale()
 	_handle_layout_files()
+	# Load dither matrix images.
+	var dither_matrices_path := "user://dither_matrices"
+	if DirAccess.dir_exists_absolute(dither_matrices_path):
+		for file_name in DirAccess.get_files_at(dither_matrices_path):
+			var file_path := dither_matrices_path.path_join(file_name)
+			ShaderLoader.load_dither_matrix_from_file(file_path)
 
 
 func _ready() -> void:
@@ -443,7 +449,7 @@ func load_recent_project_file(path: String) -> void:
 
 func _on_OpenSprite_files_selected(paths: PackedStringArray) -> void:
 	for path in paths:
-		OpenSave.handle_loading_file(path)
+		OpenSave.handle_loading_file(path, true)
 	save_sprite_dialog.current_dir = paths[0].get_base_dir()
 
 

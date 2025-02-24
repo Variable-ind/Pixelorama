@@ -66,7 +66,7 @@ enum ImageMenu {
 	CROP_TO_CONTENT,
 }
 ## Enumeration of items present in the Select Menu.
-enum SelectMenu { SELECT_ALL, CLEAR_SELECTION, INVERT, WRAP_STROKES, MODIFY }
+enum SelectMenu { SELECT_ALL, CLEAR_SELECTION, INVERT, SELECT_CEL_AREA, WRAP_STROKES, MODIFY }
 ## Enumeration of items present in the Help Menu.
 enum HelpMenu {
 	VIEW_SPLASH_SCREEN,
@@ -819,6 +819,7 @@ func _initialize_keychain() -> void:
 		&"mirror_view": Keychain.InputAction.new("", "View menu", true),
 		&"show_grid": Keychain.InputAction.new("", "View menu", true),
 		&"show_pixel_grid": Keychain.InputAction.new("", "View menu", true),
+		&"show_pixel_indices": Keychain.InputAction.new("", "View menu", true),
 		&"show_guides": Keychain.InputAction.new("", "View menu", true),
 		&"show_rulers": Keychain.InputAction.new("", "View menu", true),
 		&"show_reference_images": Keychain.InputAction.new("", "View menu", true),
@@ -829,6 +830,7 @@ func _initialize_keychain() -> void:
 		&"clear_selection": Keychain.InputAction.new("", "Select menu", true),
 		&"select_all": Keychain.InputAction.new("", "Select menu", true),
 		&"invert_selection": Keychain.InputAction.new("", "Select menu", true),
+		&"select_cel_area": Keychain.InputAction.new("", "Select menu", true),
 		&"view_splash_screen": Keychain.InputAction.new("", "Help menu", true),
 		&"open_docs": Keychain.InputAction.new("", "Help menu", true),
 		&"issue_tracker": Keychain.InputAction.new("", "Help menu", true),
@@ -906,6 +908,10 @@ func _initialize_keychain() -> void:
 		&"reference_scale": Keychain.InputAction.new("", "Reference images", false),
 		&"reference_quick_menu": Keychain.InputAction.new("", "Reference images", false),
 		&"cancel_reference_transform": Keychain.InputAction.new("", "Reference images", false),
+		&"toggle_draw_tiles_mode": Keychain.InputAction.new("", "Tileset panel", false),
+		&"tile_edit_mode_manual": Keychain.InputAction.new("", "Tileset panel", false),
+		&"tile_edit_mode_auto": Keychain.InputAction.new("", "Tileset panel", false),
+		&"tile_edit_mode_stack": Keychain.InputAction.new("", "Tileset panel", false),
 		&"tile_rotate_left": Keychain.InputAction.new("", "Tileset panel", false),
 		&"tile_rotate_right": Keychain.InputAction.new("", "Tileset panel", false),
 		&"tile_flip_horizontal": Keychain.InputAction.new("", "Tileset panel", false),

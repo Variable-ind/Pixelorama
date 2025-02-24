@@ -25,7 +25,7 @@ func _ready() -> void:
 	update_autosave()
 
 
-func handle_loading_file(file: String) -> void:
+func handle_loading_file(file: String, force_import_dialog_on_images := false) -> void:
 	file = file.replace("\\", "/")
 	var file_ext := file.get_extension().to_lower()
 	if file_ext == "pxo":  # Pixelorama project file
@@ -74,7 +74,7 @@ func handle_loading_file(file: String) -> void:
 			var file_name: String = file.get_file()
 			Global.popup_error(tr("Can't load file '%s'.") % [file_name])
 			return
-		handle_loading_image(file, image)
+		handle_loading_image(file, image, force_import_dialog_on_images)
 
 
 func add_import_option(import_name: StringName, import_scene: PackedScene) -> int:
@@ -118,8 +118,12 @@ func load_image_from_buffer(buffer: PackedByteArray) -> Image:
 	return image
 
 
-func handle_loading_image(file: String, image: Image) -> void:
-	if Global.projects.size() <= 1 and Global.current_project.is_empty():
+func handle_loading_image(file: String, image: Image, force_import_dialog := false) -> void:
+	if (
+		Global.projects.size() <= 1
+		and Global.current_project.is_empty()
+		and not force_import_dialog
+	):
 		open_image_as_new_tab(file, image)
 		return
 	var preview_dialog := preview_dialog_tscn.instantiate() as ImportPreviewDialog
@@ -287,7 +291,10 @@ func open_pxo_file(path: String, is_backup := false, replace_empty := true) -> v
 					var image := Image.create_from_data(
 						tile_size.x, tile_size.y, false, new_project.get_image_format(), image_data
 					)
-					tileset.add_tile(image, null, 0)
+					if j > tileset.tiles.size() - 1:
+						tileset.add_tile(image, null, 0)
+					else:
+						tileset.tiles[j].image = image
 			for cel in new_project.get_all_pixel_cels():
 				if cel is CelTileMap:
 					cel.find_times_used_of_tiles()

@@ -21,8 +21,13 @@ static var placing_tiles := false:
 static var tile_editing_mode := TileEditingMode.AUTO
 static var selected_tile_index := 0:
 	set(value):
-		selected_tile_index = value
+		selected_tiles = [value]
 		_call_update_brushes()
+	get:
+		if is_instance_valid(current_tileset):
+			return current_tileset.pick_random_tile(selected_tiles)
+		return selected_tiles[0]
+static var selected_tiles: Array[int] = [0]
 static var is_flipped_h := false:
 	set(value):
 		is_flipped_h = value
@@ -35,7 +40,7 @@ static var is_transposed := false:
 	set(value):
 		is_transposed = value
 		_call_update_brushes()
-var current_tileset: TileSetCustom
+static var current_tileset: TileSetCustom
 var button_size := 36:
 	set(value):
 		if button_size == value:
@@ -58,6 +63,9 @@ var tile_index_menu_popped := 0
 @onready var options: Popup = $Options
 @onready var tile_size_slider: ValueSlider = %TileSizeSlider
 @onready var tile_button_popup_menu: PopupMenu = $TileButtonPopupMenu
+@onready var tile_properties: AcceptDialog = $TileProperties
+@onready var tile_probability_slider: ValueSlider = %TileProbabilitySlider
+@onready var tile_user_data_text_edit: TextEdit = %TileUserDataTextEdit
 
 
 func _ready() -> void:
@@ -113,21 +121,22 @@ func _on_cel_switched() -> void:
 
 func _update_tileset(_cel: BaseCel, _replace_index: int) -> void:
 	_clear_tile_buttons()
-	var button_group := ButtonGroup.new()
-	if selected_tile_index >= current_tileset.tiles.size():
+	for tile_index in selected_tiles:
+		if tile_index >= current_tileset.tiles.size():
+			selected_tiles.erase(tile_index)
+	if selected_tiles.is_empty():
 		selected_tile_index = 0
 	for i in current_tileset.tiles.size():
 		var tile := current_tileset.tiles[i]
 		var texture := ImageTexture.create_from_image(tile.image)
-		var button := _create_tile_button(texture, i, button_group)
-		if i == selected_tile_index:
+		var button := _create_tile_button(texture, i)
+		if i in selected_tiles:
 			button.set_pressed_no_signal(true)
 		tile_button_container.add_child(button)
 
 
-func _create_tile_button(texture: Texture2D, index: int, button_group: ButtonGroup) -> Button:
+func _create_tile_button(texture: Texture2D, index: int) -> Button:
 	var button := Button.new()
-	button.button_group = button_group
 	button.toggle_mode = true
 	button.custom_minimum_size = Vector2(button_size, button_size)
 	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
@@ -164,10 +173,28 @@ static func _call_update_brushes() -> void:
 			slot.tool_node.update_brush()
 
 
-func _on_tile_button_toggled(toggled_on: bool, index: int) -> void:
-	if toggled_on:
+func _on_tile_button_toggled(_toggled_on: bool, index: int) -> void:
+	if Input.is_action_pressed("shift"):
+		selected_tiles.sort()
+		var diff_sign := signi(index - selected_tiles[-1])
+		if diff_sign == 0:
+			diff_sign = 1
+		for i in range(selected_tiles[-1], index + diff_sign, diff_sign):
+			if not selected_tiles.has(i):
+				selected_tiles.append(i)
+				tile_button_container.get_child(i).set_pressed_no_signal(true)
+	elif Input.is_action_pressed("ctrl"):
+		if selected_tiles.has(index):
+			if selected_tiles.size() > 1:
+				selected_tiles.erase(index)
+		else:
+			selected_tiles.append(index)
+	else:
 		selected_tile_index = index
-		place_tiles.button_pressed = true
+		for i in tile_button_container.get_child_count():
+			var child_button := tile_button_container.get_child(i) as BaseButton
+			child_button.set_pressed_no_signal(i == index)
+	place_tiles.button_pressed = true
 
 
 func _on_tile_button_gui_input(event: InputEvent, index: int) -> void:
@@ -175,7 +202,7 @@ func _on_tile_button_gui_input(event: InputEvent, index: int) -> void:
 		tile_button_popup_menu.popup_on_parent(Rect2(get_global_mouse_position(), Vector2.ONE))
 		tile_index_menu_popped = index
 		tile_button_popup_menu.set_item_disabled(
-			0, not current_tileset.tiles[index].can_be_removed()
+			1, not current_tileset.tiles[index].can_be_removed()
 		)
 
 
@@ -255,10 +282,15 @@ func _on_show_empty_tile_toggled(toggled_on: bool) -> void:
 
 
 func _on_tile_button_popup_menu_index_pressed(index: int) -> void:
-	if tile_index_menu_popped == 0:
-		return
-	if index == 0:  # Delete
-		if current_tileset.tiles[tile_index_menu_popped].can_be_removed():
+	var selected_tile := current_tileset.tiles[tile_index_menu_popped]
+	if index == 0:  # Properties
+		tile_probability_slider.value = selected_tile.probability
+		tile_user_data_text_edit.text = selected_tile.user_data
+		tile_properties.popup_centered()
+	elif index == 1:  # Delete
+		if tile_index_menu_popped == 0:
+			return
+		if selected_tile.can_be_removed():
 			var undo_data := current_tileset.serialize_undo_data()
 			current_tileset.tiles.remove_at(tile_index_menu_popped)
 			var redo_data := current_tileset.serialize_undo_data()
@@ -273,3 +305,11 @@ func _on_tile_button_popup_menu_index_pressed(index: int) -> void:
 			project.undo_redo.add_undo_method(Global.undo_or_redo.bind(true))
 			project.undo_redo.add_do_method(Global.undo_or_redo.bind(false))
 			project.undo_redo.commit_action()
+
+
+func _on_tile_probability_slider_value_changed(value: float) -> void:
+	current_tileset.tiles[tile_index_menu_popped].probability = value
+
+
+func _on_tile_user_data_text_edit_text_changed() -> void:
+	current_tileset.tiles[tile_index_menu_popped].user_data = tile_user_data_text_edit.text

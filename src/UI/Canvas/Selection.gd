@@ -109,7 +109,7 @@ func _ready() -> void:
 	gizmos.append(Gizmo.new(Gizmo.Type.SCALE, Vector2i(0, 1)))  # Center bottom
 	gizmos.append(Gizmo.new(Gizmo.Type.SCALE, Vector2i(-1, 1)))  # Bottom left
 	gizmos.append(Gizmo.new(Gizmo.Type.SCALE, Vector2i(-1, 0)))  # Center left
-	gizmos.append(Gizmo.new(Gizmo.Type.ROTATE))  # Rotation gizmo (temp)
+	#gizmos.append(Gizmo.new(Gizmo.Type.ROTATE))  # Rotation gizmo (temp)
 
 
 func _input(event: InputEvent) -> void:
@@ -313,9 +313,9 @@ func _update_gizmos() -> void:
 	)
 
 	# Rotation gizmo (temp)
-	gizmos[8].rect = Rect2(
-		Vector2((rect_end.x + rect_pos.x - size.x) / 2, rect_pos.y - size.y - (size.y * 2)), size
-	)
+	#gizmos[8].rect = Rect2(
+	#Vector2((rect_end.x + rect_pos.x - size.x) / 2, rect_pos.y - size.y - (size.y * 2)), size
+	#)
 	queue_redraw()
 
 
@@ -665,7 +665,12 @@ func commit_undo(action: String, undo_data_tmp: Dictionary) -> void:
 		print("No undo data found!")
 		return
 	var project := Global.current_project
-	project.update_tilemaps(undo_data_tmp, TileSetPanel.TileEditingMode.AUTO)
+	if Tools.is_placing_tiles():
+		for cel in undo_data_tmp:
+			if cel is CelTileMap:
+				(cel as CelTileMap).re_index_all_cells(true)
+	else:
+		project.update_tilemaps(undo_data_tmp, TileSetPanel.TileEditingMode.AUTO)
 	var redo_data := get_undo_data(undo_data_tmp["undo_image"])
 	project.undos += 1
 	project.undo_redo.create_action(action)
@@ -1015,6 +1020,26 @@ func clear_selection(use_undo := false) -> void:
 	queue_redraw()
 	if use_undo:
 		commit_undo("Clear Selection", undo_data_tmp)
+
+
+func select_cel_rect() -> void:
+	transform_content_confirm()
+	var project := Global.current_project
+	var undo_data_tmp := get_undo_data(false)
+	project.selection_map.crop(project.size.x, project.size.y)
+	project.selection_map.clear()
+	var current_cel := project.get_current_cel()
+	var cel_image: Image
+	if current_cel is GroupCel:
+		var group_layer := project.layers[project.current_layer] as GroupLayer
+		cel_image = group_layer.blend_children(project.frames[project.current_frame])
+	else:
+		cel_image = current_cel.get_image()
+	project.selection_map.select_rect(cel_image.get_used_rect())
+	project.selection_map_changed()
+	big_bounding_rectangle = project.selection_map.get_used_rect()
+	project.selection_offset = Vector2.ZERO
+	commit_undo("Select", undo_data_tmp)
 
 
 func _project_switched() -> void:
