@@ -75,6 +75,7 @@ func _ready() -> void:
 
 
 func fix_precision_error(_float_value: float):
+	# Only proceed if fixing is needed else ignore
 	if str(value).length() - str(value).find(".") > 10:
 		var format_string = "%*.*f"
 		var round = step_decimals(min(step, snap_step))
