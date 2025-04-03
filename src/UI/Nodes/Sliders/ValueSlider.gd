@@ -70,7 +70,16 @@ func _ready() -> void:
 	if not Engine.is_editor_hint():  # Pixelorama specific code
 		_value_up_button.modulate = Global.modulate_icon_color
 		_value_down_button.modulate = Global.modulate_icon_color
+	value_changed.connect(fix_precision_error)
 	_setup_nodes()
+
+
+func fix_precision_error(_float_value: float):
+	if str(value).length() - str(value).find(".") > 10:
+		var format_string = "%*.*f"
+		var round = step_decimals(min(step, snap_step))
+		_line_edit.text = _line_edit.text.replace(
+			str(value), format_string % [0, round, value])
 
 
 func _notification(what: int) -> void:
@@ -162,10 +171,10 @@ func _gui_input(event: InputEvent) -> void:
 			# Snap when snap_by_default is true, do the opposite when Control is pressed
 			if snap_by_default:
 				if not event.ctrl_pressed:
-					value = roundf(value / snap_step) * snap_step
+					value = float(roundi(value / snap_step)) * snap_step
 			else:
 				if event.ctrl_pressed:
-					value = roundf(value / snap_step) * snap_step
+					value = float(roundi(value / snap_step)) * snap_step
 			get_viewport().set_input_as_handled()
 
 
@@ -282,6 +291,7 @@ func _reset_display(theme_has_changed := false) -> void:
 		else:
 			tint_progress = Color.TRANSPARENT
 	_line_edit.text = str(tr(prefix), " ", value, " ", tr(suffix)).strip_edges()
+	fix_precision_error(value)
 
 
 func _on_Value_button_down(direction: int) -> void:
