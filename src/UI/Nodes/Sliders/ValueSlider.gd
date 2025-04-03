@@ -171,10 +171,10 @@ func _gui_input(event: InputEvent) -> void:
 			# Snap when snap_by_default is true, do the opposite when Control is pressed
 			if snap_by_default:
 				if not event.ctrl_pressed:
-					value = float(roundi(value / snap_step)) * snap_step
+					value = roundf(value / snap_step) * snap_step
 			else:
 				if event.ctrl_pressed:
-					value = float(roundi(value / snap_step)) * snap_step
+					value = roundf(value / snap_step) * snap_step
 			get_viewport().set_input_as_handled()
 
 
