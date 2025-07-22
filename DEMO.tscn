@@ -43,7 +43,7 @@ size = Vector2i(1281, 717)
 size_2d_override_stretch = true
 render_target_update_mode = 4
 
-[node name="Control" parent="MeshInstance3D/SubViewport" groups=["Pixelorama"] instance=ExtResource("1_f1ggi")]
+[node name="Control" parent="MeshInstance3D/SubViewport" instance=ExtResource("1_f1ggi")]
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.843279, 0.537476, 0, -0.537476, 0.843279, 6.04109, 8.04941, 11.4606)

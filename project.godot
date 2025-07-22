@@ -63,6 +63,7 @@ enabled=PackedStringArray("res://addons/aimg_io/plugin.cfg", "res://addons/docka
 
 CanvasCameras=""
 CanvasPreviews=""
+Pixelorama=""
 
 [importer_defaults]
 

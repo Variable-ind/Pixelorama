@@ -19,7 +19,7 @@
 [ext_resource type="PackedScene" uid="uid://clbjfkdupw52l" path="res://src/UI/Timeline/CelProperties.tscn" id="17_ucs64"]
 [ext_resource type="PackedScene" uid="uid://clgu8wb5o6oup" path="res://src/UI/Dialogs/ExportDialog.tscn" id="39"]
 
-[node name="Control" type="Control"]
+[node name="Control" type="Control" groups=["Pixelorama"]]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
