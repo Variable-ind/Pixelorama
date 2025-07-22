@@ -1,6 +1,6 @@
 extends TabBar
 
-@onready var main := get_tree().current_scene
+@onready var main := get_tree().get_first_node_in_group("Pixelorama")
 @onready var unsaved_changes_dialog: ConfirmationDialog = main.find_child("UnsavedCanvasDialog")
 
 

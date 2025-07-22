@@ -622,7 +622,7 @@ var layer_button_node := preload("res://src/UI/Timeline/LayerButton.tscn")
 var cel_button_scene: PackedScene = load("res://src/UI/Timeline/CelButton.tscn")
 
 ## The control node (aka Main node). It has the [param Main.gd] script attached.
-@onready var control := get_tree().current_scene as Control
+@onready var control := get_tree().get_first_node_in_group("Pixelorama") as Control
 ## The project tabs bar. It has the [param Tabs.gd] script attached.
 @onready var tabs: TabBar = control.find_child("TabBar")
 ## Contains viewport of the main canvas. It has the [param ViewportContainer.gd] script attached.

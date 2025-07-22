@@ -179,6 +179,8 @@ func _init() -> void:
 			ShaderLoader.load_dither_matrix_from_file(file_path)
 
 
+
+
 func _ready() -> void:
 	get_tree().set_auto_accept_quit(false)
 
@@ -387,20 +389,20 @@ func _notification(what: int) -> void:
 			show_quit_dialog()
 		# If the mouse exits the window and another application has the focus,
 		# pause the application
-		NOTIFICATION_APPLICATION_FOCUS_OUT:
-			if Global.pause_when_unfocused:
-				get_tree().paused = true
-		NOTIFICATION_WM_MOUSE_EXIT:
+		#NOTIFICATION_APPLICATION_FOCUS_OUT:
+			#if Global.pause_when_unfocused:
+				#get_tree().paused = true
+		#NOTIFICATION_WM_MOUSE_EXIT:
 			# Do not pause the application if the mouse leaves the main window
 			# but there are child subwindows opened, because that makes them unresponsive.
-			var window_count := DisplayServer.get_window_list().size()
-			if not get_window().has_focus() and window_count == 1 and Global.pause_when_unfocused:
-				get_tree().paused = true
+			#var window_count := DisplayServer.get_window_list().size()
+			#if not get_window().has_focus() and window_count == 1 and Global.pause_when_unfocused:
+				#get_tree().paused = true
 		# Unpause it when the mouse enters the window or when it gains focus
-		NOTIFICATION_WM_MOUSE_ENTER:
-			get_tree().paused = false
-		NOTIFICATION_APPLICATION_FOCUS_IN:
-			get_tree().paused = false
+		#NOTIFICATION_WM_MOUSE_ENTER:
+			#get_tree().paused = false
+		#NOTIFICATION_APPLICATION_FOCUS_IN:
+			#get_tree().paused = false
 
 
 func _on_files_dropped(files: PackedStringArray) -> void:

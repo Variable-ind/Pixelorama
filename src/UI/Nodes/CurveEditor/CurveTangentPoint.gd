@@ -22,7 +22,7 @@ func _ready() -> void:
 
 func _draw() -> void:
 	var color := Color.GRAY
-	var current_scene := get_tree().current_scene
+	var current_scene := get_tree().get_first_node_in_group("Pixelorama")
 	if current_scene is Control:
 		var current_theme := (current_scene as Control).theme
 		color = current_theme.get_color("font_color", "Label")

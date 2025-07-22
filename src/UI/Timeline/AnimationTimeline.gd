@@ -80,7 +80,7 @@ func _ready() -> void:
 	layer_container.custom_minimum_size.x = layer_settings_container.size.x + 12
 	layer_header_container.custom_minimum_size.x = layer_container.custom_minimum_size.x
 	var loaded_cel_size: int = Global.config_cache.get_value("timeline", "cel_size", 40)
-	min_cel_size = get_tree().current_scene.theme.default_font_size + CEL_MIN_SIZE_OFFSET
+	min_cel_size = get_tree().get_first_node_in_group("Pixelorama").theme.default_font_size + CEL_MIN_SIZE_OFFSET
 	cel_size_slider.max_value = max_cel_size
 	cel_size = loaded_cel_size
 	add_layer_list.get_popup().id_pressed.connect(on_add_layer_list_id_pressed)
@@ -128,7 +128,7 @@ func _notification(what: int) -> void:
 		drag_highlight.hide()
 	elif what == NOTIFICATION_THEME_CHANGED or what == NOTIFICATION_TRANSLATION_CHANGED:
 		await get_tree().process_frame
-		min_cel_size = get_tree().current_scene.theme.default_font_size + CEL_MIN_SIZE_OFFSET
+		min_cel_size = get_tree().get_first_node_in_group("Pixelorama").theme.default_font_size + CEL_MIN_SIZE_OFFSET
 		if is_instance_valid(layer_settings_container):
 			layer_container.custom_minimum_size.x = layer_settings_container.size.x + 12
 			layer_header_container.custom_minimum_size.x = layer_container.custom_minimum_size.x

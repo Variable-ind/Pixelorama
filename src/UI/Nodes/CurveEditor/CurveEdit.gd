@@ -182,7 +182,7 @@ func reverse_transform_point(p: Vector2) -> Vector2:
 func _draw() -> void:
 	var bg := Color.DARK_GRAY
 	var fg := Color.GRAY
-	var current_scene := get_tree().current_scene
+	var current_scene := get_tree().get_first_node_in_group("Pixelorama")
 	if current_scene is Control:
 		var current_theme := (current_scene as Control).theme
 		var panel_stylebox := current_theme.get_stylebox("panel", "Panel")

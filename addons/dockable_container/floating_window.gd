@@ -24,7 +24,7 @@ func _ready() -> void:
 	set_deferred(&"size", Vector2(300, 300))
 	await get_tree().process_frame
 	await get_tree().process_frame
-	if get_tree().current_scene.get_window().gui_embed_subwindows:
+	if get_tree().get_first_node_in_group("Pixelorama").get_window().gui_embed_subwindows:
 		position = DisplayServer.window_get_size() / 2 - size / 2
 	else:
 		position = DisplayServer.screen_get_usable_rect().size / 2 - size / 2

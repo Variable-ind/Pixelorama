@@ -736,7 +736,7 @@ func view_menu_id_pressed(id: int) -> void:
 		Global.ViewMenu.CENTER_CANVAS:
 			Global.camera.offset = Global.current_project.size / 2
 		Global.ViewMenu.TILE_MODE_OFFSETS:
-			_popup_dialog(get_tree().current_scene.tile_mode_offsets_dialog)
+			_popup_dialog(get_tree().get_first_node_in_group("Pixelorama").tile_mode_offsets_dialog)
 		Global.ViewMenu.GREYSCALE_VIEW:
 			_toggle_greyscale_view()
 		Global.ViewMenu.MIRROR_VIEW:
@@ -789,7 +789,7 @@ func _tile_mode_submenu_id_pressed(id: Tiles.MODE) -> void:
 	Global.canvas.tile_mode.queue_redraw()
 	Global.canvas.pixel_grid.queue_redraw()
 	Global.canvas.grid.queue_redraw()
-	get_tree().current_scene.tile_mode_offsets_dialog.change_mask()
+	get_tree().get_first_node_in_group("Pixelorama").tile_mode_offsets_dialog.change_mask()
 
 
 func _selection_modify_submenu_id_pressed(id: int) -> void:
@@ -1145,7 +1145,7 @@ func select_menu_id_pressed(id: int) -> void:
 func help_menu_id_pressed(id: int) -> void:
 	match id:
 		Global.HelpMenu.VIEW_SPLASH_SCREEN:
-			_popup_dialog(get_tree().current_scene.splash_dialog)
+			_popup_dialog(get_tree().get_first_node_in_group("Pixelorama").splash_dialog)
 		Global.HelpMenu.ONLINE_DOCS:
 			OS.shell_open(DOCS_URL)
 			SteamManager.set_achievement("ACH_ONLINE_DOCS")

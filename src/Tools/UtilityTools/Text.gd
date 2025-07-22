@@ -11,7 +11,7 @@ var text_edit: TextToolEdit:
 	set(value):
 		text_edit = value
 		confirm_buttons.visible = is_instance_valid(text_edit)
-		get_tree().current_scene.is_writing_text = is_instance_valid(text_edit)
+		get_tree().get_first_node_in_group("Pixelorama").is_writing_text = is_instance_valid(text_edit)
 var text_size := 16
 var font := FontVariation.new()
 var font_name := "":

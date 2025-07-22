@@ -15,7 +15,7 @@ func _input(event: InputEvent) -> void:
 		return
 	if not Global.can_draw:
 		return
-	if get_tree().current_scene.is_writing_text:
+	if get_tree().get_first_node_in_group("Pixelorama").is_writing_text:
 		return
 	for action in ["undo", "redo"]:
 		if event.is_action_pressed(action):
