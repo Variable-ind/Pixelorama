@@ -452,7 +452,16 @@ func save_pxo_file(
 	var zip_packer := ZIPPacker.new()
 	var err := zip_packer.open(temp_path)
 	if err != OK:
-		Global.popup_error("The path that failed \n \"%s\"" % temp_path)
+		Global.popup_error(
+			(
+				'The path that failed \n "%s" \n The path exists: %s'
+				% [temp_path, FileAccess.file_exists(temp_path)]
+			)
+		)
+		printerr(
+			'The path that failed \n "%s" \n The path exists: %s'
+			% [temp_path, FileAccess.file_exists(temp_path)]
+		)
 		#Global.popup_error(tr("File failed to save. Error code %s (%s)") % [err, error_string(err)])
 		if temp_path.is_valid_filename():
 			return false
