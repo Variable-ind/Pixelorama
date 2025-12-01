@@ -1,4 +1,4 @@
-[gd_scene load_steps=55 format=3 uid="uid://c8dsi6ggkqa7a"]
+[gd_scene load_steps=56 format=3 uid="uid://c8dsi6ggkqa7a"]
 
 [ext_resource type="PackedScene" uid="uid://byu3rtoipuvoc" path="res://src/UI/ToolsPanel/Tools.tscn" id="1"]
 [ext_resource type="PackedScene" uid="uid://c546tskdu53j1" path="res://src/UI/Canvas/CanvasPreview.tscn" id="2"]
@@ -22,6 +22,7 @@
 [ext_resource type="Script" uid="uid://dqwin6fl5qqn0" path="res://src/UI/ViewportContainer.gd" id="23"]
 [ext_resource type="PackedScene" uid="uid://bfbragmmdwfbl" path="res://src/UI/TilesPanel.tscn" id="23_wyr78"]
 [ext_resource type="Script" uid="uid://bvvbi3x82xnut" path="res://addons/dockable_container/layout_split.gd" id="27"]
+[ext_resource type="PackedScene" uid="uid://mtacfl5ojypn" path="res://src/UI/PixeloramaNotes/PixeloramaNotes.tscn" id="27_bf5mq"]
 [ext_resource type="Script" uid="uid://bfi1mm158ge5l" path="res://addons/dockable_container/dockable_container.gd" id="35"]
 [ext_resource type="Script" uid="uid://da67x3ua6ietw" path="res://addons/dockable_container/layout_panel.gd" id="36"]
 [ext_resource type="Script" uid="uid://bssab6bm6lntw" path="res://src/UI/UI.gd" id="37"]
@@ -37,7 +38,7 @@ shader_parameter/size = Vector2(100, 100)
 [sub_resource type="Resource" id="Resource_xnnnd"]
 resource_name = "Tabs"
 script = ExtResource("36")
-names = PackedStringArray("Tools", "Reference Images", "Tiles")
+names = PackedStringArray("Tools", "Reference Images", "Tiles", "PixeloramaNotes")
 
 [sub_resource type="Resource" id="Resource_34hle"]
 resource_name = "Tabs"
@@ -300,7 +301,7 @@ camera_path = NodePath("SubViewport/Camera2D")
 disable_3d = true
 handle_input_locally = false
 canvas_item_default_texture_filter = 0
-size = Vector2i(821, 515)
+size = Vector2i(754, 515)
 render_target_update_mode = 4
 
 [node name="TransparentChecker" parent="DockableContainer/Main Canvas/ViewportandVerticalRuler/SubViewportContainer/SubViewport" instance=ExtResource("5")]
@@ -400,6 +401,10 @@ visible = false
 layout_mode = 2
 
 [node name="Recorder" parent="DockableContainer" instance=ExtResource("13")]
+visible = false
+layout_mode = 2
+
+[node name="PixeloramaNotes" parent="DockableContainer" instance=ExtResource("27_bf5mq")]
 visible = false
 layout_mode = 2
 
