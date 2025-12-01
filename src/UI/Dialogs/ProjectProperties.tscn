@@ -1,18 +1,20 @@
-[gd_scene load_steps=2 format=3 uid="uid://dnjcs2l1ri38n"]
+[gd_scene load_steps=3 format=3 uid="uid://dnjcs2l1ri38n"]
 
 [ext_resource type="Script" uid="uid://dy4j3c4fws8m" path="res://src/UI/Dialogs/ProjectProperties.gd" id="1_0n4uc"]
+[ext_resource type="PackedScene" uid="uid://mtacfl5ojypn" path="res://src/UI/ProjectNotes/ProjectNotes.tscn" id="2_h0qhi"]
 
 [node name="ProjectProperties" type="AcceptDialog"]
+oversampling_override = 1.0
 title = "Project Properties"
 position = Vector2i(0, 36)
-size = Vector2i(300, 288)
+size = Vector2i(300, 301)
 script = ExtResource("1_0n4uc")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 offset_left = 8.0
 offset_top = 8.0
 offset_right = 292.0
-offset_bottom = 239.0
+offset_bottom = 252.0
 
 [node name="GridContainer" type="GridContainer" parent="VBoxContainer"]
 layout_mode = 2
@@ -66,16 +68,15 @@ text = "Name:"
 [node name="NameLineEdit" type="LineEdit" parent="VBoxContainer/GridContainer"]
 layout_mode = 2
 
-[node name="UserDataLabel" type="Label" parent="VBoxContainer/GridContainer"]
+[node name="UserDataLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
 text = "User data:"
 
-[node name="UserDataTextEdit" type="TextEdit" parent="VBoxContainer/GridContainer"]
+[node name="ProjectNotes" parent="VBoxContainer" instance=ExtResource("2_h0qhi")]
 layout_mode = 2
-size_flags_horizontal = 3
-scroll_fit_content_height = true
+size_flags_vertical = 3
 
 [node name="TilesetsContainer" type="VBoxContainer" parent="VBoxContainer"]
 visible = false
@@ -102,5 +103,4 @@ hide_root = true
 
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
 [connection signal="text_changed" from="VBoxContainer/GridContainer/NameLineEdit" to="." method="_on_name_line_edit_text_changed"]
-[connection signal="text_changed" from="VBoxContainer/GridContainer/UserDataTextEdit" to="." method="_on_user_data_text_edit_text_changed"]
 [connection signal="button_clicked" from="VBoxContainer/TilesetsContainer/TilesetsList" to="." method="_on_tilesets_list_button_clicked"]

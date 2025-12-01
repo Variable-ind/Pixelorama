@@ -8,7 +8,7 @@ const REMOVE_TEXTURE := preload("res://assets/graphics/misc/close.png")
 @onready var frames_value_label := $VBoxContainer/GridContainer/FramesValueLabel as Label
 @onready var layers_value_label := $VBoxContainer/GridContainer/LayersValueLabel as Label
 @onready var name_line_edit := $VBoxContainer/GridContainer/NameLineEdit as LineEdit
-@onready var user_data_text_edit := $VBoxContainer/GridContainer/UserDataTextEdit as TextEdit
+@onready var project_notes: ProjectNotes = $VBoxContainer/ProjectNotes
 @onready var tilesets_container := $VBoxContainer/TilesetsContainer as VBoxContainer
 @onready var tilesets_list := $VBoxContainer/TilesetsContainer/TilesetsList as Tree
 
@@ -25,7 +25,7 @@ func _on_visibility_changed() -> void:
 	frames_value_label.text = str(Global.current_project.frames.size())
 	layers_value_label.text = str(Global.current_project.layers.size())
 	name_line_edit.text = Global.current_project.name
-	user_data_text_edit.text = Global.current_project.user_data
+	project_notes.update_text(Global.current_project.user_data)
 	tilesets_container.visible = Global.current_project.tilesets.size() > 0
 	tilesets_list.clear()
 	var root_item := tilesets_list.create_item()
@@ -54,10 +54,6 @@ func _create_tileset_tree_item(i: int, root_item: TreeItem) -> void:
 
 func _on_name_line_edit_text_changed(new_text: String) -> void:
 	Global.current_project.name = new_text
-
-
-func _on_user_data_text_edit_text_changed() -> void:
-	Global.current_project.user_data = user_data_text_edit.text
 
 
 func _on_tilesets_list_button_clicked(item: TreeItem, column: int, id: int, _mbi: int) -> void:
