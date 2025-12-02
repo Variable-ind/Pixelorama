@@ -3,14 +3,14 @@ extends AcceptDialog
 const DUPLICATE_TEXTURE := preload("res://assets/graphics/timeline/copy_frame.png")
 const REMOVE_TEXTURE := preload("res://assets/graphics/misc/close.png")
 
-@onready var size_value_label := $VBoxContainer/GridContainer/SizeValueLabel as Label
-@onready var color_mode_value_label := $VBoxContainer/GridContainer/ColorModeValueLabel as Label
-@onready var frames_value_label := $VBoxContainer/GridContainer/FramesValueLabel as Label
-@onready var layers_value_label := $VBoxContainer/GridContainer/LayersValueLabel as Label
-@onready var name_line_edit := $VBoxContainer/GridContainer/NameLineEdit as LineEdit
-@onready var project_notes: ProjectNotes = $VBoxContainer/ProjectNotes
-@onready var tilesets_container := $VBoxContainer/TilesetsContainer as VBoxContainer
-@onready var tilesets_list := $VBoxContainer/TilesetsContainer/TilesetsList as Tree
+@onready var size_value_label := %SizeValueLabel as Label
+@onready var color_mode_value_label := %ColorModeValueLabel as Label
+@onready var frames_value_label := %FramesValueLabel as Label
+@onready var layers_value_label := %LayersValueLabel as Label
+@onready var name_line_edit := %NameLineEdit as LineEdit
+@onready var project_notes: ProjectNotes = %ProjectNotes
+@onready var tilesets_container := %TilesetsContainer as VBoxContainer
+@onready var tilesets_list := %TilesetsList as Tree
 
 
 func _on_visibility_changed() -> void:

@@ -1,106 +1,126 @@
 [gd_scene load_steps=3 format=3 uid="uid://dnjcs2l1ri38n"]
 
 [ext_resource type="Script" uid="uid://dy4j3c4fws8m" path="res://src/UI/Dialogs/ProjectProperties.gd" id="1_0n4uc"]
-[ext_resource type="PackedScene" uid="uid://mtacfl5ojypn" path="res://src/UI/ProjectNotes/ProjectNotes.tscn" id="2_h0qhi"]
+[ext_resource type="PackedScene" uid="uid://mtacfl5ojypn" path="res://src/UI/Nodes/ProjectNotes/ProjectNotes.tscn" id="2_h0qhi"]
 
 [node name="ProjectProperties" type="AcceptDialog"]
 oversampling_override = 1.0
 title = "Project Properties"
 position = Vector2i(0, 36)
-size = Vector2i(300, 301)
+size = Vector2i(457, 330)
+visible = true
 script = ExtResource("1_0n4uc")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 offset_left = 8.0
 offset_top = 8.0
-offset_right = 292.0
-offset_bottom = 252.0
+offset_right = 449.0
+offset_bottom = 281.0
 
-[node name="GridContainer" type="GridContainer" parent="VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="GeneralProperties" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/HBoxContainer/GeneralProperties"]
 layout_mode = 2
 columns = 2
 
-[node name="SizeLabel" type="Label" parent="VBoxContainer/GridContainer"]
+[node name="SizeLabel" type="Label" parent="VBoxContainer/HBoxContainer/GeneralProperties/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Size:"
 
-[node name="SizeValueLabel" type="Label" parent="VBoxContainer/GridContainer"]
+[node name="SizeValueLabel" type="Label" parent="VBoxContainer/HBoxContainer/GeneralProperties/GridContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "64x64"
 
-[node name="ColorModeLabel" type="Label" parent="VBoxContainer/GridContainer"]
+[node name="ColorModeLabel" type="Label" parent="VBoxContainer/HBoxContainer/GeneralProperties/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Color mode:"
 
-[node name="ColorModeValueLabel" type="Label" parent="VBoxContainer/GridContainer"]
+[node name="ColorModeValueLabel" type="Label" parent="VBoxContainer/HBoxContainer/GeneralProperties/GridContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "RGBA8"
 
-[node name="FramesLabel" type="Label" parent="VBoxContainer/GridContainer"]
+[node name="FramesLabel" type="Label" parent="VBoxContainer/HBoxContainer/GeneralProperties/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Frames:"
 
-[node name="FramesValueLabel" type="Label" parent="VBoxContainer/GridContainer"]
+[node name="FramesValueLabel" type="Label" parent="VBoxContainer/HBoxContainer/GeneralProperties/GridContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "1"
 
-[node name="LayersLabel" type="Label" parent="VBoxContainer/GridContainer"]
+[node name="LayersLabel" type="Label" parent="VBoxContainer/HBoxContainer/GeneralProperties/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Layers:"
 
-[node name="LayersValueLabel" type="Label" parent="VBoxContainer/GridContainer"]
+[node name="LayersValueLabel" type="Label" parent="VBoxContainer/HBoxContainer/GeneralProperties/GridContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "1"
 
-[node name="NameLabel" type="Label" parent="VBoxContainer/GridContainer"]
+[node name="NameLabel" type="Label" parent="VBoxContainer/HBoxContainer/GeneralProperties/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Name:"
 
-[node name="NameLineEdit" type="LineEdit" parent="VBoxContainer/GridContainer"]
+[node name="NameLineEdit" type="LineEdit" parent="VBoxContainer/HBoxContainer/GeneralProperties/GridContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 
-[node name="UserDataLabel" type="Label" parent="VBoxContainer"]
+[node name="TilesetsContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/GeneralProperties"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TilesetsHeader" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/GeneralProperties/TilesetsContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/GeneralProperties/TilesetsContainer/TilesetsHeader"]
+layout_mode = 2
+theme_type_variation = &"HeaderSmall"
+text = "Tilesets"
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer/HBoxContainer/GeneralProperties/TilesetsContainer/TilesetsHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TilesetsList" type="Tree" parent="VBoxContainer/HBoxContainer/GeneralProperties/TilesetsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+hide_root = true
+
+[node name="UserData" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="UserDataLabel" type="Label" parent="VBoxContainer/HBoxContainer/UserData"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
 text = "User data:"
 
-[node name="ProjectNotes" parent="VBoxContainer" instance=ExtResource("2_h0qhi")]
+[node name="ProjectNotes" parent="VBoxContainer/HBoxContainer/UserData" instance=ExtResource("2_h0qhi")]
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 size_flags_vertical = 3
-
-[node name="TilesetsContainer" type="VBoxContainer" parent="VBoxContainer"]
-visible = false
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="TilesetsHeader" type="HBoxContainer" parent="VBoxContainer/TilesetsContainer"]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="Label" type="Label" parent="VBoxContainer/TilesetsContainer/TilesetsHeader"]
-layout_mode = 2
-theme_type_variation = &"HeaderSmall"
-text = "Tilesets"
-
-[node name="HSeparator" type="HSeparator" parent="VBoxContainer/TilesetsContainer/TilesetsHeader"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="TilesetsList" type="Tree" parent="VBoxContainer/TilesetsContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-hide_root = true
 
 [connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
-[connection signal="text_changed" from="VBoxContainer/GridContainer/NameLineEdit" to="." method="_on_name_line_edit_text_changed"]
-[connection signal="button_clicked" from="VBoxContainer/TilesetsContainer/TilesetsList" to="." method="_on_tilesets_list_button_clicked"]
+[connection signal="text_changed" from="VBoxContainer/HBoxContainer/GeneralProperties/GridContainer/NameLineEdit" to="." method="_on_name_line_edit_text_changed"]
+[connection signal="button_clicked" from="VBoxContainer/HBoxContainer/GeneralProperties/TilesetsContainer/TilesetsList" to="." method="_on_tilesets_list_button_clicked"]

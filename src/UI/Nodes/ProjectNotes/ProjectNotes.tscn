@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://mtacfl5ojypn"]
 
-[ext_resource type="Script" uid="uid://cm35xahkje64v" path="res://src/UI/ProjectNotes/ProjectNotes.gd" id="1_8ejrt"]
+[ext_resource type="Script" uid="uid://cm35xahkje64v" path="res://src/UI/Nodes/ProjectNotes/ProjectNotes.gd" id="1_8ejrt"]
 [ext_resource type="Texture2D" uid="uid://dvwgfoajkwkbt" path="res://assets/graphics/tools/text_options/allign_left.png" id="2_5vuny"]
 [ext_resource type="Texture2D" uid="uid://bw8cnv4x3bv76" path="res://assets/graphics/tools/text_options/allign_center.png" id="3_ltn3g"]
 [ext_resource type="Texture2D" uid="uid://crgq05c1i6p67" path="res://assets/graphics/tools/text_options/allign_right.png" id="4_454kh"]
@@ -13,38 +13,25 @@ script = ExtResource("1_8ejrt")
 
 [node name="TabContainer" type="TabContainer" parent="."]
 layout_mode = 2
-current_tab = 1
+current_tab = 0
 
-[node name="Note" type="ScrollContainer" parent="TabContainer"]
-visible = false
+[node name="Edit" type="VBoxContainer" parent="TabContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-horizontal_scroll_mode = 0
 metadata/_tab_index = 0
 
-[node name="Output" type="VBoxContainer" parent="TabContainer/Note"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="Code" type="VBoxContainer" parent="TabContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-metadata/_tab_index = 1
-
-[node name="HFlowContainer" type="HFlowContainer" parent="TabContainer/Code"]
+[node name="HFlowContainer" type="HFlowContainer" parent="TabContainer/Edit"]
 layout_mode = 2
 
-[node name="AlignOptions" type="HBoxContainer" parent="TabContainer/Code/HFlowContainer"]
+[node name="AlignOptions" type="HBoxContainer" parent="TabContainer/Edit/HFlowContainer"]
 layout_mode = 2
 
-[node name="ALeft" type="Button" parent="TabContainer/Code/HFlowContainer/AlignOptions"]
+[node name="ALeft" type="Button" parent="TabContainer/Edit/HFlowContainer/AlignOptions"]
 custom_minimum_size = Vector2(30, 0)
 layout_mode = 2
 focus_mode = 0
 
-[node name="TextureRect" type="TextureRect" parent="TabContainer/Code/HFlowContainer/AlignOptions/ALeft"]
+[node name="TextureRect" type="TextureRect" parent="TabContainer/Edit/HFlowContainer/AlignOptions/ALeft"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -59,12 +46,12 @@ texture = ExtResource("2_5vuny")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="ACenter" type="Button" parent="TabContainer/Code/HFlowContainer/AlignOptions"]
+[node name="ACenter" type="Button" parent="TabContainer/Edit/HFlowContainer/AlignOptions"]
 custom_minimum_size = Vector2(30, 0)
 layout_mode = 2
 focus_mode = 0
 
-[node name="TextureRect" type="TextureRect" parent="TabContainer/Code/HFlowContainer/AlignOptions/ACenter"]
+[node name="TextureRect" type="TextureRect" parent="TabContainer/Edit/HFlowContainer/AlignOptions/ACenter"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -79,12 +66,12 @@ texture = ExtResource("3_ltn3g")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="ARight" type="Button" parent="TabContainer/Code/HFlowContainer/AlignOptions"]
+[node name="ARight" type="Button" parent="TabContainer/Edit/HFlowContainer/AlignOptions"]
 custom_minimum_size = Vector2(30, 0)
 layout_mode = 2
 focus_mode = 0
 
-[node name="TextureRect" type="TextureRect" parent="TabContainer/Code/HFlowContainer/AlignOptions/ARight"]
+[node name="TextureRect" type="TextureRect" parent="TabContainer/Edit/HFlowContainer/AlignOptions/ARight"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -99,12 +86,12 @@ texture = ExtResource("4_454kh")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="AFill" type="Button" parent="TabContainer/Code/HFlowContainer/AlignOptions"]
+[node name="AFill" type="Button" parent="TabContainer/Edit/HFlowContainer/AlignOptions"]
 custom_minimum_size = Vector2(30, 0)
 layout_mode = 2
 focus_mode = 0
 
-[node name="TextureRect" type="TextureRect" parent="TabContainer/Code/HFlowContainer/AlignOptions/AFill"]
+[node name="TextureRect" type="TextureRect" parent="TabContainer/Edit/HFlowContainer/AlignOptions/AFill"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -119,27 +106,40 @@ texture = ExtResource("5_gwjtw")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="AddList" type="MenuButton" parent="TabContainer/Code/HFlowContainer"]
+[node name="AddList" type="MenuButton" parent="TabContainer/Edit/HFlowContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Add List"
 flat = false
 
-[node name="HelpButton" type="Button" parent="TabContainer/Code/HFlowContainer"]
+[node name="HelpButton" type="Button" parent="TabContainer/Edit/HFlowContainer"]
 layout_mode = 2
 text = "Help"
 
-[node name="CodeEdit" type="CodeEdit" parent="TabContainer/Code"]
+[node name="CodeEdit" type="CodeEdit" parent="TabContainer/Edit"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 wrap_mode = 1
 draw_tabs = true
 
+[node name="Preview" type="ScrollContainer" parent="TabContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_scroll_mode = 0
+metadata/_tab_index = 1
+
+[node name="Output" type="VBoxContainer" parent="TabContainer/Preview"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
 [connection signal="tab_changed" from="TabContainer" to="." method="_on_tab_container_tab_changed"]
-[connection signal="pressed" from="TabContainer/Code/HFlowContainer/AlignOptions/ALeft" to="." method="_on_a_left_pressed"]
-[connection signal="pressed" from="TabContainer/Code/HFlowContainer/AlignOptions/ACenter" to="." method="_on_a_center_pressed"]
-[connection signal="pressed" from="TabContainer/Code/HFlowContainer/AlignOptions/ARight" to="." method="_on_a_right_pressed"]
-[connection signal="pressed" from="TabContainer/Code/HFlowContainer/AlignOptions/AFill" to="." method="_on_a_fill_pressed"]
-[connection signal="pressed" from="TabContainer/Code/HFlowContainer/HelpButton" to="." method="_on_button_pressed"]
-[connection signal="text_changed" from="TabContainer/Code/CodeEdit" to="." method="_on_code_edit_text_changed"]
+[connection signal="pressed" from="TabContainer/Edit/HFlowContainer/AlignOptions/ALeft" to="." method="_on_a_left_pressed"]
+[connection signal="pressed" from="TabContainer/Edit/HFlowContainer/AlignOptions/ACenter" to="." method="_on_a_center_pressed"]
+[connection signal="pressed" from="TabContainer/Edit/HFlowContainer/AlignOptions/ARight" to="." method="_on_a_right_pressed"]
+[connection signal="pressed" from="TabContainer/Edit/HFlowContainer/AlignOptions/AFill" to="." method="_on_a_fill_pressed"]
+[connection signal="pressed" from="TabContainer/Edit/HFlowContainer/HelpButton" to="." method="_on_button_pressed"]
+[connection signal="text_changed" from="TabContainer/Edit/CodeEdit" to="." method="_on_code_edit_text_changed"]
