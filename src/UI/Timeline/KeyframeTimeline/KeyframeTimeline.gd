@@ -113,41 +113,30 @@ func _recreate_timeline() -> void:
 	layer_element_tree.create_item()
 	for child in track_container.get_children():
 		child.queue_free()
-	#region Add tracks for layer effects.
+	#region Add tracks for animatable objects.
 	# Await is needed so that the params get added to the layer effect.
 	await get_tree().process_frame
+	if current_layer is BoneLayer:
+		var bone_section := add_section("Bone", KeyframeAnimationTrack.TrackTypes.LAYER_EFFECT)
+		var animatable_props = current_layer.default_bone_params()
+		for param_name in animatable_props.keys():
+			var value = animatable_props[param_name]
+			if not LayerEffect.is_animatable_type(value):
+				continue
+			add_property(
+				param_name, KeyframeAnimationTrack.TrackTypes.BONE, bone_section, current_layer
+			)
 	for effect in current_layer.effects:
-		var tree_item := layer_element_tree.create_item()
-		tree_item.set_text(0, effect.name)
-		var track := KeyframeAnimationTrack.new()
-		track.type = KeyframeAnimationTrack.TrackTypes.LAYER_EFFECT
-		track.custom_minimum_size.x = frame_ui_size * Global.current_project.frames.size()
-		track.custom_minimum_size.y = layer_element_tree.get_item_area_rect(tree_item).size.y
-		track_container.add_child(track)
+		var effect_item := add_section(effect.name, KeyframeAnimationTrack.TrackTypes.LAYER_EFFECT)
 		for param_name in effect.params:
 			if param_name in ["PXO_time", "PXO_frame_index", "PXO_layer_index"]:
 				continue
 			var value = effect.params[param_name]
 			if not LayerEffect.is_animatable_type(value):
 				continue
-			var param_tree_item := tree_item.create_child()
-			param_tree_item.set_text(0, Keychain.humanize_snake_case(param_name))
-			var param_track := KeyframeAnimationTrack.new()
-			param_track.type = KeyframeAnimationTrack.TrackTypes.LAYER_EFFECT
-			param_track.timeline = self
-			param_track.effect = effect
-			param_track.param_name = param_name
-			param_track.is_property = true
-			var tree_item_area_rect := layer_element_tree.get_item_area_rect(param_tree_item)
-			param_track.custom_minimum_size.x = frame_ui_size * Global.current_project.frames.size()
-			param_track.custom_minimum_size.y = tree_item_area_rect.size.y
-			track_container.add_child(param_track)
-			if effect.animated_params.has(param_name):
-				for frame_index: int in effect.animated_params[param_name]:
-					var key_button := _create_keyframe_button(
-						frame_index, param_track, effect.animated_params, param_name
-					)
-					param_track.add_child(key_button)
+			add_property(
+				param_name, KeyframeAnimationTrack.TrackTypes.LAYER_EFFECT, effect_item, effect
+			)
 	#endregion
 	select_keyframes()
 	await get_tree().process_frame
@@ -155,6 +144,57 @@ func _recreate_timeline() -> void:
 	track_scroll_container.scroll_vertical = v_scroll
 	# Hide UI which is un-usable
 	_hide_extra_ui()
+
+
+func add_section(
+	section_name: StringName, track_type: KeyframeAnimationTrack.TrackTypes
+) -> TreeItem:
+	var tree_item := layer_element_tree.create_item()
+	tree_item.set_text(0, section_name)
+	var track := KeyframeAnimationTrack.new()
+	track.type = track_type
+	track.custom_minimum_size.x = frame_ui_size * Global.current_project.frames.size()
+	track.custom_minimum_size.y = layer_element_tree.get_item_area_rect(tree_item).size.y
+	track_container.add_child(track)
+	return tree_item
+
+
+# NOTE: the property to be animated must have a animated_params variable
+func add_property(
+	property: StringName,
+	param_type: KeyframeAnimationTrack.TrackTypes,
+	parent_item: TreeItem,
+	animatable_object: RefCounted,
+	animation_dictionary_name: StringName = &"animated_params"
+):
+	var param_tree_item := parent_item.create_child()
+	param_tree_item.set_text(0, Keychain.humanize_snake_case(property))
+	var param_track := KeyframeAnimationTrack.new()
+	param_track.type = param_type
+	param_track.timeline = self
+	param_track.param_name = property
+	param_track.is_property = true
+	var tree_item_area_rect := layer_element_tree.get_item_area_rect(param_tree_item)
+	param_track.custom_minimum_size.x = frame_ui_size * Global.current_project.frames.size()
+	param_track.custom_minimum_size.y = tree_item_area_rect.size.y
+	track_container.add_child(param_track)
+	match param_track.type:
+		KeyframeAnimationTrack.TrackTypes.LAYER_EFFECT:
+			param_track.effect = animatable_object
+		KeyframeAnimationTrack.TrackTypes.BONE:
+			param_track.bone_layer = animatable_object
+
+	var animation_dictionary: Dictionary[String, Dictionary] = animatable_object.get(
+		animation_dictionary_name
+	)
+	if not animation_dictionary:
+		return
+	if animation_dictionary.has(property):
+		for frame_index: int in animation_dictionary[property]:
+			var key_button := _create_keyframe_button(
+				frame_index, param_track, animation_dictionary, property
+			)
+			param_track.add_child(key_button)
 
 
 func _hide_extra_ui() -> void:
@@ -369,6 +409,21 @@ func _update_keyframe_property_ui(dict: Dictionary, keyframe_id: int) -> void:
 			properties_grid_container.get_node(^"EaseTypeOptions") as OptionButton
 		)
 		ease_type_options.select(ease_type)
+
+
+func add_bone_keyframe(bone_layer: BoneLayer, frame_index: int, param_name: String) -> void:
+	var next_keyframe_id := bone_layer.next_keyframe_id
+	selected_keyframes = [next_keyframe_id]
+	var undo_redo := Global.current_project.undo_redo
+	undo_redo.create_action("Add keyframe")
+	undo_redo.add_do_method(bone_layer.set_keyframe.bind(param_name, frame_index))
+	undo_redo.add_undo_method(func(): bone_layer.animated_params[param_name].erase(frame_index))
+	undo_redo.add_undo_method(unselect_keyframe.bind(next_keyframe_id))
+	undo_redo.add_do_method(_recreate_timeline)
+	undo_redo.add_undo_method(_recreate_timeline)
+	undo_redo.add_do_method(Global.undo_or_redo.bind(false))
+	undo_redo.add_undo_method(Global.undo_or_redo.bind(true))
+	undo_redo.commit_action()
 
 
 func add_effect_keyframe(effect: LayerEffect, frame_index: int, param_name: String) -> void:

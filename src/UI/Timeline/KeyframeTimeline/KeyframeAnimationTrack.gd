@@ -7,12 +7,15 @@ enum TrackTypes { LAYER_EFFECT , BONE}
 
 var timeline: KeyframeTimeline
 var type := TrackTypes.LAYER_EFFECT
-var effect: LayerEffect
 var param_name: String
 var is_property := false
 var popup_menu := PopupMenu.new()
 var keyframe_at := 0
 var line_color := Color.WHITE
+
+# Various animatable stuff
+var effect: LayerEffect
+var bone_layer: BoneLayer
 
 
 func _ready() -> void:
@@ -50,12 +53,13 @@ func _draw() -> void:
 
 func _on_popup_menu_id_pressed(id: int) -> void:
 	if id == 0:
-		if (
-			effect.animated_params.has(param_name)
-			and effect.animated_params[param_name].has(keyframe_at)
-		):
-			return
-		if type == TrackTypes.LAYER_EFFECT:
-			timeline.add_effect_keyframe(effect, keyframe_at, param_name)
-		if type == TrackTypes.BONE:
-			timeline.add_effect_keyframe(effect, keyframe_at, param_name)
+		match type:
+			TrackTypes.LAYER_EFFECT:
+				if (
+					effect.animated_params.has(param_name)
+					and effect.animated_params[param_name].has(keyframe_at)
+				):
+					return
+				timeline.add_effect_keyframe(effect, keyframe_at, param_name)
+			TrackTypes.BONE:
+				timeline.add_bone_keyframe(bone_layer, keyframe_at, param_name)

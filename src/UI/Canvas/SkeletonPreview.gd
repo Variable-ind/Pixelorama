@@ -11,12 +11,11 @@ var transformation_active := false
 
 func _ready() -> void:
 	Global.camera.zoom_changed.connect(queue_redraw)
-	Global.cel_switched.connect(test)
+	Global.cel_switched.connect(update_bone_layers)
 
 
-func test():
+func update_bone_layers():
 	var project := Global.current_project
-	print("==========")
 	if project:
 		#for i: int in range(project.layers.size() - 1, -1, -1):
 		for i: int in range(0, project.layers.size()):

@@ -433,8 +433,8 @@ func is_blender() -> bool:
 func update_children(property: String, diff):
 	if not is_instance_valid(project):
 		return
-	if should_make_keyframes and self == Global.canvas.skeleton.selected_bone:
-		set_keyframe(property, project.current_frame, get(property))
+	#if should_make_keyframes and self == Global.canvas.skeleton.selected_bone:
+		#set_keyframe(property, project.current_frame, get(property))
 	## update first child (This will trigger a chain process)
 	for child_bone in get_child_bones(false):
 		if child_bone.get_layer_type() == Global.LayerTypes.BONE:
