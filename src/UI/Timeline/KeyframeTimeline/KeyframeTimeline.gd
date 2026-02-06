@@ -9,11 +9,11 @@ static var selected_keyframes: Array[int]
 var current_layer: BaseLayer:
 	set(value):
 		if is_instance_valid(current_layer):
-			if current_layer.effects_added_removed.is_connected(_recreate_timeline):
-				current_layer.effects_added_removed.disconnect(_recreate_timeline)
+			if current_layer.effects_added_removed.is_connected(recreate_timeline):
+				current_layer.effects_added_removed.disconnect(recreate_timeline)
 		current_layer = value
-		_recreate_timeline()
-		current_layer.effects_added_removed.connect(_recreate_timeline)
+		recreate_timeline()
+		current_layer.effects_added_removed.connect(recreate_timeline)
 		await get_tree().process_frame
 		keyframe_timeline_cursor.update_position()
 		await get_tree().process_frame
@@ -106,7 +106,7 @@ static func get_selected_keyframe_buttons() -> Array[KeyframeButton]:
 	return keyframe_buttons
 
 
-func _recreate_timeline() -> void:
+func recreate_timeline() -> void:
 	var h_scroll := track_scroll_container.scroll_horizontal
 	var v_scroll := track_scroll_container.scroll_vertical
 	layer_element_tree.clear()
@@ -117,7 +117,7 @@ func _recreate_timeline() -> void:
 	# Await is needed so that the params get added to the layer effect.
 	await get_tree().process_frame
 	if current_layer is BoneLayer:
-		var bone_section := add_section("Bone", KeyframeAnimationTrack.TrackTypes.LAYER_EFFECT)
+		var bone_section := add_section("Bone", KeyframeAnimationTrack.TrackTypes.BONE)
 		var animatable_props = current_layer.default_bone_params()
 		for param_name in animatable_props.keys():
 			var value = animatable_props[param_name]
@@ -357,7 +357,7 @@ func _on_keyframe_property_changed(new_value, property_name: String) -> void:
 	var undo_redo := Global.current_project.undo_redo
 	undo_redo.create_action("Change keyframe %s" % property_name, UndoRedo.MERGE_ENDS)
 	var last_key_button: KeyframeButton
-	for key_button in get_selected_keyframe_buttons():
+	for key_button: KeyframeButton in get_selected_keyframe_buttons():
 		var dict := key_button.dict
 		var param_name := key_button.param_name
 		var frame_index := key_button.frame_index
@@ -365,6 +365,8 @@ func _on_keyframe_property_changed(new_value, property_name: String) -> void:
 		undo_redo.add_do_method(func(): dict[param_name][frame_index][property_name] = new_value)
 		undo_redo.add_undo_method(func(): dict[param_name][frame_index][property_name] = old_value)
 		last_key_button = key_button
+		if param_name in ["start_point", "bone_rotation"]:
+			Global.canvas.skeleton.queue_redraw()
 	var last_dict := last_key_button.dict
 	var last_param_name := last_key_button.param_name
 	var last_frame_index := last_key_button.frame_index
@@ -416,11 +418,13 @@ func add_bone_keyframe(bone_layer: BoneLayer, frame_index: int, param_name: Stri
 	selected_keyframes = [next_keyframe_id]
 	var undo_redo := Global.current_project.undo_redo
 	undo_redo.create_action("Add keyframe")
-	undo_redo.add_do_method(bone_layer.set_keyframe.bind(param_name, frame_index))
+	undo_redo.add_do_method(
+		bone_layer.set_keyframe.bind(param_name, frame_index, bone_layer.get(param_name))
+	)
 	undo_redo.add_undo_method(func(): bone_layer.animated_params[param_name].erase(frame_index))
 	undo_redo.add_undo_method(unselect_keyframe.bind(next_keyframe_id))
-	undo_redo.add_do_method(_recreate_timeline)
-	undo_redo.add_undo_method(_recreate_timeline)
+	undo_redo.add_do_method(recreate_timeline)
+	undo_redo.add_undo_method(recreate_timeline)
 	undo_redo.add_do_method(Global.undo_or_redo.bind(false))
 	undo_redo.add_undo_method(Global.undo_or_redo.bind(true))
 	undo_redo.commit_action()
@@ -434,8 +438,8 @@ func add_effect_keyframe(effect: LayerEffect, frame_index: int, param_name: Stri
 	undo_redo.add_do_method(effect.set_keyframe.bind(param_name, frame_index))
 	undo_redo.add_undo_method(func(): effect.animated_params[param_name].erase(frame_index))
 	undo_redo.add_undo_method(unselect_keyframe.bind(next_keyframe_id))
-	undo_redo.add_do_method(_recreate_timeline)
-	undo_redo.add_undo_method(_recreate_timeline)
+	undo_redo.add_do_method(recreate_timeline)
+	undo_redo.add_undo_method(recreate_timeline)
 	undo_redo.add_do_method(Global.undo_or_redo.bind(false))
 	undo_redo.add_undo_method(Global.undo_or_redo.bind(true))
 	undo_redo.commit_action()
@@ -452,8 +456,8 @@ func _on_keyframe_deleted() -> void:
 		undo_redo.add_do_method(func(): dict[param_name].erase(frame_index))
 		undo_redo.add_undo_method(func(): dict[param_name][frame_index] = old_dict)
 		undo_redo.add_do_method(unselect_keyframe.bind(key_button.keyframe_id))
-	undo_redo.add_do_method(_recreate_timeline)
-	undo_redo.add_undo_method(_recreate_timeline)
+	undo_redo.add_do_method(recreate_timeline)
+	undo_redo.add_undo_method(recreate_timeline)
 	undo_redo.add_do_method(Global.undo_or_redo.bind(false))
 	undo_redo.add_undo_method(Global.undo_or_redo.bind(true))
 	undo_redo.commit_action()
@@ -481,8 +485,8 @@ func update_keyframe_positions() -> void:
 		undo_redo.add_do_method(_apply_frame_moves.bind(param_dict, move_list))
 		undo_redo.add_undo_method(_apply_frame_moves.bind(param_dict, _invert_moves(move_list)))
 
-	undo_redo.add_do_method(_recreate_timeline)
-	undo_redo.add_undo_method(_recreate_timeline)
+	undo_redo.add_do_method(recreate_timeline)
+	undo_redo.add_undo_method(recreate_timeline)
 	undo_redo.add_do_method(Global.undo_or_redo.bind(false))
 	undo_redo.add_undo_method(Global.undo_or_redo.bind(true))
 	undo_redo.commit_action()

@@ -151,27 +151,26 @@ func _on_ik_error_margin_value_changed(value: float) -> void:
 	update_config()
 	save_config()
 
-
-func _on_rotation_changed(value: float):
-	if current_selected_bone:
-		var bone_cel = current_selected_bone.get_current_bone_cel()
-		var old_update_children = bone_cel.should_update_children
-		bone_cel.should_update_children = _include_children
-		bone_cel.bone_rotation = deg_to_rad(value)
-		Global.canvas.skeleton.queue_redraw()
-		Global.canvas.queue_redraw()
-		bone_cel.should_update_children = old_update_children
-
-
-func _on_position_changed(value: Vector2):
-	if current_selected_bone:
-		var bone_cel = current_selected_bone.get_current_bone_cel()
-		var old_update_children = bone_cel.should_update_children
-		bone_cel.should_update_children = _include_children
-		bone_cel.start_point = bone_cel.rel_to_origin(value).ceil()
-		Global.canvas.skeleton.queue_redraw()
-		Global.canvas.queue_redraw()
-		bone_cel.should_update_children = old_update_children
+## TODO: figure out later
+#func _on_rotation_changed(value: float):
+	#if current_selected_bone:
+		#var bone_cel = current_selected_bone.get_current_bone_cel()
+		#var old_update_children = bone_cel.should_update_children
+		#bone_cel.should_update_children = _include_children
+		#bone_cel.bone_rotation = deg_to_rad(value)
+		#Global.canvas.skeleton.queue_redraw()
+		#Global.canvas.queue_redraw()
+		#bone_cel.should_update_children = old_update_children
+#
+#
+#func _on_position_changed(value: Vector2):
+	#if current_selected_bone:
+		#var old_update_children = current_selected_bone.should_update_children
+		#current_selected_bone.should_update_children = _include_children
+		#current_selected_bone.start_point = current_selected_bone.rel_to_origin(value).ceil()
+		#Global.canvas.skeleton.queue_redraw()
+		#Global.canvas.queue_redraw()
+		#current_selected_bone.should_update_children = old_update_children
 
 
 func _on_rotation_reset_menu_about_to_popup() -> void:
@@ -395,7 +394,6 @@ func draw_start(_pos: Vector2i) -> void:
 	if _prev_mouse_position == Vector2.INF:
 		_displace_offset = current_selected_bone.rel_to_start_point(mouse_point)
 		_prev_mouse_position = mouse_point
-	print(current_selected_bone.modify_mode)
 	display_props()
 
 
@@ -500,6 +498,7 @@ func draw_end(_pos: Vector2i) -> void:
 				Global.canvas.queue_redraw()
 				current_selected_bone.modify_mode = BoneLayer.NONE
 	Global.current_project.has_changed = true
+	Global.animation_timeline.keyframe_timeline.recreate_timeline()
 	display_props()
 
 
