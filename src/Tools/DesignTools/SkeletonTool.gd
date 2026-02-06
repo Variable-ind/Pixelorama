@@ -41,9 +41,9 @@ func _ready() -> void:
 	Global.project_switched.connect(_queue_display_props)
 	Global.project_data_changed.connect(_on_project_data_changed)
 
-	quick_set_bones_menu.get_popup().index_pressed.connect(quick_set_bones)
-	rotation_reset_menu.get_popup().index_pressed.connect(reset_bone_angle)
-	position_reset_menu.get_popup().index_pressed.connect(reset_bone_position)
+	#quick_set_bones_menu.get_popup().index_pressed.connect(quick_set_bones)
+	#rotation_reset_menu.get_popup().index_pressed.connect(reset_bone_angle)
+	#position_reset_menu.get_popup().index_pressed.connect(reset_bone_position)
 	super()
 
 
@@ -186,55 +186,57 @@ func _on_quick_set_bones_menu_about_to_popup() -> void:
 	populate_popup(quick_set_bones_menu.get_popup())
 
 
-func _on_copy_pose_from_about_to_popup() -> void:
-	var popup := copy_pose_from.get_popup()
-	popup.clear(true)
-	var project = Global.current_project
-	var bone_layers = PackedInt32Array()
-	for layer in project.layers:
-		if layer is BoneLayer:
-			bone_layers.push_back(layer.index)
-	var reference_props := merge_bone_data(project.current_frame, bone_layers)
-	bone_layers.reverse()  ## makes the parent bones come first
-	for frame_idx in project.frames.size():
-		if project.current_frame == frame_idx:
-			# It won't make a difference if we skip it or not (as the system will autoatically)
-			# skip it anyway (but it's bet to skip it ourselves to avoid unnecessary calculations)
-			continue
-		var frame_data = merge_bone_data(frame_idx, bone_layers)
-		if reference_props != frame_data:  # Checks if this pose is already added to list
-			var popup_submenu = PopupMenu.new()
-			popup_submenu.about_to_popup.connect(
-				populate_popup.bind(popup_submenu, reference_props, frame_idx)
-			)
-			popup.add_submenu_node_item(str("Frame ", frame_idx + 1), popup_submenu)
-			popup_submenu.index_pressed.connect(copy_bone_data.bind(frame_idx, popup_submenu))
+## TODO: Figure out later
+#func _on_copy_pose_from_about_to_popup() -> void:
+	#var popup := copy_pose_from.get_popup()
+	#popup.clear(true)
+	#var project = Global.current_project
+	#var bone_layers = PackedInt32Array()
+	#for layer in project.layers:
+		#if layer is BoneLayer:
+			#bone_layers.push_back(layer.index)
+	#var reference_props := merge_bone_data(project.current_frame, bone_layers)
+	#bone_layers.reverse()  ## makes the parent bones come first
+	#for frame_idx in project.frames.size():
+		#if project.current_frame == frame_idx:
+			## It won't make a difference if we skip it or not (as the system will autoatically)
+			## skip it anyway (but it's bet to skip it ourselves to avoid unnecessary calculations)
+			#continue
+		#var frame_data = merge_bone_data(frame_idx, bone_layers)
+		#if reference_props != frame_data:  # Checks if this pose is already added to list
+			#var popup_submenu = PopupMenu.new()
+			#popup_submenu.about_to_popup.connect(
+				#populate_popup.bind(popup_submenu, reference_props, frame_idx)
+			#)
+			#popup.add_submenu_node_item(str("Frame ", frame_idx + 1), popup_submenu)
+			#popup_submenu.index_pressed.connect(copy_bone_data.bind(frame_idx, popup_submenu))
 
 
-func _on_tween_skeleton_about_to_popup() -> void:
-	var popup := tween_skeleton_menu.get_popup()
-	var project = Global.current_project
-	popup.clear(true)
-	var bone_layers = PackedInt32Array()
-	for layer in project.layers:
-		if layer is BoneLayer:
-			bone_layers.push_back(layer.index)
-	var reference_props := merge_bone_data(project.current_frame, bone_layers)
-	bone_layers.reverse()  ## makes the parent bones come first
-	popup.add_separator("Start From")
-	for frame_idx in project.frames.size():
-		if frame_idx >= project.current_frame:
-			# It won't make a difference if we skip it or not (as the system will autoatically)
-			# skip it anyway (but it's bet to skip it ourselves to avoid unnecessary calculations)
-			break
-		var frame_data = merge_bone_data(frame_idx, bone_layers)
-		if reference_props != frame_data:  # Checks if this pose is already added to list
-			var popup_submenu = PopupMenu.new()
-			popup_submenu.about_to_popup.connect(
-				populate_popup.bind(popup_submenu, reference_props, frame_idx)
-			)
-			popup.add_submenu_node_item(str("Frame ", frame_idx + 1), popup_submenu)
-			popup_submenu.index_pressed.connect(tween_skeleton_data.bind(frame_idx, popup_submenu))
+## TODO: Figure out later
+#func _on_tween_skeleton_about_to_popup() -> void:
+	#var popup := tween_skeleton_menu.get_popup()
+	#var project = Global.current_project
+	#popup.clear(true)
+	#var bone_layers = PackedInt32Array()
+	#for layer in project.layers:
+		#if layer is BoneLayer:
+			#bone_layers.push_back(layer.index)
+	#var reference_props := merge_bone_data(project.current_frame, bone_layers)
+	#bone_layers.reverse()  ## makes the parent bones come first
+	#popup.add_separator("Start From")
+	#for frame_idx in project.frames.size():
+		#if frame_idx >= project.current_frame:
+			## It won't make a difference if we skip it or not (as the system will autoatically)
+			## skip it anyway (but it's bet to skip it ourselves to avoid unnecessary calculations)
+			#break
+		#var frame_data = merge_bone_data(frame_idx, bone_layers)
+		#if reference_props != frame_data:  # Checks if this pose is already added to list
+			#var popup_submenu = PopupMenu.new()
+			#popup_submenu.about_to_popup.connect(
+				#populate_popup.bind(popup_submenu, reference_props, frame_idx)
+			#)
+			#popup.add_submenu_node_item(str("Frame ", frame_idx + 1), popup_submenu)
+			#popup_submenu.index_pressed.connect(tween_skeleton_data.bind(frame_idx, popup_submenu))
 
 
 # UI "updating" signals
@@ -256,125 +258,124 @@ func _queue_display_props() -> void:
 func _on_project_data_changed(_project):
 	display_props()
 
+## TODO: Figure out later
+## Bone "apply" signals
+#func quick_set_bones(bone_index: int):
+	#var bones = get_selected_bones(quick_set_bones_menu.get_popup(), bone_index)
+	#var looper := bones.duplicate()
+	#var project := Global.current_project
+	#var frame := project.frames[project.current_frame]
+	#project.undo_redo.create_action("Quick set bones")
+	#for bone: BoneLayer in looper:
+		#if (_include_children or bone_index == 0) and bone in bones:
+			#var child_bones = bone.get_child_bones(true)
+			#child_bones.reverse()
+			#looper.append_array(child_bones)
+		#var bone_cel := bone.get_current_bone_cel()
+		#var old_data := bone_cel.serialize()
+		#var best_origin := Vector2(bone.get_best_origin(frame))
+		#project.undo_redo.add_do_method(bone_cel.reset.bind({"gizmo_origin": best_origin}))
+		#project.undo_redo.add_undo_method(bone_cel.deserialize.bind(old_data))
+	#commit_undo()
 
-# Bone "apply" signals
-func quick_set_bones(bone_index: int):
-	Global.current_project.undo_redo.create_action("Quick set bones")
-	var bones = get_selected_bones(quick_set_bones_menu.get_popup(), bone_index)
-	var looper := bones.duplicate()
-	var project := Global.current_project
-	var frame := project.frames[project.current_frame]
-	for bone: BoneLayer in looper:
-		if (_include_children or bone_index == 0) and bone in bones:
-			var child_bones = bone.get_child_bones(true)
-			child_bones.reverse()
-			looper.append_array(child_bones)
-		var bone_cel := bone.get_current_bone_cel()
-		var old_data := bone_cel.serialize()
-		var best_origin := Vector2(bone.get_best_origin(frame))
-		project.undo_redo.add_do_method(bone_cel.reset.bind({"gizmo_origin": best_origin}))
-		project.undo_redo.add_undo_method(bone_cel.deserialize.bind(old_data))
-	commit_undo()
-
-
-func copy_bone_data(bone_index: int, from_frame: int, popup: PopupMenu):
-	Global.current_project.undo_redo.create_action("Copy pose")
-	var bones := get_selected_bones(popup, bone_index)
-	var looper := bones.duplicate()
-	var project := Global.current_project
-	for bone: BoneLayer in looper:
-		if (_include_children or bone_index == 0) and bone in bones:
-			var child_bones = bone.get_child_bones(true)
-			child_bones.reverse()
-			looper.append_array(child_bones)
-		var bone_cel := bone.get_current_bone_cel()
-		var from_cel: BoneCel = project.frames[from_frame].cels[bone.index]
-		project.undo_redo.add_undo_method(bone_cel.deserialize.bind(bone_cel.serialize()))
-		project.undo_redo.add_do_method(bone_cel.deserialize.bind(from_cel.serialize()))
-	copy_pose_from.get_popup().hide()
-	copy_pose_from.get_popup().clear(true)  # To save Memory
-	commit_undo()
-
-
-func tween_skeleton_data(bone_index: int, from_frame: int, popup: PopupMenu):
-	Global.current_project.undo_redo.create_action("Tween Skeleton")
-	var bones := get_selected_bones(popup, bone_index)
-	var looper := bones.duplicate()
-	var project := Global.current_project
-	var props := bones[0].get_current_bone_cel().serialize().keys()
-	for frame_idx in range(from_frame + 1, project.current_frame):
-		for bone: BoneLayer in looper:
-			if (_include_children or bone_index == 0) and bone in bones:
-				var child_bones = bone.get_child_bones(true)
-				child_bones.reverse()
-				looper.append_array(child_bones)
-			var to_cel: BoneCel = project.frames[project.current_frame].cels[bone.index]
-			var bone_cel: BoneCel = project.frames[frame_idx].cels[bone.index]
-			var from_cel: BoneCel = project.frames[from_frame].cels[bone.index]
-			var old_update = bone_cel.should_update_children
-			project.undo_redo.add_do_property(bone_cel, "should_update_children", false)
-			project.undo_redo.add_undo_property(bone_cel, "should_update_children", false)
-			for property: String in props:
-				if typeof(bone_cel.get(property)) != TYPE_STRING:
-					project.undo_redo.add_undo_method(
-						bone_cel.set.bind(property, bone_cel.get(property))
-					)
-					project.undo_redo.add_do_method(
-						bone_cel.set.bind(
-							property,
-							Tween.interpolate_value(
-								from_cel.get(property),
-								to_cel.get(property) - from_cel.get(property),
-								frame_idx - from_frame,
-								project.current_frame - from_frame,
-								Tween.TRANS_LINEAR,
-								Tween.EASE_IN
-							)
-						)
-					)
-			project.undo_redo.add_undo_property(bone_cel, "should_update_children", old_update)
-			project.undo_redo.add_do_property(bone_cel, "should_update_children", old_update)
-	copy_pose_from.get_popup().hide()
-	copy_pose_from.get_popup().clear(true)  # To save Memory
-	commit_undo()
+## TODO: Figure out later
+#func copy_bone_data(bone_index: int, from_frame: int, popup: PopupMenu):
+	#var project := Global.current_project
+	#var bones := get_selected_bones(popup, bone_index)
+	#var looper := bones.duplicate()
+	#project.undo_redo.create_action("Copy pose")
+	#for bone: BoneLayer in looper:
+		#if (_include_children or bone_index == 0) and bone in bones:
+			#var child_bones = bone.get_child_bones(true)
+			#child_bones.reverse()
+			#looper.append_array(child_bones)
+		#var bone_cel := bone.get_current_bone_cel()
+		#var from_cel: BoneCel = project.frames[from_frame].cels[bone.index]
+		#project.undo_redo.add_undo_method(bone_cel.deserialize.bind(bone_cel.serialize()))
+		#project.undo_redo.add_do_method(bone_cel.deserialize.bind(from_cel.serialize()))
+	#copy_pose_from.get_popup().hide()
+	#copy_pose_from.get_popup().clear(true)  # To save Memory
+	#commit_undo()
 
 
-func reset_bone_angle(bone_index: int):
-	Global.current_project.undo_redo.create_action("Reset Rotation")
-	var bones := get_selected_bones(rotation_reset_menu.get_popup(), bone_index)
-	var looper := bones.duplicate()
-	var project := Global.current_project
-	for bone: BoneLayer in looper:
-		if (_include_children or bone_index == 0) and bone in bones:
-			var child_bones = bone.get_child_bones(true)
-			child_bones.reverse()
-			looper.append_array(child_bones)
-		var bone_cel: BoneCel = project.frames[project.current_frame].cels[bone.index]
-		project.undo_redo.add_undo_property(bone_cel, "bone_rotation", bone_cel.bone_rotation)
-		project.undo_redo.add_do_property(bone_cel, "bone_rotation", 0)
-	commit_undo()
+#func tween_skeleton_data(bone_index: int, from_frame: int, popup: PopupMenu):
+	#.create_action("Tween Skeleton")
+	#var bones := get_selected_bones(popup, bone_index)
+	#var looper := bones.duplicate()
+	#var project := Global.current_project
+	#var props := bones[0].get_current_bone_cel().serialize().keys()
+	#for frame_idx in range(from_frame + 1, project.current_frame):
+		#for bone: BoneLayer in looper:
+			#if (_include_children or bone_index == 0) and bone in bones:
+				#var child_bones = bone.get_child_bones(true)
+				#child_bones.reverse()
+				#looper.append_array(child_bones)
+			#var to_cel: BoneCel = project.frames[project.current_frame].cels[bone.index]
+			#var bone_cel: BoneCel = project.frames[frame_idx].cels[bone.index]
+			#var from_cel: BoneCel = project.frames[from_frame].cels[bone.index]
+			#var old_update = bone_cel.should_update_children
+			#project.undo_redo.add_do_property(bone_cel, "should_update_children", false)
+			#project.undo_redo.add_undo_property(bone_cel, "should_update_children", false)
+			#for property: String in props:
+				#if typeof(bone_cel.get(property)) != TYPE_STRING:
+					#project.undo_redo.add_undo_method(
+						#bone_cel.set.bind(property, bone_cel.get(property))
+					#)
+					#project.undo_redo.add_do_method(
+						#bone_cel.set.bind(
+							#property,
+							#Tween.interpolate_value(
+								#from_cel.get(property),
+								#to_cel.get(property) - from_cel.get(property),
+								#frame_idx - from_frame,
+								#project.current_frame - from_frame,
+								#Tween.TRANS_LINEAR,
+								#Tween.EASE_IN
+							#)
+						#)
+					#)
+			#project.undo_redo.add_undo_property(bone_cel, "should_update_children", old_update)
+			#project.undo_redo.add_do_property(bone_cel, "should_update_children", old_update)
+	#copy_pose_from.get_popup().hide()
+	#copy_pose_from.get_popup().clear(true)  # To save Memory
+	#commit_undo()
 
 
-func reset_bone_position(bone_index: int):
-	Global.current_project.undo_redo.create_action("Reset Position")
-	var bones := get_selected_bones(position_reset_menu.get_popup(), bone_index)
-	var looper := bones.duplicate()
-	var project := Global.current_project
-	for bone: BoneLayer in looper:
-		if (_include_children or bone_index == 0) and bone in bones:
-			var child_bones = bone.get_child_bones(true)
-			child_bones.reverse()
-			looper.append_array(child_bones)
-		var bone_cel: BoneCel = project.frames[project.current_frame].cels[bone.index]
-		project.undo_redo.add_undo_property(bone_cel, "start_point", bone_cel.start_point)
-		project.undo_redo.add_do_property(bone_cel, "start_point", Vector2.ZERO)
-	commit_undo()
+#func reset_bone_angle(bone_index: int):
+	#.create_action("Reset Rotation")
+	#var bones := get_selected_bones(rotation_reset_menu.get_popup(), bone_index)
+	#var looper := bones.duplicate()
+	#var project := Global.current_project
+	#for bone: BoneLayer in looper:
+		#if (_include_children or bone_index == 0) and bone in bones:
+			#var child_bones = bone.get_child_bones(true)
+			#child_bones.reverse()
+			#looper.append_array(child_bones)
+		#var bone_cel: BoneCel = project.frames[project.current_frame].cels[bone.index]
+		#project.undo_redo.add_undo_property(bone_cel, "bone_rotation", bone_cel.bone_rotation)
+		#project.undo_redo.add_do_property(bone_cel, "bone_rotation", 0)
+	#commit_undo()
+
+
+#func reset_bone_position(bone_index: int):
+	#.create_action("Reset Position")
+	#var bones := get_selected_bones(position_reset_menu.get_popup(), bone_index)
+	#var looper := bones.duplicate()
+	#var project := Global.current_project
+	#for bone: BoneLayer in looper:
+		#if (_include_children or bone_index == 0) and bone in bones:
+			#var child_bones = bone.get_child_bones(true)
+			#child_bones.reverse()
+			#looper.append_array(child_bones)
+		#var bone_cel: BoneCel = project.frames[project.current_frame].cels[bone.index]
+		#project.undo_redo.add_undo_property(bone_cel, "start_point", bone_cel.start_point)
+		#project.undo_redo.add_do_property(bone_cel, "start_point", Vector2.ZERO)
+	#commit_undo()
 
 
 # Tool draw actions
 func draw_start(_pos: Vector2i) -> void:
 	_undo_target_frames.clear()
-	Global.current_project.undo_redo.create_action("Move bone")
 	# If this tool is on both sides then only allow one at a time
 	if Global.canvas.skeleton.transformation_active:
 		return
@@ -384,48 +385,21 @@ func draw_start(_pos: Vector2i) -> void:
 	var mouse_point: Vector2 = Global.canvas.current_pixel
 	if !current_selected_bone:
 		return
-	var bone_cel = current_selected_bone.get_current_bone_cel()
 	if current_selected_bone.modify_mode == BoneLayer.NONE:
 		# When moving mouse we may stop hovering but we are still modifying that bone.
 		# this is why we need a separate modify_mode variable
+		@warning_ignore("int_as_enum_without_cast")
 		current_selected_bone.modify_mode = current_selected_bone.hover_mode(
 			Vector2(mouse_point), Global.camera.zoom
 		)
 	if _prev_mouse_position == Vector2.INF:
-		_displace_offset = bone_cel.rel_to_start_point(mouse_point)
+		_displace_offset = current_selected_bone.rel_to_start_point(mouse_point)
 		_prev_mouse_position = mouse_point
-
+	print(current_selected_bone.modify_mode)
 	display_props()
 
 
-func add_undo_draw_data():
-	if !Global.current_project.current_frame in _undo_target_frames and current_selected_bone:
-		var current_cel = current_selected_bone.get_current_bone_cel()
-		_undo_target_frames.append(Global.current_project.current_frame)
-		Global.current_project.undo_redo.add_undo_method(
-			current_cel.deserialize.bind(current_cel.serialize(), true)
-		)
-		# Check if bone is a parent of anything (skip if it is)
-		if _allow_chaining and BoneLayer.get_parent_bone(current_selected_bone):
-			if _use_ik:
-				for cel in get_ik_cels(current_selected_bone):
-					Global.current_project.undo_redo.add_undo_method(
-						cel.deserialize.bind(cel.serialize(), false)
-					)
-			var parent_bone = BoneLayer.get_parent_bone(current_selected_bone)
-			var parent_b_cel = (
-				Global
-				. current_project
-				. frames[Global.current_project.current_frame]
-				. cels[parent_bone.index]
-			)
-			Global.current_project.undo_redo.add_undo_method(
-				parent_b_cel.deserialize.bind(parent_b_cel.serialize(), false)
-			)
-
-
 func draw_move(_pos: Vector2i) -> void:
-	add_undo_draw_data()  # This is done so we can animate while playing
 	# Another tool is already active
 	if not is_transforming:
 		return
@@ -434,8 +408,6 @@ func draw_move(_pos: Vector2i) -> void:
 	var offset := mouse_point - _prev_mouse_position
 	if !current_selected_bone or !current_selected_bone is BoneLayer:
 		return
-	# This is thae cel that is the main focus of rotation
-	var bone_cel_in_focus = current_selected_bone.get_current_bone_cel()
 	if (
 		_allow_chaining
 		and BoneLayer.get_parent_bone(current_selected_bone)
@@ -472,38 +444,37 @@ func draw_move(_pos: Vector2i) -> void:
 				else:
 					_hover_layer_in_chain = current_selected_bone
 					current_selected_bone = BoneLayer.get_parent_bone(current_selected_bone)
-					bone_cel_in_focus = current_selected_bone.get_current_bone_cel()
 					current_selected_bone.modify_mode = BoneLayer.ROTATE
 					Global.canvas.skeleton.selected_bone = current_selected_bone
 					_hover_layer_in_chain.modify_mode = BoneLayer.NONE
 	if current_selected_bone.modify_mode == BoneLayer.DISPLACE:
-		var old_update_children = bone_cel_in_focus.should_update_children
+		var old_update_children = current_selected_bone.should_update_children
 		if Input.is_action_pressed(&"transform_move_selection_only", true):
-			bone_cel_in_focus.gizmo_origin += offset.rotated(-bone_cel_in_focus.bone_rotation)
-			bone_cel_in_focus.should_update_children = false
-		bone_cel_in_focus.start_point = Vector2i(
-			bone_cel_in_focus.rel_to_origin(mouse_point) - _displace_offset
+			current_selected_bone.gizmo_origin += offset.rotated(-current_selected_bone.bone_rotation)
+			current_selected_bone.should_update_children = false
+		current_selected_bone.start_point = Vector2i(
+			current_selected_bone.rel_to_origin(mouse_point) - _displace_offset
 		)
-		bone_cel_in_focus.should_update_children = old_update_children
+		current_selected_bone.should_update_children = old_update_children
 	elif (
 		current_selected_bone.modify_mode == BoneLayer.ROTATE
 		or current_selected_bone.modify_mode == BoneLayer.EXTEND
 	):
 		var localized_mouse_norm: Vector2 = (
-			bone_cel_in_focus.rel_to_start_point(mouse_point).normalized()
+			current_selected_bone.rel_to_start_point(mouse_point).normalized()
 		)
 		var localized_prev_mouse_norm: Vector2 = (
-			bone_cel_in_focus.rel_to_start_point(_prev_mouse_position).normalized()
+			current_selected_bone.rel_to_start_point(_prev_mouse_position).normalized()
 		)
 		var diff := localized_mouse_norm.angle_to(localized_prev_mouse_norm)
 		if Input.is_action_pressed(&"transform_move_selection_only", true):
-			bone_cel_in_focus.gizmo_rotate_origin -= diff
+			current_selected_bone.gizmo_rotate_origin -= diff
 			if current_selected_bone.modify_mode == BoneLayer.EXTEND:
-				bone_cel_in_focus.gizmo_length = (
-					bone_cel_in_focus.rel_to_start_point(mouse_point).length()
+				current_selected_bone.gizmo_length = (
+					current_selected_bone.rel_to_start_point(mouse_point).length()
 				)
 		else:
-			bone_cel_in_focus.bone_rotation -= diff
+			current_selected_bone.bone_rotation -= diff
 			if _allow_chaining and _hover_layer_in_chain:
 				_hover_layer_in_chain.get_current_bone_cel().bone_rotation += diff
 	if _live_update:
@@ -521,46 +492,15 @@ func draw_end(_pos: Vector2i) -> void:
 	if Global.canvas.skeleton:
 		# Another tool is already active
 		if not is_transforming:
-			commit_undo(false)
 			return
 		is_transforming = false
 		Global.canvas.skeleton.transformation_active = false
 		if current_selected_bone:
-			for frame_idx in _undo_target_frames:
-				var bone_cel = current_selected_bone.get_current_bone_cel(frame_idx)
-				if not bone_cel is BoneCel:
-					continue
-				Global.current_project.undo_redo.add_do_method(
-					bone_cel.deserialize.bind(bone_cel.serialize(), true)
-				)
-				if current_selected_bone.modify_mode != BoneLayer.NONE:
-					Global.canvas.queue_redraw()
-					current_selected_bone.modify_mode = BoneLayer.NONE
-				if _allow_chaining:
-					if _use_ik:
-						for cel in get_ik_cels(current_selected_bone, frame_idx):
-							Global.current_project.undo_redo.add_do_method(
-								cel.deserialize.bind(cel.serialize(), true)
-							)
-					else:
-						for child in current_selected_bone.get_child_bones(false):
-							var child_cel = child.get_current_bone_cel(frame_idx)
-							Global.current_project.undo_redo.add_do_method(
-								child_cel.deserialize.bind(child_cel.serialize(), true)
-							)
-	commit_undo(false)
+			if current_selected_bone.modify_mode != BoneLayer.NONE:
+				Global.canvas.queue_redraw()
+				current_selected_bone.modify_mode = BoneLayer.NONE
 	Global.current_project.has_changed = true
 	display_props()
-
-
-## Helper functions
-func commit_undo(execute := true):
-	var undo_redo = Global.current_project.undo_redo
-	undo_redo.add_do_method(Global.canvas.queue_redraw)
-	undo_redo.add_undo_method(Global.canvas.queue_redraw)
-	undo_redo.add_do_method(Global.undo_or_redo.bind(false))
-	undo_redo.add_undo_method(Global.undo_or_redo.bind(true))
-	undo_redo.commit_action(execute)
 
 
 func populate_popup(
@@ -619,15 +559,14 @@ func display_props():
 		pos_slider.max_value = Global.current_project.size
 	current_selected_bone = Global.canvas.skeleton.selected_bone
 	if current_selected_bone is BoneLayer:
-		var frame_cels = Global.current_project.frames[Global.current_project.current_frame].cels
 		%BoneProps.visible = true
 		%BoneLabel.text = tr("Name:") + " " + current_selected_bone.name
 		rot_slider.set_value_no_signal_update_display(
-			rad_to_deg(frame_cels[current_selected_bone.index].bone_rotation)
+			rad_to_deg(current_selected_bone.bone_rotation)
 		)
 		pos_slider.set_value_no_signal(
-			frame_cels[current_selected_bone.index].rel_to_canvas(
-				frame_cels[current_selected_bone.index].start_point
+			current_selected_bone.rel_to_canvas(
+				current_selected_bone.start_point
 			)
 		)
 		return
@@ -635,15 +574,16 @@ func display_props():
 		%BoneProps.visible = false
 
 
-func merge_bone_data(frame_idx: int, bones: PackedInt32Array) -> Dictionary:
-	var data = {}
-	var project = Global.current_project
-	for i in bones.size():
-		var test_cel = project.frames[frame_idx].cels[bones[i]]
-		if test_cel is BoneCel:
-			var cel_data = test_cel.serialize()
-			data[bones[i]] = cel_data
-	return data
+## TODO: Figure out later
+#func merge_bone_data(frame_idx: int, bones: PackedInt32Array) -> Dictionary:
+	#var data = {}
+	#var project = Global.current_project
+	#for i in bones.size():
+		#var test_cel = project.frames[frame_idx].cels[bones[i]]
+		#if test_cel is BoneCel:
+			#var cel_data = test_cel.serialize()
+			#data[bones[i]] = cel_data
+	#return data
 
 
 class FABRIK:

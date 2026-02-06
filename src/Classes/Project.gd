@@ -731,15 +731,9 @@ func deserialize_cel_undo_data(redo_data: Dictionary, undo_data: Dictionary) -> 
 	for cel in redo_data:
 		if cel is CelTileMap:
 			(cel as CelTileMap).deserialize_undo_data(redo_data[cel], undo_redo, false)
-		if cel is BoneCel:
-			undo_redo.add_do_method((cel as BoneCel).deserialize.bind(redo_data[cel], false, false))
 	for cel in undo_data:
 		if cel is CelTileMap:
 			(cel as CelTileMap).deserialize_undo_data(undo_data[cel], undo_redo, true)
-		if cel is BoneCel:
-			undo_redo.add_undo_method(
-				(cel as BoneCel).deserialize.bind(undo_data[cel], false, false)
-			)
 
 
 ## Returns all [BaseCel]s in [param cels], and for every [CelTileMap],
