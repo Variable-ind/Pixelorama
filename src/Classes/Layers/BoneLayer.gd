@@ -131,11 +131,9 @@ func set_keyframe(
 			{"value": value, "trans": trans, "ease": ease_type}, true
 		)
 	else:
-		var id := next_keyframe_id
 		animated_params[param_name][frame_index] = {
-			"id": id, "value": value, "trans": trans, "ease": ease_type
+			"value": value, "trans": trans, "ease": ease_type
 		}
-		next_keyframe_id += 1
 
 
 func get_param(param_name, frame_index := project.current_frame):

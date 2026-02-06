@@ -498,6 +498,7 @@ func draw_end(_pos: Vector2i) -> void:
 				Global.canvas.queue_redraw()
 				current_selected_bone.modify_mode = BoneLayer.NONE
 	Global.current_project.has_changed = true
+	Global.animation_timeline.keyframe_timeline.unselect_keyframe()
 	Global.animation_timeline.keyframe_timeline.recreate_timeline()
 	display_props()
 

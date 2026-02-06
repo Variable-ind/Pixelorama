@@ -21,7 +21,7 @@ var current_layer: BaseLayer:
 		track_scroll_container.ensure_control_visible(keyframe_timeline_cursor)
 		track_scroll_container.scroll_vertical = v_scroll
 var layer_element_tree_vscrollbar: VScrollBar
-
+var next_keyframe_id := 0
 @onready
 var keyframe_timeline_frame_display: KeyframeTimelineFrameDisplay = %KeyframeTimelineFrameDisplay
 @onready var track_scroll_container: ScrollContainer = %TrackScrollContainer
@@ -226,7 +226,8 @@ func _create_keyframe_button(
 	frame_index: int, param_track: KeyframeAnimationTrack, dict: Dictionary, param_name: String
 ) -> KeyframeButton:
 	var key_button := KeyframeButton.new()
-	key_button.keyframe_id = dict[param_name][frame_index].get("id", 0)
+	key_button.keyframe_id = next_keyframe_id
+	next_keyframe_id += 1
 	key_button.dict = dict
 	key_button.param_name = param_name
 	key_button.frame_index = frame_index
@@ -429,7 +430,6 @@ func _update_keyframe_property_ui(dict: Dictionary, keyframe_id: int) -> void:
 
 
 func add_bone_keyframe(bone_layer: BoneLayer, frame_index: int, param_name: String) -> void:
-	var next_keyframe_id := bone_layer.next_keyframe_id
 	selected_keyframes = [next_keyframe_id]
 	var undo_redo := Global.current_project.undo_redo
 	undo_redo.create_action("Add keyframe")
@@ -446,7 +446,6 @@ func add_bone_keyframe(bone_layer: BoneLayer, frame_index: int, param_name: Stri
 
 
 func add_effect_keyframe(effect: LayerEffect, frame_index: int, param_name: String) -> void:
-	var next_keyframe_id := effect.layer.next_keyframe_id
 	selected_keyframes = [next_keyframe_id]
 	var undo_redo := Global.current_project.undo_redo
 	undo_redo.create_action("Add keyframe")
