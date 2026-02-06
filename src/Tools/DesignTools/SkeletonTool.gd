@@ -474,7 +474,7 @@ func draw_move(_pos: Vector2i) -> void:
 		else:
 			current_selected_bone.bone_rotation -= diff
 			if _allow_chaining and _hover_layer_in_chain:
-				_hover_layer_in_chain.get_current_bone_cel().bone_rotation += diff
+				_hover_layer_in_chain.bone_rotation += diff
 	if _live_update:
 		Global.canvas.queue_redraw()
 	else:
@@ -739,14 +739,14 @@ class CCDIK:
 
 ## Returns the cels in the IK chain in order, with the last bone at the end
 func get_ik_cels(
-	start_layer: BoneLayer, frame_idx := Global.current_project.current_frame
+	start_layer: BoneLayer
 ) -> Array[BoneCel]:
 	var bone_cels: Array[BoneCel] = []
 	var i = 0
-	var p = start_layer
-	while p:
-		bone_cels.push_front(p.get_current_bone_cel(frame_idx))
-		p = BoneLayer.get_parent_bone(p)
+	var parent_bone = start_layer
+	while parent_bone:
+		bone_cels.push_front(parent_bone)
+		parent_bone = BoneLayer.get_parent_bone(parent_bone)
 		i += 1
 		if i > _chain_length:
 			break

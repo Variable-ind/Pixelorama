@@ -38,8 +38,7 @@ func _draw() -> void:
 					var bone_offset := Vector2i.ZERO
 					if parent_bone:
 						if not parent_bone.is_edit_mode():
-							var bone_cel := parent_bone.get_current_bone_cel(change)
-							bone_offset = bone_cel.start_point
+							bone_offset = parent_bone.start_point
 					color.a = opacity / i
 					if [change, layer_i] in project.selected_cels:
 						draw_texture(
