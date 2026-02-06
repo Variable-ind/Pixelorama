@@ -262,6 +262,10 @@ func select_keyframes() -> void:
 		selected_keyframe.button_pressed = true
 		# Set the last selected keyframe as the key button.
 		key_button = selected_keyframe
+	# TODO: Fix this later
+	if not key_button:
+		unselect_keyframe()
+		return
 	var dict := key_button.dict
 	var param_name := key_button.param_name
 	var frame_index := key_button.frame_index
