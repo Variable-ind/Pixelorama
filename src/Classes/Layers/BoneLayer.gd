@@ -22,27 +22,27 @@ var gizmo_rotate_origin: float = 0:  ## Unit is Radians
 			gizmo_rotate_origin = value
 var start_point := Vector2.ZERO:  ## This is relative to the gizmo_origin
 	set(value):
-		_is_calculating = true
 		if not start_point.is_equal_approx(value):
 			var diff = value - start_point
+			_is_calculating = true
 			start_point = value
 			if should_update_children:
 				update_children("start_point", diff)
-		_is_calculating = false
+			_is_calculating = false
 	get():
 		if _is_calculating:
 			return start_point
 		return get_param("start_point")
 var bone_rotation: float = 0:  ## This is relative to the gizmo_rotate_origin (Radians)
 	set(value):
-		_is_calculating = true
 		if not is_equal_approx(value, bone_rotation):
 			value = wrapf(value, -PI, PI)
+			_is_calculating = true
 			var diff = value - bone_rotation
 			bone_rotation = value
 			if should_update_children:
 				update_children("bone_rotation", diff)
-		_is_calculating = false
+			_is_calculating = false
 	get():
 		if _is_calculating:
 			return bone_rotation
@@ -138,17 +138,8 @@ func set_keyframe(
 		next_keyframe_id += 1
 
 
-#func repopulate_variables() -> void:
-	#if project == Global.current_project:
-		#should_make_keyframes = false
-		#should_update_children = false
-		#set_bone_data(get_params(project.current_frame))
-		#should_make_keyframes = true
-		#should_update_children = true
-
-
 func get_param(param_name, frame_index := project.current_frame):
-	var to_return = default_bone_params().get(param_name, null)
+	var to_return = BoneLayer.default_bone_params().get(param_name, null)
 	var animated_properties: Dictionary = animated_params.get(param_name, {}) # Dictionary[int, Dictionary]
 	if animated_properties.has(frame_index):
 		# If the frame index exists in the properties, get that.
@@ -181,7 +172,7 @@ func get_param(param_name, frame_index := project.current_frame):
 
 #func get_params(frame_index: int) -> Dictionary:
 	##var to_return := get_bone_data(false).duplicate()
-	#var to_return := default_bone_params()
+	#var to_return := BoneLayer.default_bone_params()
 	#for param in animated_params:
 		#var animated_properties := animated_params[param]  # Dictionary[int, Dictionary]
 		#if animated_properties.has(frame_index):
@@ -213,7 +204,7 @@ func get_param(param_name, frame_index := project.current_frame):
 	#return to_return
 
 
-func default_bone_params() -> Dictionary:
+static func default_bone_params() -> Dictionary:
 	var data := {}
 	data["start_point"] = Vector2.ZERO
 	data["bone_rotation"] = 0
@@ -233,6 +224,16 @@ func find_frame_edges(frame_index: int, animated_properties: Dictionary) -> Arra
 		if key < maximum and key >= frame_index:
 			maximum = key
 	return [minimum, maximum]
+
+
+static func is_animatable_type(value: Variant) -> bool:
+	if is_interpolatable_type(value):
+		return true
+	match typeof(value):
+		TYPE_BOOL, TYPE_BASIS:
+			return true
+		_:
+			return false
 
 
 static func is_interpolatable_type(value: Variant) -> bool:
@@ -491,9 +492,9 @@ func update_children(property: String, diff):
 	for child_bone in get_child_bones(false):
 		if child_bone.get_layer_type() == Global.LayerTypes.BONE:
 			var property_increment = child_bone.get(property) + diff
+			child_bone.set(property, property_increment)
 			if should_make_keyframes:
 				child_bone.set_keyframe(property, project.current_frame, property_increment)
-			child_bone.set(property, property_increment)
 			if property == "bone_rotation":
 				var parent_bone: BoneLayer = BoneLayer.get_parent_bone(child_bone)
 				if parent_bone:
@@ -504,8 +505,8 @@ func update_children(property: String, diff):
 					var child_rotated_start := child_bone.rel_to_origin(
 						parent_bone.rel_to_canvas(start_point) + displacement
 					)
+					child_bone.start_point = child_rotated_start
 					if should_make_keyframes:
 						child_bone.set_keyframe(
 							"start_point", project.current_frame, child_rotated_start
 						)
-					child_bone.start_point = child_rotated_start

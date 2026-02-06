@@ -117,15 +117,30 @@ func recreate_timeline() -> void:
 	# Await is needed so that the params get added to the layer effect.
 	await get_tree().process_frame
 	if current_layer is BoneLayer:
-		var bone_section := add_section("Bone", KeyframeAnimationTrack.TrackTypes.BONE)
-		var animatable_props = current_layer.default_bone_params()
+		var bone_section := add_section(
+			"Bone:%s" % current_layer.name, KeyframeAnimationTrack.TrackTypes.BONE
+		)
+		var animatable_props = BoneLayer.default_bone_params()
 		for param_name in animatable_props.keys():
 			var value = animatable_props[param_name]
-			if not LayerEffect.is_animatable_type(value):
+			if not BoneLayer.is_animatable_type(value):
 				continue
 			add_property(
 				param_name, KeyframeAnimationTrack.TrackTypes.BONE, bone_section, current_layer
 			)
+		var child_bones: Array[BoneLayer] = current_layer.get_child_bones(true)
+		child_bones.reverse()
+		for child_bone in child_bones:
+			var child_bone_section := add_section(
+				"Bone:%s" % child_bone.name, KeyframeAnimationTrack.TrackTypes.BONE
+			)
+			for param_name in animatable_props.keys():
+				var value = animatable_props[param_name]
+				if not LayerEffect.is_animatable_type(value):
+					continue
+				add_property(
+					param_name, KeyframeAnimationTrack.TrackTypes.BONE, child_bone_section, child_bone
+				)
 	for effect in current_layer.effects:
 		var effect_item := add_section(effect.name, KeyframeAnimationTrack.TrackTypes.LAYER_EFFECT)
 		for param_name in effect.params:

@@ -11,18 +11,6 @@ var transformation_active := false
 
 func _ready() -> void:
 	Global.camera.zoom_changed.connect(queue_redraw)
-	#Global.cel_switched.connect(update_bone_layers)
-
-
-#func update_bone_layers():
-	#var project := Global.current_project
-	#if project:
-		##for i: int in range(project.layers.size() - 1, -1, -1):
-		#for i: int in range(0, project.layers.size()):
-			#var layer := project.layers[i]
-			#if layer is BoneLayer:
-				#layer.repopulate_variables()
-	#queue_redraw()
 
 
 func _draw() -> void:
