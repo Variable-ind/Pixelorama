@@ -62,7 +62,7 @@ var gizmo_length: int = MIN_LENGTH + 5:
 			gizmo_length = value
 
 var associated_layer: BoneLayer  ## only used in _update_children()
-var should_update_children := true
+var make_new_keyframes := true
 
 # Properties determined using above variables
 var end_point: Vector2:  ## This is relative to the start_point
@@ -154,18 +154,31 @@ func get_param(param_name, frame_index := project.current_frame):
 		if not is_interpolatable_type(min_value):
 			to_return = max_value
 			return to_return
+		var parent_bone := BoneLayer.get_parent_bone(self)
 		var elapsed := frame_index - frame_edges[0]
-		var delta = max_value - min_value
 		var duration := frame_edges[1] - frame_edges[0]
 		var trans_type: int = min_params.get("trans", Tween.TRANS_LINEAR)
 		if trans_type == Tween.TRANS_SPRING + 1:
 			to_return = min_value
 			return to_return
+		if parent_bone:
+			# temporarily convert to parent's local coordinates
+			if param_name == "start_point":
+				var parent_start_min = parent_bone.get_param(param_name, frame_edges[0]) + parent_bone.gizmo_origin
+				var parent_start_max = parent_bone.get_param(param_name, frame_edges[1]) + parent_bone.gizmo_origin
+				min_value = min_value + gizmo_origin - parent_start_min
+				max_value = max_value + gizmo_origin - parent_start_max
 		var ease_type: Tween.EaseType = min_params.get("ease", Tween.EASE_IN)
+		var delta = max_value - min_value
 		to_return = Tween.interpolate_value(
 			min_value, delta, elapsed, duration, trans_type, ease_type
 		)
-		_update_bone_data(param_name, get(param_name) - to_return)
+		if parent_bone:
+			# convert back
+			if param_name == "start_point":
+				var rotation_delta = parent_bone.get_param("bone_rotation", frame_edges[0]) - parent_bone.bone_rotation
+				to_return = to_return.rotated(-rotation_delta)
+				to_return = rel_to_origin(parent_bone.rel_to_canvas(parent_bone.start_point + to_return))
 	return to_return
 
 
@@ -451,35 +464,36 @@ func _update_bone_data(property: String, diff):
 	if not is_instance_valid(project):
 		return
 	print(Global.canvas.skeleton.selected_bone)
-	if Global.canvas.skeleton.selected_bone:  # Top-most bone
+	if Global.canvas.skeleton.selected_bone and make_new_keyframes:  # Top-most bone
 		set_keyframe(property, project.current_frame, get(property))
-	if not should_update_children:
-		return
-	## update first child (This will trigger a chain process)
-	for child_bone in get_child_bones(false):
-		if child_bone.get_layer_type() == Global.LayerTypes.BONE:
-			var property_increment = child_bone.get(property) + diff
-			# NOTE: set_keyframe should always be done After setting the variable not Before.
-			child_bone.set(property, property_increment)
-			child_bone.set_keyframe(property, project.current_frame, property_increment)
-			if property == "bone_rotation":
-				# Check if any rotation was done before, if not, make a keyframe at frame 0
-				var animated_properties: Dictionary = animated_params.get(property, {})
-				if animated_properties.keys().size() <= 1 and project.current_frame > 0:
-					if not animated_properties.keys().has(0):
-						set_keyframe(property, 0, get(property) - diff)
-						child_bone.set_keyframe(property, 0, get(property) - diff)
-
-				# Get the displacement of bone with respect to parent and rotate it
-				var displacement := rel_to_start_point(
-					child_bone.rel_to_canvas(child_bone.start_point)
-				)
-				displacement = displacement.rotated(diff)
-				var child_rotated_start := child_bone.rel_to_origin(
-					rel_to_canvas(start_point) + displacement
-				)
-				# NOTE: set_keyframe should always be done After setting the variable not Before.
-				child_bone.start_point = child_rotated_start
-				child_bone.set_keyframe(
-					"start_point", project.current_frame, child_rotated_start
-				)
+	#return
+	#if not should_update_children:
+		#return
+	### update first child (This will trigger a chain process)
+	#for child_bone in get_child_bones(false):
+		#if child_bone.get_layer_type() == Global.LayerTypes.BONE:
+			#var property_increment = child_bone.get(property) + diff
+			## NOTE: set_keyframe should always be done After setting the variable not Before.
+			#child_bone.set(property, property_increment)
+			##child_bone.set_keyframe(property, project.current_frame, property_increment)
+			#if property == "bone_rotation":
+				## Check if any rotation was done before, if not, make a keyframe at frame 0
+				#var animated_properties: Dictionary = animated_params.get(property, {})
+				#if animated_properties.keys().size() <= 1 and project.current_frame > 0:
+					#if not animated_properties.keys().has(0):
+						#set_keyframe(property, 0, get(property) - diff)
+						#child_bone.set_keyframe(property, 0, get(property) - diff)
+#
+				## Get the displacement of bone with respect to parent and rotate it
+				#var displacement := rel_to_start_point(
+					#child_bone.rel_to_canvas(child_bone.start_point)
+				#)
+				#displacement = displacement.rotated(diff)
+				#var child_rotated_start := child_bone.rel_to_origin(
+					#rel_to_canvas(start_point) + displacement
+				#)
+				## NOTE: set_keyframe should always be done After setting the variable not Before.
+				#child_bone.start_point = child_rotated_start
+				#child_bone.set_keyframe(
+					#"start_point", project.current_frame, child_rotated_start
+				#)
