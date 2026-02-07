@@ -159,7 +159,7 @@ func get_params(frame_index: int) -> Dictionary:
 				if param == "start_point":
 					min_value = min_value + gizmo_origin - parent_start_min
 					max_value = max_value + gizmo_origin - parent_start_max
-				if param == "bone_rotation":
+				elif param == "bone_rotation":
 					min_value = min_value - parent_rot_min
 					max_value = max_value - parent_rot_max
 
@@ -180,8 +180,8 @@ func get_params(frame_index: int) -> Dictionary:
 					to_return["start_point"] = rel_to_origin(
 						parent_bone.rel_to_canvas(p_start_current + rotated_start_value)
 					)
-				if param == "bone_rotation":
-					to_return["bone_rotation"] = to_return["bone_rotation"] - rotation_delta
+				elif param == "bone_rotation":  # offset rotation by parent's current rotation
+					to_return["bone_rotation"] = to_return["bone_rotation"] + p_min_rotation - rotation_delta
 	return to_return
 
 

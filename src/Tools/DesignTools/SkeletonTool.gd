@@ -406,9 +406,15 @@ func draw_move(_pos: Vector2i) -> void:
 					current_selected_bone.rel_to_start_point(mouse_point).length()
 				)
 		else:
+			# offset child bone rotaion so it appears to be of same global rotaion
+			var old_chain_rotation: float = 0
+			if _hover_layer_in_chain:
+				old_chain_rotation = _hover_layer_in_chain.bone_rotation
 			current_selected_bone.bone_rotation -= diff
 			if _allow_chaining and _hover_layer_in_chain:
-				_hover_layer_in_chain.bone_rotation += diff
+				_hover_layer_in_chain.bone_rotation = (
+					2 * _hover_layer_in_chain.bone_rotation - old_chain_rotation
+				)
 	if _live_update:
 		Global.canvas.queue_redraw()
 	else:
