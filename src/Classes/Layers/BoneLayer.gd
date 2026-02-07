@@ -9,43 +9,22 @@ const START_RADIUS: float = 6
 const END_RADIUS: float = 4
 const WIDTH: float = 2
 
-var _is_calculating := false
 
 # These variables are to assist in calculations. Setting them triggers a calculation loop.
 # Getting them (in normal situations) just returns the state from get_param()
 var start_point := Vector2.INF:  ## This is relative to the gizmo_origin
 	set(value):
-		_is_calculating = true
-		if not start_point.is_equal_approx(value):
-			var diff = value - start_point
-			start_point = value
-			# initiates the calculation loop
-			_update_bone_data("start_point", diff)
-		_is_calculating = false
-		# Reset it after the calculation loop is finished
-		start_point = Vector2.INF
+		_update_bone_data("start_point", value)
 	get():
-		if _is_calculating and start_point != Vector2.INF:
-			# get this variable only if it was set during this calculation loop
-			return start_point
 		return get_param("start_point")
 var bone_rotation: float = INF:  ## This is relative to the gizmo_rotate_origin (Radians)
 	set(value):
 		if not is_equal_approx(value, bone_rotation):
 			value = wrapf(value, -PI, PI)
-			_is_calculating = true
-			var diff = value - bone_rotation
-			bone_rotation = value
-			# initiates the calculation loop
-			_update_bone_data("bone_rotation", diff)
-			_is_calculating = false
-			# Reset it after the calculation loop is finished
-			bone_rotation = INF
+			_update_bone_data("bone_rotation", value)
 	get():
-		if _is_calculating and bone_rotation != INF:
-			# get this variable only if it was set during this calculation loop
-			return wrapf(bone_rotation, -PI, PI)
 		return wrapf(get_param("bone_rotation"), -PI, PI)
+
 var gizmo_origin := Vector2.ZERO:
 	set(value):
 		if not gizmo_origin.is_equal_approx(value):
@@ -62,7 +41,7 @@ var gizmo_length: int = MIN_LENGTH + 5:
 			gizmo_length = value
 
 var associated_layer: BoneLayer  ## only used in _update_children()
-var make_new_keyframes := true
+var should_update_children := true
 
 # Properties determined using above variables
 var end_point: Vector2:  ## This is relative to the start_point
@@ -136,50 +115,78 @@ func set_keyframe(
 	}
 
 
-func get_param(param_name, frame_index := project.current_frame):
-	var to_return = BoneLayer.default_bone_params().get(param_name, null)
-	var animated_properties: Dictionary = animated_params.get(param_name, {}) # Dictionary[int, Dictionary]
-	if animated_properties.has(frame_index):
-		# If the frame index exists in the properties, get that.
-		to_return = animated_properties[frame_index].get("value", to_return)
-	else:
-		if animated_properties.size() == 0:
-			return to_return
-		# If it doesn't exist, interpolate.
-		var frame_edges := find_frame_edges(frame_index, animated_properties)
-		var min_params: Dictionary = animated_properties[frame_edges[0]]
-		var max_params: Dictionary = animated_properties[frame_edges[1]]
-		var min_value = min_params.get("value", to_return)
-		var max_value = max_params.get("value", to_return)
-		if not is_interpolatable_type(min_value):
-			to_return = max_value
-			return to_return
-		var parent_bone := BoneLayer.get_parent_bone(self)
-		var elapsed := frame_index - frame_edges[0]
-		var duration := frame_edges[1] - frame_edges[0]
-		var trans_type: int = min_params.get("trans", Tween.TRANS_LINEAR)
-		if trans_type == Tween.TRANS_SPRING + 1:
-			to_return = min_value
-			return to_return
-		if parent_bone:
+func get_params(frame_index: int) -> Dictionary:
+	var to_return := BoneLayer.default_bone_params()
+	for param in animated_params:
+		var animated_properties := animated_params[param]  # Dictionary[int, Dictionary]
+		if animated_properties.has(frame_index):
+			# If the frame index exists in the properties, get that.
+			to_return[param] = animated_properties[frame_index].get("value", to_return[param])
+		else:
+			if animated_properties.size() == 0:
+				continue
+			# If it doesn't exist, interpolate.
+			var frame_edges := find_frame_edges(frame_index, animated_properties)
+			var min_params: Dictionary = animated_properties[frame_edges[0]]
+			var max_params: Dictionary = animated_properties[frame_edges[1]]
+			var min_value = min_params.get("value", to_return[param])
+			var max_value = max_params.get("value", to_return[param])
+			if not is_interpolatable_type(min_value):
+				to_return[param] = max_value
+				continue
+			var elapsed := frame_index - frame_edges[0]
+			var duration := frame_edges[1] - frame_edges[0]
+			var trans_type: int = min_params.get("trans", Tween.TRANS_LINEAR)
+			if trans_type == Tween.TRANS_SPRING + 1:
+				to_return[param] = min_value
+				continue
+			var ease_type: Tween.EaseType = min_params.get("ease", Tween.EASE_IN)
+
 			# temporarily convert to parent's local coordinates
-			if param_name == "start_point":
-				var parent_start_min = parent_bone.get_param(param_name, frame_edges[0]) + parent_bone.gizmo_origin
-				var parent_start_max = parent_bone.get_param(param_name, frame_edges[1]) + parent_bone.gizmo_origin
-				min_value = min_value + gizmo_origin - parent_start_min
-				max_value = max_value + gizmo_origin - parent_start_max
-		var ease_type: Tween.EaseType = min_params.get("ease", Tween.EASE_IN)
-		var delta = max_value - min_value
-		to_return = Tween.interpolate_value(
-			min_value, delta, elapsed, duration, trans_type, ease_type
-		)
-		if parent_bone:
-			# convert back
-			if param_name == "start_point":
-				var rotation_delta = parent_bone.get_param("bone_rotation", frame_edges[0]) - parent_bone.bone_rotation
-				to_return = to_return.rotated(-rotation_delta)
-				to_return = rel_to_origin(parent_bone.rel_to_canvas(parent_bone.start_point + to_return))
+			var parent_bone := BoneLayer.get_parent_bone(self)
+			var parent_start_min_info: Dictionary
+			var parent_start_max_info: Dictionary
+			var parent_bone_current_info: Dictionary
+			if parent_bone:
+				parent_start_min_info = parent_bone.get_params(frame_edges[0])
+				parent_start_max_info = parent_bone.get_params(frame_edges[1])
+				parent_bone_current_info = parent_bone.get_params(project.current_frame)
+			if parent_start_min_info and parent_start_max_info and parent_bone_current_info:
+				var parent_start_min = parent_start_min_info["start_point"] + parent_bone.gizmo_origin
+				var parent_start_max = parent_start_max_info["start_point"] + parent_bone.gizmo_origin
+				var parent_rot_min = parent_start_min_info["bone_rotation"]
+				var parent_rot_max = parent_start_max_info["bone_rotation"]
+				if param == "start_point":
+					min_value = min_value + gizmo_origin - parent_start_min
+					max_value = max_value + gizmo_origin - parent_start_max
+				if param == "bone_rotation":
+					min_value = min_value - parent_rot_min
+					max_value = max_value - parent_rot_max
+
+			# Do the tweening relative to parent coordinates
+			var delta = max_value - min_value
+			to_return[param] = Tween.interpolate_value(
+				min_value, delta, elapsed, duration, trans_type, ease_type
+			)
+
+			# Covert back to original (relative to gizmo_origin) coordinates
+			if parent_start_min_info and parent_start_max_info and parent_bone_current_info:
+				var p_min_rotation: float = parent_start_min_info["bone_rotation"]
+				var p_start_current: Vector2 = parent_bone_current_info["start_point"]
+				var p_current_rotation: float = parent_bone_current_info["bone_rotation"]
+				var rotation_delta = p_min_rotation - p_current_rotation
+				if param == "start_point":
+					var rotated_start_value = to_return["start_point"].rotated(-rotation_delta)
+					to_return["start_point"] = rel_to_origin(
+						parent_bone.rel_to_canvas(p_start_current + rotated_start_value)
+					)
+				if param == "bone_rotation":
+					to_return["bone_rotation"] = to_return["bone_rotation"] - rotation_delta
 	return to_return
+
+
+func get_param(param_name, frame_index := project.current_frame):
+	return get_params(frame_index)[param_name]
 
 
 static func default_bone_params() -> Dictionary:
@@ -460,40 +467,14 @@ func is_blender() -> bool:
 
 ## This is a recursive function. Calculates and updates the child transformations
 ## according to the parent transformation.
-func _update_bone_data(property: String, diff):
+func _update_bone_data(property: String, value: Variant):
 	if not is_instance_valid(project):
 		return
-	print(Global.canvas.skeleton.selected_bone)
-	if Global.canvas.skeleton.selected_bone and make_new_keyframes:  # Top-most bone
-		set_keyframe(property, project.current_frame, get(property))
-	#return
-	#if not should_update_children:
-		#return
-	### update first child (This will trigger a chain process)
-	#for child_bone in get_child_bones(false):
-		#if child_bone.get_layer_type() == Global.LayerTypes.BONE:
-			#var property_increment = child_bone.get(property) + diff
-			## NOTE: set_keyframe should always be done After setting the variable not Before.
-			#child_bone.set(property, property_increment)
-			##child_bone.set_keyframe(property, project.current_frame, property_increment)
-			#if property == "bone_rotation":
-				## Check if any rotation was done before, if not, make a keyframe at frame 0
-				#var animated_properties: Dictionary = animated_params.get(property, {})
-				#if animated_properties.keys().size() <= 1 and project.current_frame > 0:
-					#if not animated_properties.keys().has(0):
-						#set_keyframe(property, 0, get(property) - diff)
-						#child_bone.set_keyframe(property, 0, get(property) - diff)
-#
-				## Get the displacement of bone with respect to parent and rotate it
-				#var displacement := rel_to_start_point(
-					#child_bone.rel_to_canvas(child_bone.start_point)
-				#)
-				#displacement = displacement.rotated(diff)
-				#var child_rotated_start := child_bone.rel_to_origin(
-					#rel_to_canvas(start_point) + displacement
-				#)
-				## NOTE: set_keyframe should always be done After setting the variable not Before.
-				#child_bone.start_point = child_rotated_start
-				#child_bone.set_keyframe(
-					#"start_point", project.current_frame, child_rotated_start
-				#)
+	if Global.canvas.skeleton.selected_bone:  # Top-most bone
+		set_keyframe(property, project.current_frame, value)
+	if property == "bone_rotation":
+		# Check if any rotation was done before, if not, make a keyframe at frame 0
+		var animated_properties: Dictionary = animated_params.get(property, {})
+		if animated_properties.keys().size() <= 1 and project.current_frame > 0:
+			if not animated_properties.keys().has(0):
+				set_keyframe("bone_rotation", 0, value)
