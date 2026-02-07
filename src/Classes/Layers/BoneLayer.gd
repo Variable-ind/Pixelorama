@@ -15,16 +15,15 @@ var _is_calculating := false
 # Getting them (in normal situations) just returns the state from get_param()
 var start_point := Vector2.INF:  ## This is relative to the gizmo_origin
 	set(value):
+		_is_calculating = true
 		if not start_point.is_equal_approx(value):
 			var diff = value - start_point
-			_is_calculating = true
 			start_point = value
-			if should_update_children:
-				# initiates the calculation loop
-				_update_children("start_point", diff)
-			_is_calculating = false
-			# Reset it after the calculation loop is finished
-			start_point = Vector2.INF
+			# initiates the calculation loop
+			_update_bone_data("start_point", diff)
+		_is_calculating = false
+		# Reset it after the calculation loop is finished
+		start_point = Vector2.INF
 	get():
 		if _is_calculating and start_point != Vector2.INF:
 			# get this variable only if it was set during this calculation loop
@@ -37,17 +36,16 @@ var bone_rotation: float = INF:  ## This is relative to the gizmo_rotate_origin 
 			_is_calculating = true
 			var diff = value - bone_rotation
 			bone_rotation = value
-			if should_update_children:
-				# initiates the calculation loop
-				_update_children("bone_rotation", diff)
+			# initiates the calculation loop
+			_update_bone_data("bone_rotation", diff)
 			_is_calculating = false
 			# Reset it after the calculation loop is finished
 			bone_rotation = INF
 	get():
 		if _is_calculating and bone_rotation != INF:
 			# get this variable only if it was set during this calculation loop
-			return bone_rotation
-		return get_param("bone_rotation")
+			return wrapf(bone_rotation, -PI, PI)
+		return wrapf(get_param("bone_rotation"), -PI, PI)
 var gizmo_origin := Vector2.ZERO:
 	set(value):
 		if not gizmo_origin.is_equal_approx(value):
@@ -167,6 +165,7 @@ func get_param(param_name, frame_index := project.current_frame):
 		to_return = Tween.interpolate_value(
 			min_value, delta, elapsed, duration, trans_type, ease_type
 		)
+		_update_bone_data(param_name, get(param_name) - to_return)
 	return to_return
 
 
@@ -448,11 +447,14 @@ func is_blender() -> bool:
 
 ## This is a recursive function. Calculates and updates the child transformations
 ## according to the parent transformation.
-func _update_children(property: String, diff):
+func _update_bone_data(property: String, diff):
 	if not is_instance_valid(project):
 		return
+	print(Global.canvas.skeleton.selected_bone)
 	if Global.canvas.skeleton.selected_bone:  # Top-most bone
 		set_keyframe(property, project.current_frame, get(property))
+	if not should_update_children:
+		return
 	## update first child (This will trigger a chain process)
 	for child_bone in get_child_bones(false):
 		if child_bone.get_layer_type() == Global.LayerTypes.BONE:

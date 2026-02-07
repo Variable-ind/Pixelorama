@@ -260,9 +260,8 @@ func select_keyframes() -> void:
 	var key_button: KeyframeButton
 	for selected_keyframe in get_selected_keyframe_buttons():
 		selected_keyframe.button_pressed = true
-		# Set the last selected keyframe as the key button.
+		# Set the last selected keyframe in the array as the key button.
 		key_button = selected_keyframe
-	# TODO: Fix this later
 	if not key_button:
 		unselect_keyframe()
 		return
