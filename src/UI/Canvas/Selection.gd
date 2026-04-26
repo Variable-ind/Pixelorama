@@ -5,7 +5,7 @@ signal transformation_confirmed
 signal transformation_canceled
 
 enum SelectionOperation { ADD, SUBTRACT, INTERSECT }
-const CLIPBOARD_FILE_PATH := "user://clipboard.txt"
+const CLIPBOARD_FILE_PATH := "user://clipboard.dat"
 
 # flags (additional properties of selection that can be toggled)
 var flag_tilemode := false
@@ -283,56 +283,55 @@ func cut() -> void:
 ## Copies the selection content (works in or between pixelorama instances only).
 func copy() -> void:
 	var project := Global.current_project
+	# NOTE: "cl" stands for clipboard
 	var cl_image := Image.new()
 	var cl_selection_map := SelectionMap.new()
 	var cl_big_bounding_rectangle := Rect2()
 	var cl_selection_offset := Vector2.ZERO
 
 	var image := project.get_current_cel().get_image()
-	var to_copy := Image.new()
 	if !project.has_selection:
-		to_copy.copy_from(image)
+		cl_image.copy_from(image)
 		cl_selection_map.copy_from(project.selection_map)
 		cl_selection_map.select_all()
 		cl_big_bounding_rectangle = Rect2(Vector2.ZERO, project.size)
 	else:
 		var selection_rect := project.selection_map.get_selection_rect(project)
 		if transformation_handles.is_transforming_content():
-			to_copy.copy_from(transformation_handles.transformed_image)
+			cl_image.copy_from(transformation_handles.transformed_image)
 			cl_selection_map = preview_selection_map
 		else:
-			to_copy = image.get_region(selection_rect)
+			cl_image = image.get_region(selection_rect)
 			# Remove unincluded pixels if the selection is not a single rectangle
 			var offset_pos := selection_rect.position
-			for x in to_copy.get_size().x:
-				for y in to_copy.get_size().y:
+			for x in cl_image.get_size().x:
+				for y in cl_image.get_size().y:
 					var pos := Vector2i(x, y)
 					if offset_pos.x < 0:
 						offset_pos.x = 0
 					if offset_pos.y < 0:
 						offset_pos.y = 0
 					if not project.selection_map.is_pixel_selected(pos + offset_pos, false):
-						to_copy.set_pixelv(pos, Color(0))
+						cl_image.set_pixelv(pos, Color(0))
 			cl_selection_map.copy_from(project.selection_map)
 		cl_big_bounding_rectangle = selection_rect
 
-	cl_image = to_copy
-	cl_selection_offset = project.selection_offset
-	var transfer_clipboard := {
-		"image": cl_image,
-		"selection_map": cl_selection_map.data,
-		"big_bounding_rectangle": cl_big_bounding_rectangle,
-		"selection_offset": cl_selection_offset,
-	}
+	if !cl_image.is_empty():
+		cl_selection_offset = project.selection_offset
+		var transfer_clipboard := {
+			"image": cl_image,
+			"selection_map": cl_selection_map.data,
+			"big_bounding_rectangle": cl_big_bounding_rectangle,
+			"selection_offset": cl_selection_offset,
+		}
 
-	var clipboard_file := FileAccess.open(CLIPBOARD_FILE_PATH, FileAccess.WRITE)
-	clipboard_file.store_var(transfer_clipboard, true)
-	clipboard_file.close()
+		var clipboard_file := FileAccess.open(CLIPBOARD_FILE_PATH, FileAccess.WRITE)
+		clipboard_file.store_var(transfer_clipboard, true)
+		clipboard_file.close()
 
-	if !to_copy.is_empty():
 		var pattern: Patterns.Pattern = Global.patterns_popup.get_pattern(0)
-		pattern.image = to_copy
-		var tex := ImageTexture.create_from_image(to_copy)
+		pattern.image = cl_image
+		var tex := ImageTexture.create_from_image(cl_image)
 		var container = Global.patterns_popup.get_node("ScrollContainer/PatternContainer")
 		container.get_child(0).get_child(0).texture = tex
 
