@@ -117,6 +117,34 @@ func recreate_timeline() -> void:
 	#region Add tracks for animatable objects.
 	# Await is needed so that the params get added to the layer effect.
 	await get_tree().process_frame
+	if current_layer is BoneLayer:
+		var bone_section := add_section(
+			"Bone:%s" % current_layer.name, KeyframeAnimationTrack.TrackTypes.BONE
+		)
+		var animatable_props = BoneLayer.default_bone_params()
+		for param_name in animatable_props.keys():
+			var value = animatable_props[param_name]
+			if not BoneLayer.is_animatable_type(value):
+				continue
+			add_property(
+				param_name, KeyframeAnimationTrack.TrackTypes.BONE, bone_section, current_layer
+			)
+		var child_bones: Array[BoneLayer] = current_layer.get_child_bones(true)
+		child_bones.reverse()
+		for child_bone in child_bones:
+			var child_bone_section := add_section(
+				"Bone:%s" % child_bone.name, KeyframeAnimationTrack.TrackTypes.BONE
+			)
+			for param_name in animatable_props.keys():
+				var value = animatable_props[param_name]
+				if not LayerEffect.is_animatable_type(value):
+					continue
+				add_property(
+					param_name,
+					KeyframeAnimationTrack.TrackTypes.BONE,
+					child_bone_section,
+					child_bone
+				)
 	for effect in current_layer.effects:
 		var effect_item := add_section(effect.name, KeyframeAnimationTrack.TrackTypes.LAYER_EFFECT)
 		for param_name in effect.params:
@@ -172,6 +200,8 @@ func add_property(
 	match param_track.type:
 		KeyframeAnimationTrack.TrackTypes.LAYER_EFFECT:
 			param_track.effect = animatable_object
+		KeyframeAnimationTrack.TrackTypes.BONE:
+			param_track.bone_layer = animatable_object
 
 	var animation_dictionary: Dictionary[String, Dictionary] = animatable_object.get(
 		animation_dictionary_name
@@ -365,6 +395,8 @@ func _on_keyframe_property_changed(new_value, property_name: String) -> void:
 		undo_redo.add_do_method(func(): dict[param_name][frame_index][property_name] = new_value)
 		undo_redo.add_undo_method(func(): dict[param_name][frame_index][property_name] = old_value)
 		last_key_button = key_button
+		if param_name in ["start_point", "bone_rotation"]:
+			Global.canvas.skeleton.queue_redraw()
 	var last_dict := last_key_button.dict
 	var last_param_name := last_key_button.param_name
 	var last_frame_index := last_key_button.frame_index
@@ -409,6 +441,22 @@ func _update_keyframe_property_ui(dict: Dictionary, keyframe_id: int) -> void:
 			properties_grid_container.get_node(^"EaseTypeOptions") as OptionButton
 		)
 		ease_type_options.select(ease_type)
+
+
+func add_bone_keyframe(bone_layer: BoneLayer, frame_index: int, param_name: String) -> void:
+	selected_keyframes = [next_keyframe_id]
+	var undo_redo := Global.current_project.undo_redo
+	undo_redo.create_action("Add keyframe")
+	undo_redo.add_do_method(
+		bone_layer.set_keyframe.bind(param_name, frame_index, bone_layer.get(param_name))
+	)
+	undo_redo.add_undo_method(func(): bone_layer.animated_params[param_name].erase(frame_index))
+	undo_redo.add_undo_method(unselect_keyframe.bind(next_keyframe_id))
+	undo_redo.add_do_method(recreate_timeline)
+	undo_redo.add_undo_method(recreate_timeline)
+	undo_redo.add_do_method(Global.undo_or_redo.bind(false))
+	undo_redo.add_undo_method(Global.undo_or_redo.bind(true))
+	undo_redo.commit_action()
 
 
 func add_effect_keyframe(effect: LayerEffect, frame_index: int, param_name: String) -> void:
