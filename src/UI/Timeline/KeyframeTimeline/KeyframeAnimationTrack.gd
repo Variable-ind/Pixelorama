@@ -60,6 +60,6 @@ func _on_popup_menu_id_pressed(id: int) -> void:
 		match type:
 			# TODO: Resolve them later.
 			TrackTypes.LAYER_EFFECT:
-				timeline.add_effect_keyframe(animatable_object, keyframe_at, param_name)
+				timeline.add_keyframe(animatable_object, keyframe_at, param_name)
 			TrackTypes.BONE:
-				timeline.add_bone_keyframe(animatable_object, keyframe_at, param_name)
+				timeline.add_keyframe(animatable_object, keyframe_at, param_name)

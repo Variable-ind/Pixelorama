@@ -9,29 +9,29 @@ const START_RADIUS: float = 6
 const END_RADIUS: float = 4
 const WIDTH: float = 2
 
-# These variables are to assist in calculations. Setting them triggers a calculation loop.
-# Getting them (in normal situations) just returns the state from get_param()
-var start_point := Vector2.INF:  ## This is relative to the gizmo_origin
-	set(value):
-		_update_bone_data("start_point", value)
+var current_frame_local_diplacement: Vector2:
 	get():
-		return get_param("start_point")
-var bone_rotation: float = INF:  ## This is relative to the gizmo_rotate_origin (Radians)
-	set(value):
-		if not is_equal_approx(value, bone_rotation):
-			value = wrapf(value, -PI, PI)
-			_update_bone_data("bone_rotation", value)
-	get():
-		return wrapf(get_param("bone_rotation"), -PI, PI)
+		return animator.get_param("local_displacement", project.current_frame)
 
-var gizmo_origin := Vector2.ZERO:
+var current_frame_local_rotation: Vector2:
+	get():
+		return animator.get_param("local_rotation", project.current_frame)
+
+## Starting point of the gizmo (with zero displacement).
+## True gizmo origin is this plus displacement. It's value is relative to canvas, instead of the
+## parent.
+var gizmo_origin_no_disp := Vector2.ZERO:
 	set(value):
-		if not gizmo_origin.is_equal_approx(value):
-			gizmo_origin = value
+		if not gizmo_origin_no_disp.is_equal_approx(value):
+			gizmo_origin_no_disp = value
+## Gizmo rotation (when local_rotation is zero).
+## True gizmo rotation is this plus local_rotation. It's value is relative to canvas, instead of the
+## parent.
 var gizmo_rotate_origin: float = 0:  ## Unit is Radians
 	set(value):
 		if not is_equal_approx(value, gizmo_rotate_origin):
 			gizmo_rotate_origin = value
+## The distance between the starting point of gizmo and it's ending point.
 var gizmo_length: int = MIN_LENGTH + 5:
 	set(value):
 		if not is_equal_approx(value, gizmo_length) and value > int(MIN_LENGTH):
@@ -39,14 +39,7 @@ var gizmo_length: int = MIN_LENGTH + 5:
 				value = int(MIN_LENGTH)
 			gizmo_length = value
 
-var associated_layer: BoneLayer  ## only used in _update_children()
 var should_update_children := true
-
-# Properties determined using above variables
-var end_point: Vector2:  ## This is relative to the start_point
-	get():
-		return Vector2(gizmo_length, 0).rotated(gizmo_rotate_origin + bone_rotation)
-
 var enabled := true
 
 var ignore_rotation_hover := false
@@ -54,241 +47,24 @@ var modify_mode := NONE
 var generation_cache: Dictionary
 var rotation_renderer := ShaderImageEffect.new()
 var algorithm := DrawingAlgos.nn_shader
+var animator := BoneAnimator.new(default_bone_params())
 
-## A Dictionary containing another Dictionary that
-## maps the frame indices (int) to another Dictionary of value, trans, ease,
-## and a layer-scope unique ID.
-## Example:
-## [codeblock]
-##{
-##	"gizmo_origin":
-##	{
-##		0: {id: 0, "value": Vector2(0, 0), "trans": 0, "ease": 2},
-##		10: {id: 1, "value": Vector2(64, 64), "trans": 1, "ease": 3},
-##	},
-##	"gizmo_rotate_origin":
-##	{
-##		1: {id: 2, "value": false, "trans": 0, "ease": 0},
-##		3: {id: 3, "value": true, "trans": 0, "ease": 0},
-##		10: {id: 4, "value": false, "trans": 0, "ease": 0},
-##	},
-##}
-## [/codeblock]
-var animated_params: Dictionary[String, Dictionary] = {}
+class BoneAnimator:
+	extends AnimatableObject
+
+	func _init(_params: Dictionary[String, Variant] = {}) -> void:
+		params = _params
 
 
-## Converts coordinates that are relative to canvas get converted to position relative to
-## gizmo_origin.
-func rel_to_origin(pos: Vector2) -> Vector2:
-	return pos - gizmo_origin
-
-
-## Converts coordinates that are relative to canvas get converted to position relative to
-## start point (the bigger circle).
-func rel_to_start_point(pos: Vector2) -> Vector2:
-	return pos - gizmo_origin - start_point
-
-
-## Converts coordinates that are relative to gizmo_origin get converted to position relative to
-## canvas.
-func rel_to_canvas(pos: Vector2, is_rel_to_start_point := false) -> Vector2:
-	var diff = start_point if is_rel_to_start_point else Vector2.ZERO
-	return pos + gizmo_origin + diff
-
-
-func _init(_project: Project, _name := "") -> void:
-	super(_project, _name)
-
-
-func set_keyframe(
-	param_name: String,
-	frame_index: int,
-	value: Variant,
-	trans := Tween.TRANS_LINEAR,
-	ease_type := Tween.EASE_IN
-) -> void:
-	if not animated_params.has(param_name):
-		animated_params[param_name] = {}
-	animated_params[param_name][frame_index] = {"value": value, "trans": trans, "ease": ease_type}
-
-
-func get_params(frame_index: int) -> Dictionary:
-	var to_return := BoneLayer.default_bone_params()
-	for param in animated_params:
-		var animated_properties := animated_params[param]  # Dictionary[int, Dictionary]
-		if animated_properties.has(frame_index):
-			# If the frame index exists in the properties, get that.
-			to_return[param] = animated_properties[frame_index].get("value", to_return[param])
-		else:
-			if animated_properties.size() == 0:
-				continue
-			# If it doesn't exist, interpolate.
-			var frame_edges := find_frame_edges(frame_index, animated_properties)
-			var min_params: Dictionary = animated_properties[frame_edges[0]]
-			var max_params: Dictionary = animated_properties[frame_edges[1]]
-			var min_value = min_params.get("value", to_return[param])
-			var max_value = max_params.get("value", to_return[param])
-			if not is_interpolatable_type(min_value):
-				to_return[param] = max_value
-				continue
-			var elapsed := frame_index - frame_edges[0]
-			var duration := frame_edges[1] - frame_edges[0]
-			var trans_type: int = min_params.get("trans", Tween.TRANS_LINEAR)
-			if trans_type == Tween.TRANS_SPRING + 1:
-				to_return[param] = min_value
-				continue
-			var ease_type: Tween.EaseType = min_params.get("ease", Tween.EASE_IN)
-
-			# temporarily convert to parent's local coordinates
-			var parent_bone := BoneLayer.get_parent_bone(self)
-			var parent_start_min_info: Dictionary
-			var parent_start_max_info: Dictionary
-			var parent_bone_current_info: Dictionary
-			if parent_bone:
-				parent_start_min_info = parent_bone.get_params(frame_edges[0])
-				parent_start_max_info = parent_bone.get_params(frame_edges[1])
-				parent_bone_current_info = parent_bone.get_params(project.current_frame)
-			if parent_start_min_info and parent_start_max_info and parent_bone_current_info:
-				var parent_start_min = (
-					parent_start_min_info["start_point"] + parent_bone.gizmo_origin
-				)
-				var parent_start_max = (
-					parent_start_max_info["start_point"] + parent_bone.gizmo_origin
-				)
-				var parent_rot_min = parent_start_min_info["bone_rotation"]
-				var parent_rot_max = parent_start_max_info["bone_rotation"]
-				if param == "start_point":
-					min_value = min_value + gizmo_origin - parent_start_min
-					max_value = max_value + gizmo_origin - parent_start_max
-				elif param == "bone_rotation":
-					min_value = min_value - parent_rot_min
-					max_value = max_value - parent_rot_max
-
-			# Do the tweening relative to parent coordinates
-			var delta = max_value - min_value
-			to_return[param] = Tween.interpolate_value(
-				min_value, delta, elapsed, duration, trans_type, ease_type
-			)
-
-			# Covert back to original (relative to gizmo_origin) coordinates
-			if parent_start_min_info and parent_start_max_info and parent_bone_current_info:
-				var p_min_rotation: float = parent_start_min_info["bone_rotation"]
-				var p_start_current: Vector2 = parent_bone_current_info["start_point"]
-				var p_current_rotation: float = parent_bone_current_info["bone_rotation"]
-				var rotation_delta = p_min_rotation - p_current_rotation
-				if param == "start_point":
-					var rotated_start_value = to_return["start_point"].rotated(-rotation_delta)
-					to_return["start_point"] = rel_to_origin(
-						parent_bone.rel_to_canvas(p_start_current + rotated_start_value)
-					)
-				elif param == "bone_rotation":  # offset rotation by parent's current rotation
-					to_return["bone_rotation"] = (
-						to_return["bone_rotation"] + p_min_rotation - rotation_delta
-					)
-	return to_return
-
-
-func get_param(param_name, frame_index := project.current_frame):
-	return get_params(frame_index)[param_name]
-
-
-static func default_bone_params() -> Dictionary:
-	var data := {}
-	data["start_point"] = Vector2.ZERO
-	data["bone_rotation"] = 0
-	return data
-
-
-func find_frame_edges(frame_index: int, animated_properties: Dictionary) -> Array[int]:
-	var param_keys := animated_properties.keys()
-	if param_keys.size() == 1:
-		return [param_keys[0], param_keys[0]]
-	param_keys.sort()
-	var minimum: int = param_keys[0]
-	var maximum: int = param_keys[-1]
-	for key in param_keys:
-		if key > minimum and key <= frame_index:
-			minimum = key
-		if key < maximum and key >= frame_index:
-			maximum = key
-	return [minimum, maximum]
-
-
-static func is_animatable_type(value: Variant) -> bool:
-	if is_interpolatable_type(value):
-		return true
-	match typeof(value):
-		TYPE_BOOL, TYPE_BASIS:
-			return true
-		_:
-			return false
-
-
-static func is_interpolatable_type(value: Variant) -> bool:
-	match typeof(value):
-		TYPE_INT, TYPE_FLOAT, TYPE_VECTOR2, TYPE_VECTOR2I, TYPE_VECTOR3, TYPE_VECTOR3I:
-			return true
-		TYPE_VECTOR4, TYPE_VECTOR4I, TYPE_COLOR, TYPE_QUATERNION:
-			return true
-		_:
-			return false
-
-
-# Currently used in serialize()
-func get_bone_data(vectors_as_string: bool) -> Dictionary:
-	var data := {}
-	if vectors_as_string:
-		data["gizmo_origin"] = var_to_str(gizmo_origin)
-		data["gizmo_rotate_origin"] = var_to_str(gizmo_rotate_origin)
-		data["start_point"] = var_to_str(start_point)
-	else:
-		data["gizmo_origin"] = gizmo_origin
-		data["gizmo_rotate_origin"] = gizmo_rotate_origin
-		data["start_point"] = start_point
-	data["bone_rotation"] = bone_rotation
-	data["gizmo_length"] = gizmo_length
-	return data
-
-
-# NOTE: Currently not used anywhere.
-#func set_bone_data(data: Dictionary) -> void:
-## These need conversion before setting
-#if typeof(data.get("gizmo_origin", gizmo_origin)) == TYPE_STRING:
-#data["gizmo_origin"] = str_to_var(data.get("gizmo_origin", var_to_str(gizmo_origin)))
-#
-#if typeof(data.get("start_point", start_point)) == TYPE_STRING:
-#data["start_point"] = str_to_var(data.get("start_point", start_point))
-#
-#if typeof(data.get("gizmo_rotate_origin", gizmo_rotate_origin)) == TYPE_STRING:
-#data["gizmo_rotate_origin"] = str_to_var(
-#data.get("gizmo_rotate_origin", gizmo_rotate_origin)
-#)
-#gizmo_origin = data.get("gizmo_origin", gizmo_origin)
-#gizmo_rotate_origin = data.get("gizmo_rotate_origin", gizmo_rotate_origin)
-#start_point = data.get("start_point", start_point)
-#bone_rotation = data.get("bone_rotation", bone_rotation)
-#gizmo_length = data.get("gizmo_length", gizmo_length)
-
-
-func serialize() -> Dictionary:
-	var data := super()
-	data["enabled"] = enabled
-	data["animated_params"] = var_to_str(animated_params)
-	data.merge(get_bone_data(true))
-	return data
-
-
-func deserialize(dict: Dictionary) -> void:
-	super(dict)
-	if dict.has("enabled"):
-		enabled = dict.get("enabled", enabled)
-	if dict.has("animated_params"):
-		animated_params = str_to_var(dict["animated_params"])
-
-
-## Returns a new empty [BaseCel]
-func new_empty_cel() -> BaseCel:
-	return BoneCel.new()
+static func get_parent_chain(layer) -> Array[BoneLayer]:
+	var chain: Array[BoneLayer] = []
+	var bone_parent = layer.parent
+	while bone_parent != null:
+		if bone_parent is BoneLayer:
+			chain.push_front(bone_parent)
+			break
+		bone_parent = bone_parent.parent
+	return chain
 
 
 static func get_parent_bone(layer) -> BoneLayer:
@@ -298,6 +74,92 @@ static func get_parent_bone(layer) -> BoneLayer:
 			break
 		bone_parent = bone_parent.parent
 	return bone_parent
+
+
+static func default_bone_params() -> Dictionary[String, Variant]:
+	var data: Dictionary[String, Variant] = {}
+	data["local_displacement"] = Vector2.ZERO
+	data["local_rotation"] = 0
+	return data
+
+
+func get_end(frame: int) -> Vector2:
+	return Vector2(gizmo_length, 0).rotated(gizmo_rotate_origin + animator.get_param("local_rotation", frame, 0))
+
+
+func get_parent_contributions(frame: int):
+	var rotation := 0
+	var displacement := Vector2.ZERO
+	var parent_chain := get_parent_chain(self)
+	if not parent_chain.is_empty():
+		displacement = parent_chain[0].gizmo_origin_no_disp
+	for parent_bone in get_parent_chain(self):
+		var params := parent_bone.animator.get_params(frame)
+		displacement += params.get("local_displacement", Vector2.ZERO).rotated(rotation)
+		rotation += params.get("local_rotation", 0)
+	return {"rotation": rotation, "displacement": rel_to_origin(displacement)}
+
+
+func get_net_displacement(frame: int) -> Vector2:
+	return animator.get_param("local_displacement", frame, Vector2.ZERO) + get_parent_contributions(frame)["displacement"]
+
+
+func get_net_rotation(frame: int) -> float:
+	return animator.get_param("local_rotation", frame, 0) + get_parent_contributions(frame)["rotation"]
+
+
+## Converts coordinates that are relative to canvas get converted to position relative to
+## gizmo_origin_no_disp.
+func rel_to_origin(pos: Vector2) -> Vector2:
+	return pos - gizmo_origin_no_disp
+
+
+## Converts coordinates that are relative to canvas get converted to position relative to
+## start point (the bigger circle).
+func rel_to_start_point(pos: Vector2, frame: int = project.current_frame) -> Vector2:
+	return pos - gizmo_origin_no_disp - get_net_displacement(frame)
+
+
+## Converts coordinates that are relative to gizmo_origin_no_disp get converted to position relative to
+## canvas.
+func rel_to_canvas(pos: Vector2) -> Vector2:
+	return pos + gizmo_origin_no_disp
+
+
+func _init(_project: Project, _name := "") -> void:
+	super(_project, _name)
+
+
+# Currently used in serialize()
+func get_bone_data(vectors_as_string: bool) -> Dictionary:
+	var data := {}
+	if vectors_as_string:
+		data["gizmo_origin_no_disp"] = var_to_str(gizmo_origin_no_disp)
+		data["gizmo_rotate_origin"] = var_to_str(gizmo_rotate_origin)
+	else:
+		data["gizmo_origin_no_disp"] = gizmo_origin_no_disp
+		data["gizmo_rotate_origin"] = gizmo_rotate_origin
+	data["gizmo_length"] = gizmo_length
+	return data.merged(animator.serialize())
+
+
+func serialize() -> Dictionary:
+	var data := super()
+	data["enabled"] = enabled
+	data.merge(get_bone_data(true))
+	return data
+
+
+func deserialize(dict: Dictionary) -> void:
+	super(dict)
+	if dict.has("enabled"):
+		enabled = dict.get("enabled", enabled)
+	animator.deserialize(dict)
+
+
+## Returns a new empty [BaseCel]
+func new_empty_cel() -> BaseCel:
+	return BoneCel.new()
 
 
 func get_best_origin(frame: Frame) -> Vector2i:
@@ -314,10 +176,10 @@ func get_best_origin(frame: Frame) -> Vector2i:
 ## Calculates hover mode of current BoneLayer
 func hover_mode(mouse_position: Vector2, camera_zoom) -> int:
 	var local_mouse_pos = rel_to_origin(mouse_position)
-	if (start_point).distance_to(local_mouse_pos) <= INTERACTION_DISTANCE / camera_zoom.x:
+	if (get_net_displacement(project.current_frame)).distance_to(local_mouse_pos) <= INTERACTION_DISTANCE / camera_zoom.x:
 		return DISPLACE
 	elif (
-		(start_point + end_point).distance_to(local_mouse_pos)
+		(get_net_displacement(project.current_frame) + get_end(project.current_frame)).distance_to(local_mouse_pos)
 		<= INTERACTION_DISTANCE / camera_zoom.x
 	):
 		if !ignore_rotation_hover:
@@ -326,7 +188,7 @@ func hover_mode(mouse_position: Vector2, camera_zoom) -> int:
 		rel_to_start_point(mouse_position),
 		INTERACTION_DISTANCE / camera_zoom.x,
 		Vector2.ZERO,
-		end_point
+		get_end(project.current_frame)
 	):
 		if !ignore_rotation_hover:
 			return ROTATE
@@ -374,8 +236,8 @@ func apply_bone(cel_image: Image, at_frame: int) -> Image:
 		if DrawingAlgos.force_bone_mode != DrawingAlgos.BoneRenderMode.POSE:
 			return cel_image
 
-	var frame_angle: float = get_param("bone_rotation", at_frame)
-	var frame_start_point: Vector2i = get_param("start_point", at_frame)
+	var frame_angle: float = get_net_rotation(at_frame)
+	var frame_start_point: Vector2i = get_net_displacement(at_frame)
 	if frame_angle == 0 and frame_start_point == Vector2i.ZERO:
 		return cel_image
 	var used_region := cel_image.get_used_rect()
@@ -418,9 +280,9 @@ func apply_bone(cel_image: Image, at_frame: int) -> Image:
 			)
 			bone_cache.clear()
 			bone_cache[cache_key] = square_image
-	var gizmo_origin_floored: Vector2i = gizmo_origin.floor()
-	var pivot: Vector2i = gizmo_origin_floored
-	var bone_start_global: Vector2i = gizmo_origin_floored + frame_start_point
+	var gizmo_origin_no_disp_floored: Vector2i = gizmo_origin_no_disp.floor()
+	var pivot: Vector2i = gizmo_origin_no_disp_floored
+	var bone_start_global: Vector2i = gizmo_origin_no_disp_floored + frame_start_point
 	var square_image_start: Vector2i = used_region.position - s_offset
 	var global_square_centre: Vector2 = square_image_start + (square_image.get_size() / 2)
 	var global_rotated_new_centre = (
@@ -466,18 +328,3 @@ func is_blender() -> bool:
 		elif DrawingAlgos.force_bone_mode == DrawingAlgos.BoneRenderMode.POSE:
 			return true
 	return false
-
-
-## This is a recursive function. Calculates and updates the child transformations
-## according to the parent transformation.
-func _update_bone_data(property: String, value: Variant):
-	if not is_instance_valid(project):
-		return
-	if Global.canvas.skeleton.selected_bone:  # Top-most bone
-		set_keyframe(property, project.current_frame, value)
-	if property == "bone_rotation":
-		# Check if any rotation was done before, if not, make a keyframe at frame 0
-		var animated_properties: Dictionary = animated_params.get(property, {})
-		if animated_properties.keys().size() <= 1 and project.current_frame > 0:
-			if not animated_properties.keys().has(0):
-				set_keyframe("bone_rotation", 0, value)

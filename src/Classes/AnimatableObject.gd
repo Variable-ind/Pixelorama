@@ -39,36 +39,46 @@ var params: Dictionary[String, Variant] = {}
 func get_params(frame_index: int) -> Dictionary:
 	var to_return := params.duplicate()
 	for param in animated_params:
-		if param.begins_with("PXO_"):
-			continue
-		var animated_properties := animated_params[param]  # Dictionary[int, Dictionary]
-		if animated_properties.has(frame_index):
-			# If the frame index exists in the properties, get that.
-			to_return[param] = animated_properties[frame_index].get("value", to_return[param])
-		else:
-			if animated_properties.size() == 0:
-				continue
-			# If it doesn't exist, interpolate.
-			var frame_edges := find_frame_edges(frame_index, animated_properties)
-			var min_params: Dictionary = animated_properties[frame_edges[0]]
-			var max_params: Dictionary = animated_properties[frame_edges[1]]
-			var min_value = min_params.get("value", to_return[param])
-			var max_value = max_params.get("value", to_return[param])
-			if not is_interpolatable_type(min_value):
-				to_return[param] = max_value
-				continue
-			var elapsed := frame_index - frame_edges[0]
-			var delta = max_value - min_value
-			var duration := frame_edges[1] - frame_edges[0]
-			var trans_type: int = min_params.get("trans", Tween.TRANS_LINEAR)
-			if trans_type == Tween.TRANS_SPRING + 1:
-				to_return[param] = min_value
-				continue
-			var ease_type: Tween.EaseType = min_params.get("ease", Tween.EASE_IN)
-			to_return[param] = Tween.interpolate_value(
-				min_value, delta, elapsed, duration, trans_type, ease_type
-			)
+		var value = get_param(param, frame_index)
+		if value:
+			to_return[param] = value
 	return to_return
+
+
+func get_param(param_name: String, frame_index: int, default = null) -> Variant:
+	var to_return := params.duplicate()
+	if param_name.begins_with("PXO_"):
+		return default
+	if not animated_params.has(param_name):
+		if params.has(param_name):
+			return params[param_name]
+		else:
+			return default
+	var animated_properties := animated_params[param_name]  # Dictionary[int, Dictionary]
+	if animated_properties.has(frame_index):
+		# If the frame index exists in the properties, get that.
+		return animated_properties[frame_index].get("value", to_return[param_name])
+	else:
+		if animated_properties.size() == 0:
+			return default
+		# If it doesn't exist, interpolate.
+		var frame_edges := find_frame_edges(frame_index, animated_properties)
+		var min_params: Dictionary = animated_properties[frame_edges[0]]
+		var max_params: Dictionary = animated_properties[frame_edges[1]]
+		var min_value = min_params.get("value", to_return[param_name])
+		var max_value = max_params.get("value", to_return[param_name])
+		if not is_interpolatable_type(min_value):
+			return max_value
+		var elapsed := frame_index - frame_edges[0]
+		var delta = max_value - min_value
+		var duration := frame_edges[1] - frame_edges[0]
+		var trans_type: int = min_params.get("trans", Tween.TRANS_LINEAR)
+		if trans_type == Tween.TRANS_SPRING + 1:
+			return min_value
+		var ease_type: Tween.EaseType = min_params.get("ease", Tween.EASE_IN)
+		return Tween.interpolate_value(
+			min_value, delta, elapsed, duration, trans_type, ease_type
+		)
 
 
 func set_keyframe(

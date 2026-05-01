@@ -124,10 +124,10 @@ func recreate_timeline() -> void:
 		var animatable_props = BoneLayer.default_bone_params()
 		for param_name in animatable_props.keys():
 			var value = animatable_props[param_name]
-			if not BoneLayer.is_animatable_type(value):
+			if not AnimatableObject.is_animatable_type(value):
 				continue
 			add_property(
-				param_name, KeyframeAnimationTrack.TrackTypes.BONE, bone_section, current_layer
+				param_name, KeyframeAnimationTrack.TrackTypes.BONE, bone_section, current_layer.animator
 			)
 		var child_bones: Array[BoneLayer] = current_layer.get_child_bones(true)
 		child_bones.reverse()
@@ -143,7 +143,7 @@ func recreate_timeline() -> void:
 					param_name,
 					KeyframeAnimationTrack.TrackTypes.BONE,
 					child_bone_section,
-					child_bone
+					child_bone.animator
 				)
 	for effect in current_layer.effects:
 		var effect_item := add_section(effect.name, KeyframeAnimationTrack.TrackTypes.LAYER_EFFECT)
@@ -285,10 +285,7 @@ func select_keyframes() -> void:
 	var property = dict[param_name][frame_index]["value"]
 	var track := key_button.get_parent() as KeyframeAnimationTrack
 	var property_properties := {}  # I apologize for the horrible name.
-	# TODO: Resolve them later
 	if track.type == KeyframeAnimationTrack.TrackTypes.LAYER_EFFECT:
-		property_properties = track.animatable_object.param_properties[param_name]
-	if track.type == KeyframeAnimationTrack.TrackTypes.BONE:
 		property_properties = track.animatable_object.param_properties[param_name]
 	var node := Global.create_node_from_variable(
 		property, _on_keyframe_property_changed.bind("value"), property_properties
