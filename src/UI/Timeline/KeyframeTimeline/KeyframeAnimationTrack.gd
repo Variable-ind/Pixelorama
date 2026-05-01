@@ -14,8 +14,7 @@ var keyframe_at := 0
 var line_color := Color.WHITE
 
 # Various animatable stuff
-var effect: LayerEffect
-var bone_layer: BoneLayer
+var animatable_object: AnimatableObject
 
 
 func _ready() -> void:
@@ -53,13 +52,14 @@ func _draw() -> void:
 
 func _on_popup_menu_id_pressed(id: int) -> void:
 	if id == 0:
+		if (
+			animatable_object.animated_params.has(param_name)
+			and animatable_object.animated_params[param_name].has(keyframe_at)
+		):
+			return
 		match type:
+			# TODO: Resolve them later.
 			TrackTypes.LAYER_EFFECT:
-				if (
-					effect.animated_params.has(param_name)
-					and effect.animated_params[param_name].has(keyframe_at)
-				):
-					return
-				timeline.add_effect_keyframe(effect, keyframe_at, param_name)
+				timeline.add_effect_keyframe(animatable_object, keyframe_at, param_name)
 			TrackTypes.BONE:
-				timeline.add_bone_keyframe(bone_layer, keyframe_at, param_name)
+				timeline.add_bone_keyframe(animatable_object, keyframe_at, param_name)
