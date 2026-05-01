@@ -60,7 +60,6 @@ func _draw_gizmo(
 	bone: BoneLayer, camera_zoom: Vector2, canon_bones := [], edit_mode := false
 ) -> void:
 	var mouse_point: Vector2 = Global.canvas.current_pixel
-	var frame: int = Global.current_project.current_frame
 	var width: float = (
 		(bone.WIDTH if (bone == selected_bone) else BoneLayer.DESELECT_WIDTH) / camera_zoom.x
 	)
@@ -76,8 +75,8 @@ func _draw_gizmo(
 	var bone_start := Vector2.ZERO
 	var bone_end := Vector2(bone.gizmo_length, 0).rotated(bone.gizmo_rotate_origin)
 	if not edit_mode:
-		bone_start = bone.get_net_displacement(frame)
-		bone_end = bone.get_end(frame)
+		bone_start = bone.get_net_displacement()
+		bone_end = bone.get_end()
 	# Draw the position circle
 	if not edit_mode or chaining_mode:
 		draw_set_transform(bone.gizmo_origin_no_disp)
@@ -151,12 +150,12 @@ func _draw_gizmo(
 	## Show connection to parent
 	var parent_bone := BoneLayer.get_parent_bone(bone)
 	if parent_bone:
-		var p_start := Vector2.ZERO if edit_mode else parent_bone.get_net_displacement(frame)
-		var p_rot := parent_bone.get_net_rotation(frame) if edit_mode else 0.0
+		var p_start := Vector2.ZERO if edit_mode else parent_bone.get_net_displacement()
+		var p_rot := parent_bone.get_net_rotation() if edit_mode else 0.0
 		var p_end := (
 			Vector2.ZERO
 			if (not parent_bone in canon_bones or chaining_mode)
-			else parent_bone.get_end(frame)
+			else parent_bone.get_end()
 		)
 		var parent_start = (
 			bone.rel_to_origin(parent_bone.rel_to_canvas(p_start)) + (p_end).rotated(-p_rot)
@@ -193,11 +192,10 @@ func _input(event: InputEvent) -> void:
 				return
 			var parent_bone := BoneLayer.get_parent_bone(bone_layer)
 			if parent_bone:  # We wish to switch to parent
-				var frame: int = Global.current_project.current_frame
 				var pos: Vector2i = Global.canvas.current_pixel
 				if Geometry2D.is_point_in_circle(
 					pos,
-					parent_bone.rel_to_canvas(parent_bone.get_net_displacement(frame)),
+					parent_bone.rel_to_canvas(parent_bone.get_net_displacement()),
 					parent_bone.START_RADIUS / Global.camera.zoom.x
 				):
 					project.selected_cels.clear()

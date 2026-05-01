@@ -9,14 +9,6 @@ const START_RADIUS: float = 6
 const END_RADIUS: float = 4
 const WIDTH: float = 2
 
-var current_frame_local_diplacement: Vector2:
-	get():
-		return animator.get_param("local_displacement", project.current_frame)
-
-var current_frame_local_rotation: Vector2:
-	get():
-		return animator.get_param("local_rotation", project.current_frame)
-
 ## Starting point of the gizmo (with zero displacement).
 ## True gizmo origin is this plus displacement. It's value is relative to canvas, instead of the
 ## parent.
@@ -39,7 +31,6 @@ var gizmo_length: int = MIN_LENGTH + 5:
 				value = int(MIN_LENGTH)
 			gizmo_length = value
 
-var should_update_children := true
 var enabled := true
 
 var ignore_rotation_hover := false
@@ -62,7 +53,6 @@ static func get_parent_chain(layer) -> Array[BoneLayer]:
 	while bone_parent != null:
 		if bone_parent is BoneLayer:
 			chain.push_front(bone_parent)
-			break
 		bone_parent = bone_parent.parent
 	return chain
 
@@ -83,11 +73,11 @@ static func default_bone_params() -> Dictionary[String, Variant]:
 	return data
 
 
-func get_end(frame: int) -> Vector2:
+func get_end(frame: int = project.current_frame) -> Vector2:
 	return Vector2(gizmo_length, 0).rotated(gizmo_rotate_origin + get_net_rotation(frame))
 
 
-func get_parent_contributions(frame: int):
+func get_parent_contributions(frame: int = project.current_frame):
 	var rotation: float = 0
 	var displacement := Vector2.ZERO
 	var parent_chain := get_parent_chain(self)
@@ -96,7 +86,7 @@ func get_parent_contributions(frame: int):
 		displacement = parent_chain[0].gizmo_origin_no_disp
 	for parent_bone in parent_chain:
 		var params := parent_bone.animator.get_params(frame)
-		displacement += params.get("local_displacement", Vector2.ZERO).rotated(rotation)
+		displacement += params.get("local_displacement", Vector2.ZERO).rotated(last_rotation)
 		last_rotation = params.get("local_rotation", 0.0)
 		rotation += last_rotation
 	return {
@@ -106,7 +96,23 @@ func get_parent_contributions(frame: int):
 	}
 
 
-func get_net_displacement(frame: int) -> Vector2:
+func get_local_displacement(frame: int = project.current_frame) -> Vector2:
+	return animator.get_param("local_displacement", frame)
+
+
+func set_local_displacement(value: Vector2, frame: int = project.current_frame) -> void:
+	animator.set_keyframe("local_displacement", frame, value)
+
+
+func get_local_rotation(frame: int = project.current_frame) -> float:
+	return animator.get_param("local_rotation", frame, 0.0)
+
+
+func set_local_rotation(value: float, frame: int = project.current_frame) -> void:
+	animator.set_keyframe("local_rotation", frame, value)
+
+
+func get_net_displacement(frame: int = project.current_frame) -> Vector2:
 	var p_contributions = get_parent_contributions(frame)
 	return (
 		animator.get_param(
@@ -116,8 +122,8 @@ func get_net_displacement(frame: int) -> Vector2:
 	)
 
 
-func get_net_rotation(frame: int) -> float:
-	return animator.get_param("local_rotation", frame, 0.0) + get_parent_contributions(frame)["rotation"]
+func get_net_rotation(frame: int = project.current_frame) -> float:
+	return get_local_rotation(frame) + get_parent_contributions(frame)["rotation"]
 
 
 ## Converts coordinates that are relative to canvas get converted to position relative to
@@ -188,10 +194,10 @@ func get_best_origin(frame: Frame) -> Vector2i:
 ## Calculates hover mode of current BoneLayer
 func hover_mode(mouse_position: Vector2, camera_zoom) -> int:
 	var local_mouse_pos = rel_to_origin(mouse_position)
-	if (get_net_displacement(project.current_frame)).distance_to(local_mouse_pos) <= INTERACTION_DISTANCE / camera_zoom.x:
+	if (get_net_displacement()).distance_to(local_mouse_pos) <= INTERACTION_DISTANCE / camera_zoom.x:
 		return DISPLACE
 	elif (
-		(get_net_displacement(project.current_frame) + get_end(project.current_frame)).distance_to(local_mouse_pos)
+		(get_net_displacement() + get_end()).distance_to(local_mouse_pos)
 		<= INTERACTION_DISTANCE / camera_zoom.x
 	):
 		if !ignore_rotation_hover:
@@ -200,7 +206,7 @@ func hover_mode(mouse_position: Vector2, camera_zoom) -> int:
 		rel_to_start_point(mouse_position),
 		INTERACTION_DISTANCE / camera_zoom.x,
 		Vector2.ZERO,
-		get_end(project.current_frame)
+		get_end()
 	):
 		if !ignore_rotation_hover:
 			return ROTATE

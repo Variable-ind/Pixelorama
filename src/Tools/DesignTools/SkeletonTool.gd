@@ -21,9 +21,8 @@ var _chain_length: int = 2
 var _max_ik_iterations: int = 20
 var _ik_error_margin: float = 0.1
 var _include_children := true
-var _displace_offset := Vector2.ZERO
 var _prev_mouse_position := Vector2.INF
-var _hover_layer_in_chain = null
+var _hover_layer_in_chain: BoneLayer = null
 var _undo_target_frames := PackedInt32Array()
 
 @onready var quick_set_bones_menu: MenuButton = $QuickSetBones
@@ -44,14 +43,6 @@ func _ready() -> void:
 	#rotation_reset_menu.get_popup().index_pressed.connect(reset_bone_angle)
 	#position_reset_menu.get_popup().index_pressed.connect(reset_bone_position)
 	super()
-
-
-func _on_warn_pressed() -> void:
-	var warn_text = """
-To avoid any quirky behavior, it is recommended to not tween between
-large rotations, and have "Include bone children" enabled.
-"""
-	Global.popup_error(warn_text)
 
 
 func get_config() -> Dictionary:
@@ -154,25 +145,21 @@ func _on_ik_error_margin_value_changed(value: float) -> void:
 func _on_rotation_changed(value: float):
 	if current_selected_bone:
 		Global.canvas.skeleton.selected_bone = current_selected_bone
-		var old_update_children = current_selected_bone.should_update_children
-		current_selected_bone.should_update_children = _include_children
-		current_selected_bone.bone_rotation = deg_to_rad(value)
+		current_selected_bone.set_local_rotation(deg_to_rad(value))
 		Global.canvas.skeleton.queue_redraw()
 		Global.canvas.queue_redraw()
-		current_selected_bone.should_update_children = old_update_children
 
 
 func _on_position_changed(value: Vector2):
 	if current_selected_bone:
 		Global.canvas.skeleton.selected_bone = current_selected_bone
-		var old_update_children = current_selected_bone.should_update_children
-		current_selected_bone.should_update_children = _include_children
-		current_selected_bone.start_point = current_selected_bone.rel_to_origin(value).ceil()
+		current_selected_bone.set_local_displacement(
+			current_selected_bone.rel_to_origin(value).ceil()
+		)
 		Global.canvas.skeleton.queue_redraw()
 		Global.animation_timeline.keyframe_timeline.unselect_keyframe()
 		Global.animation_timeline.keyframe_timeline.recreate_timeline()
 		Global.canvas.queue_redraw()
-		current_selected_bone.should_update_children = old_update_children
 
 
 func _on_rotation_reset_menu_about_to_popup() -> void:
@@ -323,7 +310,6 @@ func draw_start(_pos: Vector2i) -> void:
 			Vector2(mouse_point), Global.camera.zoom
 		)
 	if _prev_mouse_position == Vector2.INF:
-		_displace_offset = current_selected_bone.rel_to_start_point(mouse_point)
 		_prev_mouse_position = mouse_point
 	display_props()
 
@@ -377,16 +363,12 @@ func draw_move(_pos: Vector2i) -> void:
 					Global.canvas.skeleton.selected_bone = current_selected_bone
 					_hover_layer_in_chain.modify_mode = BoneLayer.NONE
 	if current_selected_bone.modify_mode == BoneLayer.DISPLACE:
-		var old_update_children = current_selected_bone.should_update_children
 		if Input.is_action_pressed(&"transform_move_selection_only", true):
-			current_selected_bone.gizmo_origin += offset.rotated(
-				-current_selected_bone.bone_rotation
-			)
-			current_selected_bone.should_update_children = false
-		current_selected_bone.start_point = Vector2i(
-			current_selected_bone.rel_to_origin(mouse_point) - _displace_offset
+			current_selected_bone.gizmo_origin_no_disp += offset
+		current_selected_bone.set_local_displacement(
+			current_selected_bone.get_local_displacement()
+			+ offset.rotated(-current_selected_bone.get_parent_contributions()["rotation"])
 		)
-		current_selected_bone.should_update_children = old_update_children
 	elif (
 		current_selected_bone.modify_mode == BoneLayer.ROTATE
 		or current_selected_bone.modify_mode == BoneLayer.EXTEND
@@ -408,11 +390,13 @@ func draw_move(_pos: Vector2i) -> void:
 			# offset child bone rotaion so it appears to be of same global rotaion
 			var old_chain_rotation: float = 0
 			if _hover_layer_in_chain:
-				old_chain_rotation = _hover_layer_in_chain.bone_rotation
-			current_selected_bone.bone_rotation -= diff
+				old_chain_rotation = _hover_layer_in_chain.get_local_rotation()
+			current_selected_bone.set_local_rotation(
+				current_selected_bone.get_local_rotation() - diff
+			)
 			if _allow_chaining and _hover_layer_in_chain:
-				_hover_layer_in_chain.bone_rotation = (
-					2 * _hover_layer_in_chain.bone_rotation - old_chain_rotation
+				_hover_layer_in_chain.set_local_rotation(
+					2 * _hover_layer_in_chain.get_local_rotation() - old_chain_rotation
 				)
 	if _live_update:
 		Global.canvas.queue_redraw()
@@ -424,7 +408,6 @@ func draw_move(_pos: Vector2i) -> void:
 
 func draw_end(_pos: Vector2i) -> void:
 	_prev_mouse_position = Vector2.INF
-	_displace_offset = Vector2.ZERO
 	_hover_layer_in_chain = null
 	if Global.canvas.skeleton:
 		# Another tool is already active
@@ -501,10 +484,10 @@ func display_props():
 		%BoneProps.visible = true
 		%BoneLabel.text = tr("Name:") + " " + current_selected_bone.name
 		rot_slider.set_value_no_signal_update_display(
-			rad_to_deg(current_selected_bone.bone_rotation)
+			rad_to_deg(current_selected_bone.get_local_rotation())
 		)
 		pos_slider.set_value_no_signal(
-			current_selected_bone.rel_to_canvas(current_selected_bone.start_point)
+			current_selected_bone.rel_to_canvas(current_selected_bone.get_local_displacement())
 		)
 		return
 	else:
