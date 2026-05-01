@@ -84,28 +84,40 @@ static func default_bone_params() -> Dictionary[String, Variant]:
 
 
 func get_end(frame: int) -> Vector2:
-	return Vector2(gizmo_length, 0).rotated(gizmo_rotate_origin + animator.get_param("local_rotation", frame, 0))
+	return Vector2(gizmo_length, 0).rotated(gizmo_rotate_origin + get_net_rotation(frame))
 
 
 func get_parent_contributions(frame: int):
-	var rotation := 0
+	var rotation: float = 0
 	var displacement := Vector2.ZERO
 	var parent_chain := get_parent_chain(self)
+	var last_rotation: float = 0
 	if not parent_chain.is_empty():
 		displacement = parent_chain[0].gizmo_origin_no_disp
-	for parent_bone in get_parent_chain(self):
+	for parent_bone in parent_chain:
 		var params := parent_bone.animator.get_params(frame)
 		displacement += params.get("local_displacement", Vector2.ZERO).rotated(rotation)
-		rotation += params.get("local_rotation", 0)
-	return {"rotation": rotation, "displacement": rel_to_origin(displacement)}
+		last_rotation = params.get("local_rotation", 0.0)
+		rotation += last_rotation
+	return {
+		"rotation": rotation,
+		"displacement": rel_to_origin(displacement),
+		"last_rotation": last_rotation
+	}
 
 
 func get_net_displacement(frame: int) -> Vector2:
-	return animator.get_param("local_displacement", frame, Vector2.ZERO) + get_parent_contributions(frame)["displacement"]
+	var p_contributions = get_parent_contributions(frame)
+	return (
+		animator.get_param(
+			"local_displacement", frame, Vector2.ZERO
+		).rotated(p_contributions["last_rotation"])
+		+ p_contributions["displacement"]
+	)
 
 
 func get_net_rotation(frame: int) -> float:
-	return animator.get_param("local_rotation", frame, 0) + get_parent_contributions(frame)["rotation"]
+	return animator.get_param("local_rotation", frame, 0.0) + get_parent_contributions(frame)["rotation"]
 
 
 ## Converts coordinates that are relative to canvas get converted to position relative to
@@ -235,7 +247,6 @@ func apply_bone(cel_image: Image, at_frame: int) -> Image:
 	if is_edit_mode() or DrawingAlgos.force_bone_mode == DrawingAlgos.BoneRenderMode.EDIT:
 		if DrawingAlgos.force_bone_mode != DrawingAlgos.BoneRenderMode.POSE:
 			return cel_image
-
 	var frame_angle: float = get_net_rotation(at_frame)
 	var frame_start_point: Vector2i = get_net_displacement(at_frame)
 	if frame_angle == 0 and frame_start_point == Vector2i.ZERO:
