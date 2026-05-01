@@ -171,7 +171,7 @@ func add_property(
 	track_container.add_child(param_track)
 	match param_track.type:
 		KeyframeAnimationTrack.TrackTypes.LAYER_EFFECT:
-			param_track.effect = animatable_object
+			param_track.animatable_object = animatable_object
 
 	var animation_dictionary: Dictionary[String, Dictionary] = animatable_object.get(
 		animation_dictionary_name
@@ -255,7 +255,7 @@ func select_keyframes() -> void:
 	var track := key_button.get_parent() as KeyframeAnimationTrack
 	var property_properties := {}  # I apologize for the horrible name.
 	if track.type == KeyframeAnimationTrack.TrackTypes.LAYER_EFFECT:
-		property_properties = track.effect.param_properties[param_name]
+		property_properties = track.animatable_object.param_properties[param_name]
 	var node := Global.create_node_from_variable(
 		property, _on_keyframe_property_changed.bind("value"), property_properties
 	)
@@ -411,12 +411,14 @@ func _update_keyframe_property_ui(dict: Dictionary, keyframe_id: int) -> void:
 		ease_type_options.select(ease_type)
 
 
-func add_effect_keyframe(effect: LayerEffect, frame_index: int, param_name: String) -> void:
+func add_keyframe(
+	anim_obj: AnimatableObject, frame_index: int, param_name: String
+) -> void:
 	selected_keyframes = [next_keyframe_id]
 	var undo_redo := Global.current_project.undo_redo
 	undo_redo.create_action("Add keyframe")
-	undo_redo.add_do_method(effect.set_keyframe.bind(param_name, frame_index))
-	undo_redo.add_undo_method(func(): effect.animated_params[param_name].erase(frame_index))
+	undo_redo.add_do_method(anim_obj.set_keyframe.bind(param_name, frame_index))
+	undo_redo.add_undo_method(anim_obj.unset_keyframe.bind(param_name, frame_index))
 	undo_redo.add_undo_method(unselect_keyframe.bind(next_keyframe_id))
 	undo_redo.add_do_method(recreate_timeline)
 	undo_redo.add_undo_method(recreate_timeline)
