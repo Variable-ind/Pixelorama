@@ -81,18 +81,15 @@ func get_parent_contributions(frame: int = project.current_frame):
 	var rotation: float = 0
 	var displacement := Vector2.ZERO
 	var parent_chain := get_parent_chain(self)
-	var last_rotation: float = 0
 	if not parent_chain.is_empty():
 		displacement = parent_chain[0].gizmo_origin_no_disp
 	for parent_bone in parent_chain:
 		var params := parent_bone.animator.get_params(frame)
-		displacement += params.get("local_displacement", Vector2.ZERO).rotated(last_rotation)
-		last_rotation = params.get("local_rotation", 0.0)
-		rotation += last_rotation
+		displacement += params.get("local_displacement", Vector2.ZERO).rotated(rotation)
+		rotation += params.get("local_rotation", 0.0)
 	return {
 		"rotation": rotation,
 		"displacement": rel_to_origin(displacement),
-		"last_rotation": last_rotation
 	}
 
 
@@ -117,7 +114,7 @@ func get_net_displacement(frame: int = project.current_frame) -> Vector2:
 	return (
 		animator.get_param(
 			"local_displacement", frame, Vector2.ZERO
-		).rotated(p_contributions["last_rotation"])
+		).rotated(p_contributions["rotation"])
 		+ p_contributions["displacement"]
 	)
 
