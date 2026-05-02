@@ -10,12 +10,12 @@ const END_RADIUS: float = 4
 const WIDTH: float = 2
 
 ## Starting point of the gizmo (with zero displacement).
-## True gizmo origin is this plus displacement. It's value is relative to canvas, instead of the
-## parent.
+## True gizmo origin is this plus displacement. It's value is ofsetted negatively from the
+## the image it's meant to move.
 var gizmo_offset := Vector2.ZERO
 ## Gizmo rotation (when local_rotation is zero).
-## True gizmo rotation is this plus local_rotation. It's value is relative to canvas, instead of the
-## parent.
+## True gizmo rotation is this plus local_rotation. It's value is relative to the origin of
+## the image it's meant to rotate.
 var gizmo_rotate_origin: float = 0  ## Unit is Radians
 
 ## The distance between the starting point of gizmo and it's ending point.
@@ -72,6 +72,11 @@ static func default_bone_params() -> Dictionary[String, Variant]:
 	return data
 
 
+## Returns the coordinates of starting (position circle) point in global coordinates
+func get_start() -> Vector2:
+	return get_net_displacement() + gizmo_offset
+
+
 func get_end(frame: int = project.current_frame) -> Vector2:
 	return Vector2(gizmo_length, 0).rotated(gizmo_rotate_origin + get_net_rotation(frame))
 
@@ -108,11 +113,10 @@ func set_local_rotation(value: float, frame: int = project.current_frame) -> voi
 
 func get_net_displacement(frame: int = project.current_frame) -> Vector2:
 	var p_contributions = get_parent_contributions(frame)
-	return (
+	return p_contributions["displacement"] + (
 		animator.get_param(
 			"local_displacement", frame, Vector2.ZERO
 		).rotated(p_contributions["rotation"])
-		+ p_contributions["displacement"]
 	)
 
 
@@ -191,14 +195,14 @@ func get_interaction_distance(zoom_level: float) -> float:
 
 ## Calculates hover mode of current BoneLayer
 func hover_mode(mouse_position: Vector2, camera_zoom) -> int:
-	var local_mouse_pos = rel_to_origin(mouse_position)
+	var gizmo_pos_circle := get_net_displacement() + gizmo_offset
 	var hover_type := NONE
 	var interaction_distance := get_interaction_distance(camera_zoom.x)
 	# Mouse close to position circle
-	if (get_net_displacement()).distance_to(local_mouse_pos) <= interaction_distance:
+	if gizmo_pos_circle.distance_to(mouse_position) <= interaction_distance:
 		hover_type = DISPLACE
 	elif (
-		(get_net_displacement() + get_end()).distance_to(local_mouse_pos)
+		(gizmo_pos_circle + get_end()).distance_to(mouse_position)
 		<= interaction_distance
 	):
 		# Mouse close to end circle
@@ -271,11 +275,14 @@ func apply_bone(cel_image: Image, at_frame: int) -> Image:
 	var diagonal_length := floori(used_region.size.length())
 	if diagonal_length % 2 == 0:
 		diagonal_length += 1
+	# Vector pointing from the top left corners of the square rect and the used rect of the
+	# contentent that is centered on it.
 	var s_offset: Vector2i = (
 		(0.5 * (Vector2i(diagonal_length, diagonal_length) - used_region.size)).floor()
 	)
+	var square_image_start: Vector2i = used_region.position - s_offset
 	var square_image = cel_image.get_region(
-		Rect2i(used_region.position - s_offset, Vector2i(diagonal_length, diagonal_length))
+		Rect2i(square_image_start, Vector2i(diagonal_length, diagonal_length))
 	)
 	# Apply Rotation To this Image
 	if frame_angle != 0:
@@ -303,13 +310,12 @@ func apply_bone(cel_image: Image, at_frame: int) -> Image:
 			)
 			bone_cache.clear()
 			bone_cache[cache_key] = square_image
-	var gizmo_offset_floored: Vector2i = gizmo_offset.floor()
-	var pivot: Vector2i = gizmo_offset_floored
-	var bone_start_global: Vector2i = gizmo_offset_floored + frame_start_point
-	var square_image_start: Vector2i = used_region.position - s_offset
+	var gizmo_offset_rotated_floored: Vector2i = gizmo_offset.rotated(frame_angle).floor()
+	var pivot: Vector2i = gizmo_offset_rotated_floored
+	var bone_start_global: Vector2i = gizmo_offset_rotated_floored + frame_start_point
 	var global_square_centre: Vector2 = square_image_start + (square_image.get_size() / 2)
 	var global_rotated_new_centre = (
-		(global_square_centre - Vector2(pivot)).rotated(frame_angle) + Vector2(bone_start_global)
+		(global_square_centre).rotated(frame_angle) - Vector2(pivot) + Vector2(bone_start_global)
 	)
 	var new_start: Vector2i = (
 		square_image_start + Vector2i((global_rotated_new_centre - global_square_centre).floor())
@@ -459,23 +465,16 @@ func draw_bone(
 		## Show connection to parent and write bone name
 		var parent_bone: BoneLayer = BoneLayer.get_parent_bone(self)
 		if parent_bone:
-			var p_start := parent_bone.get_net_displacement()
+			var p_start := parent_bone.get_start()
 			var p_end := Vector2.ZERO if preview.chaining_mode else parent_bone.get_end()
-			var parent_start = (
-				rel_to_origin(parent.rel_to_canvas(p_start)) + p_end
-			)
-			preview.draw_set_transform(gizmo_offset)
 			if not parent_bone in preview.canon_layers:
-				preview.draw_circle(parent_start, START_RADIUS / camera_zoom.x, Color.GRAY, true)
-			# NOTE: start_point is coordinate of tail of bone, parent_start is head of parent
-			# (or tail in chained mode)
+				preview.draw_circle(p_start + p_end, START_RADIUS / camera_zoom.x, Color.GRAY, true)
 			preview.draw_dashed_line(
-				get_net_displacement(),
-				parent_start,
+				bone_displacement + gizmo_offset,
+				p_start + p_end,
 				highlight_color,
 				BoneLayer.DESELECT_WIDTH / camera_zoom.x
 			)
-			preview.draw_set_transform(Vector2.ZERO)
 
 		var font = Themes.get_font()
 		var line_size = gizmo_length
@@ -484,7 +483,7 @@ func draw_bone(
 			fade_ratio = max(0.3, fade_ratio)
 		if fade_ratio >= 0.4 and !preview.active_tool:  # Hide names if we have zoomed far
 			preview.draw_set_transform(
-				gizmo_offset + get_net_displacement(), preview.rotation, Vector2.ONE / camera_zoom.x
+				gizmo_offset + bone_displacement, preview.rotation, Vector2.ONE / camera_zoom.x
 			)
 			preview.draw_string(
 				font, Vector2(3, -3), name, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, highlight_color

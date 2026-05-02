@@ -154,7 +154,7 @@ func _on_position_changed(value: Vector2):
 	if current_selected_bone:
 		Global.canvas.skeleton.selected_bone = current_selected_bone
 		current_selected_bone.set_local_displacement(
-			current_selected_bone.rel_to_origin(value).ceil()
+			value.ceil()
 		)
 		Global.canvas.skeleton.queue_redraw()
 		Global.animation_timeline.keyframe_timeline.unselect_keyframe()
@@ -497,7 +497,7 @@ func display_props():
 			rad_to_deg(current_selected_bone.get_local_rotation())
 		)
 		pos_slider.set_value_no_signal(
-			current_selected_bone.rel_to_canvas(current_selected_bone.get_local_displacement())
+			current_selected_bone.get_local_displacement()
 		)
 		return
 	else:
