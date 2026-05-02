@@ -369,7 +369,7 @@ func draw_move(_pos: Vector2i) -> void:
 	# Simple dragging
 	if current_selected_bone.modify_mode == BoneLayer.DISPLACE:
 		if Input.is_action_pressed(&"transform_move_selection_only", true):
-			current_selected_bone.gizmo_origin_no_disp += offset
+			current_selected_bone.gizmo_offset += offset
 		else:
 			current_selected_bone.set_local_displacement(
 				current_selected_bone.get_local_displacement() + offset

@@ -12,17 +12,12 @@ const WIDTH: float = 2
 ## Starting point of the gizmo (with zero displacement).
 ## True gizmo origin is this plus displacement. It's value is relative to canvas, instead of the
 ## parent.
-var gizmo_origin_no_disp := Vector2.ZERO:
-	set(value):
-		if not gizmo_origin_no_disp.is_equal_approx(value):
-			gizmo_origin_no_disp = value
+var gizmo_offset := Vector2.ZERO
 ## Gizmo rotation (when local_rotation is zero).
 ## True gizmo rotation is this plus local_rotation. It's value is relative to canvas, instead of the
 ## parent.
-var gizmo_rotate_origin: float = 0:  ## Unit is Radians
-	set(value):
-		if not is_equal_approx(value, gizmo_rotate_origin):
-			gizmo_rotate_origin = value
+var gizmo_rotate_origin: float = 0  ## Unit is Radians
+
 ## The distance between the starting point of gizmo and it's ending point.
 var gizmo_length: int = MIN_LENGTH + 5:
 	set(value):
@@ -39,6 +34,10 @@ var generation_cache: Dictionary
 var rotation_renderer := ShaderImageEffect.new()
 var algorithm := DrawingAlgos.nn_shader
 var animator := BoneAnimator.new(default_bone_params())
+
+# Performance variables
+var _old_hover := NONE
+
 
 class BoneAnimator:
 	extends AnimatableObject
@@ -122,21 +121,21 @@ func get_net_rotation(frame: int = project.current_frame) -> float:
 
 
 ## Converts coordinates that are relative to canvas get converted to position relative to
-## gizmo_origin_no_disp.
+## gizmo_offset.
 func rel_to_origin(pos: Vector2) -> Vector2:
-	return pos - gizmo_origin_no_disp
+	return pos - gizmo_offset
 
 
 ## Converts coordinates that are relative to canvas get converted to position relative to
 ## start point (the bigger circle).
 func rel_to_start_point(pos: Vector2, frame: int = project.current_frame) -> Vector2:
-	return pos - gizmo_origin_no_disp - get_net_displacement(frame)
+	return pos - gizmo_offset - get_net_displacement(frame)
 
 
-## Converts coordinates that are relative to gizmo_origin_no_disp get converted to position relative to
+## Converts coordinates that are relative to gizmo_offset get converted to position relative to
 ## canvas.
 func rel_to_canvas(pos: Vector2) -> Vector2:
-	return pos + gizmo_origin_no_disp
+	return pos + gizmo_offset
 
 
 func _init(_project: Project, _name := "") -> void:
@@ -147,10 +146,10 @@ func _init(_project: Project, _name := "") -> void:
 func get_bone_data(vectors_as_string: bool) -> Dictionary:
 	var data := {}
 	if vectors_as_string:
-		data["gizmo_origin_no_disp"] = var_to_str(gizmo_origin_no_disp)
+		data["gizmo_offset"] = var_to_str(gizmo_offset)
 		data["gizmo_rotate_origin"] = var_to_str(gizmo_rotate_origin)
 	else:
-		data["gizmo_origin_no_disp"] = gizmo_origin_no_disp
+		data["gizmo_offset"] = gizmo_offset
 		data["gizmo_rotate_origin"] = gizmo_rotate_origin
 	data["gizmo_length"] = gizmo_length
 	return data.merged(animator.serialize())
@@ -186,29 +185,41 @@ func get_best_origin(frame: Frame) -> Vector2i:
 	return used_rect.position + (used_rect.size / 2)
 
 
+func get_interaction_distance(zoom_level: float) -> float:
+	return clampf(INTERACTION_DISTANCE / zoom_level, 0, gizmo_length * 0.2)
+
+
 ## Calculates hover mode of current BoneLayer
 func hover_mode(mouse_position: Vector2, camera_zoom) -> int:
 	var local_mouse_pos = rel_to_origin(mouse_position)
-	if (get_net_displacement()).distance_to(local_mouse_pos) <= INTERACTION_DISTANCE / camera_zoom.x:
-		return DISPLACE
+	var hover_type := NONE
+	var interaction_distance := get_interaction_distance(camera_zoom.x)
+	# Mouse close to position circle
+	if (get_net_displacement()).distance_to(local_mouse_pos) <= interaction_distance:
+		hover_type = DISPLACE
 	elif (
 		(get_net_displacement() + get_end()).distance_to(local_mouse_pos)
-		<= INTERACTION_DISTANCE / camera_zoom.x
+		<= interaction_distance
 	):
+		# Mouse close to end circle
 		if !ignore_rotation_hover:
-			return EXTEND
-	elif _is_close_to_segment(
+			hover_type = EXTEND
+	elif BoneLayer.is_close_to_segment(
 		rel_to_start_point(mouse_position),
-		INTERACTION_DISTANCE / camera_zoom.x,
-		Vector2.ZERO,
-		get_end()
+		interaction_distance,
+		Vector2.ZERO, get_end()
 	):
+		# Mouse close joining line
 		if !ignore_rotation_hover:
-			return ROTATE
-	return NONE
+			hover_type = ROTATE
+	if gizmo_length * camera_zoom.x < 10 and hover_type != NONE:  # we zoomed out too much
+		hover_type = DISPLACE
+	if _old_hover != hover_type:
+		Global.canvas.skeleton.queue_redraw()
+	return hover_type
 
 
-static func _is_close_to_segment(
+static func is_close_to_segment(
 	pos: Vector2, detect_distance: float, s1: Vector2, s2: Vector2
 ) -> bool:
 	var test_line := (s2 - s1).rotated(deg_to_rad(90)).normalized()
@@ -292,9 +303,9 @@ func apply_bone(cel_image: Image, at_frame: int) -> Image:
 			)
 			bone_cache.clear()
 			bone_cache[cache_key] = square_image
-	var gizmo_origin_no_disp_floored: Vector2i = gizmo_origin_no_disp.floor()
-	var pivot: Vector2i = gizmo_origin_no_disp_floored
-	var bone_start_global: Vector2i = gizmo_origin_no_disp_floored + frame_start_point
+	var gizmo_offset_floored: Vector2i = gizmo_offset.floor()
+	var pivot: Vector2i = gizmo_offset_floored
+	var bone_start_global: Vector2i = gizmo_offset_floored + frame_start_point
 	var square_image_start: Vector2i = used_region.position - s_offset
 	var global_square_centre: Vector2 = square_image_start + (square_image.get_size() / 2)
 	var global_rotated_new_centre = (
@@ -340,3 +351,141 @@ func is_blender() -> bool:
 		elif DrawingAlgos.force_bone_mode == DrawingAlgos.BoneRenderMode.POSE:
 			return true
 	return false
+
+
+## Generates a gizmo (for preview). Called by _draw() of manager
+func draw_bone(
+	camera_zoom: Vector2, mouse_point: Vector2, with_transform := true
+) -> void:
+	var preview := Global.canvas.skeleton
+	var highlight = (self == preview.hover_bone or self == preview.selected_bone)
+	var primary_color := Color.WHITE
+	var secondary_color := Color(1, 1, 1, 0.8)
+	var highlight_color := primary_color if (highlight) else secondary_color
+
+	# Get the appropriate hover mode
+	var true_hover_mode = BoneLayer.NONE
+	if highlight:
+		var hover := hover_mode(mouse_point, camera_zoom)
+		true_hover_mode = max(modify_mode, hover)
+		if true_hover_mode == BoneLayer.EXTEND:
+			true_hover_mode = BoneLayer.ROTATE
+		if hover == BoneLayer.NONE:
+			true_hover_mode = BoneLayer.NONE
+
+		preview.cursor_reset_delay = 10
+		match true_hover_mode:
+			BoneLayer.DISPLACE:
+				if DisplayServer.cursor_get_shape() != Input.CURSOR_MOVE:
+					Input.set_default_cursor_shape(Input.CURSOR_MOVE)
+			BoneLayer.ROTATE:
+				if DisplayServer.cursor_get_shape() != Input.CURSOR_POINTING_HAND:
+					Input.set_default_cursor_shape(Input.CURSOR_POINTING_HAND)
+
+	var bone_displacement := get_net_displacement()
+	var bone_end := get_end()
+	if not with_transform:  # Exclude effects of rotation
+		bone_displacement = Vector2.ZERO
+		bone_end = bone_end.rotated(-get_net_rotation())
+
+	# Lambdha func to get width
+	var get_width := func(for_hover_mode):
+		var initial_width: float = (WIDTH if (highlight) else DESELECT_WIDTH) / camera_zoom.x
+		var hover_width_diff: float = (
+			initial_width / 2 if (true_hover_mode != BoneLayer.NONE) else 0.0
+		)
+		var net_width := (
+			initial_width + hover_width_diff
+			if true_hover_mode == for_hover_mode or self == preview.selected_bone
+			else BoneLayer.DESELECT_WIDTH / camera_zoom.x
+		)
+		return net_width
+
+	# Draw the position circle
+	preview.draw_set_transform(gizmo_offset)
+	# Joint circle at start
+	preview.draw_circle(
+		bone_displacement,
+		START_RADIUS / camera_zoom.x,
+		highlight_color,
+		false,
+		get_width.call(BoneLayer.DISPLACE)
+	)
+
+	preview.draw_set_transform(Vector2.ZERO)
+	ignore_rotation_hover = preview.chaining_mode
+	var skip_rotation_bone := false
+	if preview.chaining_mode and not get_child_bones(false).is_empty():
+		skip_rotation_bone = true
+	ignore_rotation_hover = skip_rotation_bone
+	if !skip_rotation_bone:
+		preview.draw_set_transform(gizmo_offset)
+		if with_transform:
+			# Increase width slightly in order to indicate highlight
+			# Draw the line joining the start and end points
+			var split := 0.1 * bone_end
+			var perp := bone_end.normalized().rotated(-(PI / 2))
+			var w1 := START_RADIUS / camera_zoom.x   # start thickness
+			var w2 := END_RADIUS / camera_zoom.x   # end thickness
+			var start := bone_displacement + (bone_end.normalized() * w1)
+			var end := bone_displacement + bone_end - (bone_end.normalized() * w2)
+			var p1 := start + split + perp * get_interaction_distance(camera_zoom.x)
+			var p2 := end + (perp / 2) * w2
+			var p3 := end - (perp / 2) * w2
+			var p4 := start + split - perp * get_interaction_distance(camera_zoom.x)
+			preview.draw_polyline(
+				PackedVector2Array([start, p1, p2, p3, p4, start, end]),
+				highlight_color,
+				get_width.call(BoneLayer.ROTATE)
+			)
+		else:
+			# Draw the line joining the position and rotation circles
+			preview.draw_line(
+				bone_displacement,
+				bone_displacement + bone_end,
+				highlight_color,
+				get_width.call(BoneLayer.ROTATE)
+			)
+		# Draw rotation circle (pose mode)
+		preview.draw_circle(
+			bone_displacement + bone_end,
+			BoneLayer.END_RADIUS / camera_zoom.x,
+			highlight_color,
+			false,
+			get_width.call(BoneLayer.ROTATE)
+		)
+	preview.draw_set_transform(Vector2.ZERO)
+	if with_transform:
+		## Show connection to parent and write bone name
+		var parent_bone: BoneLayer = BoneLayer.get_parent_bone(self)
+		if parent_bone:
+			var p_start := parent_bone.get_net_displacement()
+			var p_end := Vector2.ZERO if preview.chaining_mode else parent_bone.get_end()
+			var parent_start = (
+				rel_to_origin(parent.rel_to_canvas(p_start)) + p_end
+			)
+			preview.draw_set_transform(gizmo_offset)
+			if not parent_bone in preview.canon_layers:
+				preview.draw_circle(parent_start, START_RADIUS / camera_zoom.x, Color.GRAY, true)
+			# NOTE: start_point is coordinate of tail of bone, parent_start is head of parent
+			# (or tail in chained mode)
+			preview.draw_dashed_line(
+				get_net_displacement(),
+				parent_start,
+				highlight_color,
+				BoneLayer.DESELECT_WIDTH / camera_zoom.x
+			)
+			preview.draw_set_transform(Vector2.ZERO)
+
+		var font = Themes.get_font()
+		var line_size = gizmo_length
+		var fade_ratio = (line_size * camera_zoom.x) / (font.get_string_size(name).x)
+		if preview.chaining_mode:
+			fade_ratio = max(0.3, fade_ratio)
+		if fade_ratio >= 0.4 and !preview.active_tool:  # Hide names if we have zoomed far
+			preview.draw_set_transform(
+				gizmo_offset + get_net_displacement(), preview.rotation, Vector2.ONE / camera_zoom.x
+			)
+			preview.draw_string(
+				font, Vector2(3, -3), name, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, highlight_color
+			)
