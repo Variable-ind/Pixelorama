@@ -195,23 +195,24 @@ func get_interaction_distance(zoom_level: float) -> float:
 
 ## Calculates hover mode of current BoneLayer
 func hover_mode(mouse_position: Vector2, camera_zoom) -> int:
-	var gizmo_pos_circle := get_net_displacement() + gizmo_offset
+	var gizmo_pos_circle := get_net_displacement() + gizmo_offset.rotated(get_net_rotation())
+	var end_point := get_end()
 	var hover_type := NONE
 	var interaction_distance := get_interaction_distance(camera_zoom.x)
 	# Mouse close to position circle
 	if gizmo_pos_circle.distance_to(mouse_position) <= interaction_distance:
 		hover_type = DISPLACE
 	elif (
-		(gizmo_pos_circle + get_end()).distance_to(mouse_position)
+		(gizmo_pos_circle + end_point).distance_to(mouse_position)
 		<= interaction_distance
 	):
 		# Mouse close to end circle
 		if !ignore_rotation_hover:
 			hover_type = EXTEND
 	elif BoneLayer.is_close_to_segment(
-		rel_to_start_point(mouse_position),
+		mouse_position,
 		interaction_distance,
-		Vector2.ZERO, get_end()
+		gizmo_pos_circle, gizmo_pos_circle + end_point
 	):
 		# Mouse close joining line
 		if !ignore_rotation_hover:
@@ -226,9 +227,9 @@ func hover_mode(mouse_position: Vector2, camera_zoom) -> int:
 static func is_close_to_segment(
 	pos: Vector2, detect_distance: float, s1: Vector2, s2: Vector2
 ) -> bool:
-	var test_line := (s2 - s1).rotated(deg_to_rad(90)).normalized()
-	var from_a := pos - test_line * detect_distance
-	var from_b := pos + test_line * detect_distance
+	var test_line := (s2 - s1).rotated(deg_to_rad(90)).normalized() * detect_distance
+	var from_a := pos - test_line
+	var from_b := pos + test_line
 	if Geometry2D.segment_intersects_segment(from_a, from_b, s1, s2):
 		return true
 	return false
@@ -389,10 +390,11 @@ func draw_bone(
 					Input.set_default_cursor_shape(Input.CURSOR_POINTING_HAND)
 
 	var bone_displacement := get_net_displacement()
+	var net_rotation := get_net_rotation()
 	var bone_end := get_end()
 	if not with_transform:  # Exclude effects of rotation
 		bone_displacement = Vector2.ZERO
-		bone_end = bone_end.rotated(-get_net_rotation())
+		bone_end = bone_end.rotated(-net_rotation)
 
 	# Lambdha func to get width
 	var get_width := func(for_hover_mode):
@@ -408,7 +410,7 @@ func draw_bone(
 		return net_width
 
 	# Draw the position circle
-	preview.draw_set_transform(gizmo_offset)
+	preview.draw_set_transform(gizmo_offset.rotated(net_rotation))
 	# Joint circle at start
 	preview.draw_circle(
 		bone_displacement,
@@ -425,7 +427,7 @@ func draw_bone(
 		skip_rotation_bone = true
 	ignore_rotation_hover = skip_rotation_bone
 	if !skip_rotation_bone:
-		preview.draw_set_transform(gizmo_offset)
+		preview.draw_set_transform(gizmo_offset.rotated(net_rotation))
 		if with_transform:
 			# Increase width slightly in order to indicate highlight
 			# Draw the line joining the start and end points
@@ -470,7 +472,7 @@ func draw_bone(
 			if not parent_bone in preview.canon_layers:
 				preview.draw_circle(p_start + p_end, START_RADIUS / camera_zoom.x, Color.GRAY, true)
 			preview.draw_dashed_line(
-				bone_displacement + gizmo_offset,
+				bone_displacement + gizmo_offset.rotated(net_rotation),
 				p_start + p_end,
 				highlight_color,
 				BoneLayer.DESELECT_WIDTH / camera_zoom.x
