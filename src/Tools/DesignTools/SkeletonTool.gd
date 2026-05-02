@@ -292,6 +292,10 @@ func _on_project_data_changed(_project):
 
 # Tool draw actions
 func draw_start(_pos: Vector2i) -> void:
+	if Global.canvas.skeleton.active_tool != null:  # preview already in use by another tool
+		return
+	Global.canvas.skeleton.active_tool = self
+
 	_undo_target_frames.clear()
 	# If this tool is on both sides then only allow one at a time
 	if Global.canvas.skeleton.transformation_active:
@@ -413,16 +417,18 @@ func draw_move(_pos: Vector2i) -> void:
 func draw_end(_pos: Vector2i) -> void:
 	_prev_mouse_position = Vector2.INF
 	_hover_layer_in_chain = null
-	if Global.canvas.skeleton:
-		# Another tool is already active
-		if not is_transforming:
-			return
-		is_transforming = false
-		Global.canvas.skeleton.transformation_active = false
-		if current_selected_bone:
-			if current_selected_bone.modify_mode != BoneLayer.NONE:
-				Global.canvas.queue_redraw()
-				current_selected_bone.modify_mode = BoneLayer.NONE
+
+	# Another tool is already active
+	if not is_transforming:
+		return
+	is_transforming = false
+	Global.canvas.skeleton.active_tool = null
+	Global.canvas.skeleton.transformation_active = false
+	if current_selected_bone:
+		if current_selected_bone.modify_mode != BoneLayer.NONE:
+			Global.canvas.queue_redraw()
+			current_selected_bone.modify_mode = BoneLayer.NONE
+
 	Global.current_project.has_changed = true
 	Global.animation_timeline.keyframe_timeline.unselect_keyframe()
 	Global.animation_timeline.keyframe_timeline.recreate_timeline()
