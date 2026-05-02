@@ -295,11 +295,10 @@ func draw_start(_pos: Vector2i) -> void:
 	if Global.canvas.skeleton.active_tool != null:  # preview already in use by another tool
 		return
 	Global.canvas.skeleton.active_tool = self
-
-	_undo_target_frames.clear()
 	# If this tool is on both sides then only allow one at a time
 	if Global.canvas.skeleton.transformation_active:
 		return
+	_undo_target_frames.clear()
 	Global.canvas.skeleton.transformation_active = true
 	is_transforming = true
 	current_selected_bone = Global.canvas.skeleton.selected_bone
@@ -320,7 +319,7 @@ func draw_start(_pos: Vector2i) -> void:
 
 func draw_move(_pos: Vector2i) -> void:
 	# Another tool is already active
-	if not is_transforming:
+	if not is_transforming or not current_selected_bone:
 		return
 	# We need mouse_point to be a Vector2 in order for rotation to work properly.
 	var mouse_point: Vector2 = Global.canvas.current_pixel
@@ -373,7 +372,9 @@ func draw_move(_pos: Vector2i) -> void:
 	# Simple dragging
 	if current_selected_bone.modify_mode == BoneLayer.DISPLACE:
 		if Input.is_action_pressed(&"transform_move_selection_only", true):
-			current_selected_bone.gizmo_offset += offset
+			current_selected_bone.gizmo_offset += offset.rotated(
+				-current_selected_bone.get_local_rotation()
+			)
 		else:
 			current_selected_bone.set_local_displacement(
 				current_selected_bone.get_local_displacement() + offset
@@ -417,7 +418,6 @@ func draw_move(_pos: Vector2i) -> void:
 func draw_end(_pos: Vector2i) -> void:
 	_prev_mouse_position = Vector2.INF
 	_hover_layer_in_chain = null
-
 	# Another tool is already active
 	if not is_transforming:
 		return
@@ -542,18 +542,20 @@ class FABRIK:
 		# out of reach, no point of IK
 		if distance >= total_length or pos_list.size() <= 2:
 			for i in bone_layers.size():
-				var cel := bone_layers[i]
+				var bone := bone_layers[i]
 				if i < bone_layers.size() - 1:
 					# find how much to rotate to bring next start point to mach the one in poslist
-					var cel_start = _get_global_start(cel)
+					var bone_start = _get_global_start(bone)
 					var look_old = _get_global_start(bone_layers[i + 1])
 					var look_new = target_pos  # what we should look at
 					# Rotate to look at the next point
 					var angle_diff = (
-						cel_start.angle_to_point(look_new) - cel_start.angle_to_point(look_old)
+						bone_start.angle_to_point(look_new) - bone_start.angle_to_point(look_old)
 					)
 					if !is_equal_approx(angle_diff, 0.0):
-						cel.bone_rotation += angle_diff
+						bone.set_local_rotation(
+							bone.get_local_rotation() + angle_diff
+						)
 			return true
 		else:
 			var error_dist: float = (target_pos - end_global).length()
@@ -567,19 +569,21 @@ class FABRIK:
 			if old_points == pos_list:
 				return false
 			for i in bone_layers.size():
-				var cel := bone_layers[i]
+				var bone := bone_layers[i]
 				if i < bone_layers.size() - 1:
 					# find how much to rotate to bring next start point to mach the one in poslist
-					var cel_start = _get_global_start(cel)
+					var bone_start = _get_global_start(bone)
 					var next_start_old = _get_global_start(bone_layers[i + 1])  # current situation
 					var next_start_new = pos_list[i + 1]  # what should have been
 					# Rotate to look at the next point
 					var angle_diff = (
-						cel_start.angle_to_point(next_start_new)
-						- cel_start.angle_to_point(next_start_old)
+						bone_start.angle_to_point(next_start_new)
+						- bone_start.angle_to_point(next_start_old)
 					)
 					if !is_equal_approx(angle_diff, 0.0):
-						cel.bone_rotation += angle_diff
+						bone.set_local_rotation(
+							bone.get_local_rotation() + angle_diff
+						)
 			return true
 
 	static func _backward_reach(pos_list: PackedVector2Array, ending: Vector2, lengths) -> void:
@@ -602,7 +606,7 @@ class FABRIK:
 			pos_list[i + 1] = tail_of_next
 
 	static func _get_global_start(bone: BoneLayer) -> Vector2:
-		return bone.rel_to_canvas(bone.start_point)
+		return bone.get_start()
 
 
 class CCDIK:
@@ -624,18 +628,20 @@ class CCDIK:
 		if total_length < distance:
 			# Stretch
 			for i in bone_layers.size():
-				var cel := bone_layers[i]
+				var bone := bone_layers[i]
 				if i < bone_layers.size() - 1:
 					# find how much to rotate to bring next start point to mach the one in poslist
-					var cel_start = _get_global_start(cel)
+					var bone_start = _get_global_start(bone)
 					var look_old = _get_global_start(bone_layers[i + 1])
 					var look_new = target_pos  # what we should look at
 					# Rotate to look at the next point
 					var angle_diff = (
-						cel_start.angle_to_point(look_new) - cel_start.angle_to_point(look_old)
+						bone_start.angle_to_point(look_new) - bone_start.angle_to_point(look_old)
 					)
 					if !is_equal_approx(angle_diff, 0.0):
-						cel.bone_rotation += angle_diff
+						bone.set_local_rotation(
+							bone.get_local_rotation() + angle_diff
+						)
 			return true
 		for _i in range(max_iterations):
 			# Adjust rotation of each bone in the skeleton
@@ -655,16 +661,18 @@ class CCDIK:
 				)
 				var angle_delta = atan2(det, dot)
 				if !is_equal_approx(angle_delta, 0.0):
-					bone_layers[i].bone_rotation += angle_delta
+					bone_layers[i].set_local_rotation(
+						bone_layers[i].get_local_rotation() + angle_delta
+					)
 
 			# Check for convergence
 			var last_cel = bone_layers[bone_layers.size() - 1]
-			if (target_pos - last_cel.rel_to_canvas(last_cel.start_point)).length() < error_margin:
+			if (target_pos - last_cel.get_start()).length() < error_margin:
 				return true
 		return true
 
 	static func _get_global_start(bone: BoneLayer) -> Vector2:
-		return bone.rel_to_canvas(bone.start_point)
+		return bone.get_start()
 
 
 ## Returns the cels in the IK chain in order, with the last bone at the end

@@ -74,7 +74,7 @@ static func default_bone_params() -> Dictionary[String, Variant]:
 
 ## Returns the coordinates of starting (position circle) point in global coordinates
 func get_start() -> Vector2:
-	return get_net_displacement() + gizmo_offset
+	return get_net_displacement() + gizmo_offset.rotated(get_net_rotation())
 
 
 func get_end(frame: int = project.current_frame) -> Vector2:
@@ -127,19 +127,19 @@ func get_net_rotation(frame: int = project.current_frame) -> float:
 ## Converts coordinates that are relative to canvas get converted to position relative to
 ## gizmo_offset.
 func rel_to_origin(pos: Vector2) -> Vector2:
-	return pos - gizmo_offset
+	return pos - gizmo_offset.rotated(get_net_rotation())
 
 
 ## Converts coordinates that are relative to canvas get converted to position relative to
 ## start point (the bigger circle).
 func rel_to_start_point(pos: Vector2, frame: int = project.current_frame) -> Vector2:
-	return pos - gizmo_offset - get_net_displacement(frame)
+	return pos - gizmo_offset.rotated(get_net_rotation()) - get_net_displacement(frame)
 
 
 ## Converts coordinates that are relative to gizmo_offset get converted to position relative to
 ## canvas.
 func rel_to_canvas(pos: Vector2) -> Vector2:
-	return pos + gizmo_offset
+	return pos + gizmo_offset.rotated(get_net_rotation())
 
 
 func _init(_project: Project, _name := "") -> void:
