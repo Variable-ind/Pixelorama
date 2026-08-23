@@ -424,7 +424,7 @@ func _can_drop_data(pos: Vector2, data) -> bool:
 			different_layers = true
 	var is_swapping_or_cloning := (
 		Global.is_ctrl_or_cmd_pressed() or different_layers or Input.is_action_pressed(&"shift")
-		)
+	)
 
 	if is_swapping_or_cloning:
 		for cel_idx in drop_cels:
