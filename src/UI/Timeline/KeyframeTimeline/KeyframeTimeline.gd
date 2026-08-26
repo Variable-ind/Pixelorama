@@ -54,7 +54,7 @@ func _ready() -> void:
 		var project := Global.current_project
 		current_layer = project.layers[project.current_layer]
 		await get_tree().process_frame
-	randomize_dialog.confirmed.connect(func (): randomize_keyframe_value(rand_spread_mag.value))
+	randomize_dialog.confirmed.connect(func(): randomize_keyframe_value(rand_spread_mag.value))
 	_on_track_scroll_container_resized()
 
 
@@ -470,9 +470,10 @@ func _on_keyframe_randomized() -> void:
 
 
 func is_randomizable(property: Variant) -> bool:
-	return typeof(property) in [
-		TYPE_INT, TYPE_FLOAT, TYPE_VECTOR2, TYPE_VECTOR3, TYPE_COLOR, TYPE_BASIS
-	]
+	return (
+		typeof(property)
+		in [TYPE_INT, TYPE_FLOAT, TYPE_VECTOR2, TYPE_VECTOR3, TYPE_COLOR, TYPE_BASIS]
+	)
 
 
 func randomize_keyframe_value(spread: float, keyframe_id := -1):
@@ -542,7 +543,6 @@ func randomize_keyframe_value(spread: float, keyframe_id := -1):
 	undo_redo.add_do_method(Global.undo_or_redo.bind(false))
 	undo_redo.add_undo_method(Global.undo_or_redo.bind(true))
 	undo_redo.commit_action()
-
 
 
 func _on_keyframe_deleted(keyframe_id := -1) -> void:
