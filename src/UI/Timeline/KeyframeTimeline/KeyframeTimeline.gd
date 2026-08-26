@@ -279,7 +279,6 @@ func select_keyframes() -> void:
 	no_key_selected_label.visible = false
 	properties_grid_container.visible = not no_key_selected_label.visible
 	delete_keyframe_button.visible = not no_key_selected_label.visible
-	randomize_values_button.visible = not no_key_selected_label.visible
 	if selected_keyframes.size() == 1:
 		delete_keyframe_button.text = "Delete keyframe"
 	else:
@@ -289,6 +288,7 @@ func select_keyframes() -> void:
 	value_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	properties_grid_container.add_child(value_label)
 	var property = dict[param_name][frame_index]["value"]
+	randomize_values_button.visible = !no_key_selected_label.visible and is_randomizable(property)
 	var track := key_button.get_parent() as KeyframeAnimationTrack
 	var property_properties := {}  # I apologize for the horrible variable name.
 	if track.type == KeyframeAnimationTrack.TrackTypes.LAYER_EFFECT:
@@ -467,6 +467,12 @@ func add_effect_keyframe(anim_obj: AnimatableObject, frame_index: int, param_nam
 
 func _on_keyframe_randomized() -> void:
 	randomize_dialog.popup_centered_clamped()
+
+
+func is_randomizable(property: Variant) -> bool:
+	return typeof(property) in [
+		TYPE_INT, TYPE_FLOAT, TYPE_VECTOR2, TYPE_VECTOR3, TYPE_COLOR, TYPE_BASIS
+	]
 
 
 func randomize_keyframe_value(spread: float, keyframe_id := -1):
