@@ -772,6 +772,11 @@ func serialize_cel_undo_data(cels: Array[BaseCel], data: Dictionary) -> void:
 	var cels_to_serialize := cels
 	if not TileSetPanel.placing_tiles:
 		cels_to_serialize = find_same_tileset_tilemap_cels(cels)
+	for cel in cels:
+		if cel.link_set:
+			cels_to_serialize.append_array(
+				cel.link_set["cels"].filter(func (c): return c not in cels )
+			)
 	for cel in cels_to_serialize:
 		if not cel is PixelCel:
 			continue
