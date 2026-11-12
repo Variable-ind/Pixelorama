@@ -441,7 +441,10 @@ func undo_redo_add_frames(frame_add_indices: PackedInt32Array) -> Dictionary[int
 			if project.layers[l].new_cels_linked:  # If the link button is pressed
 				var prev_cel := project.frames[project.current_frame].cels[l]
 				if prev_cel.link_set == null:
-					prev_cel.link_set = {}
+					var offset_calibrated := true
+					if prev_cel is PixelCel and prev_cel.image.is_invisible():
+						offset_calibrated = false
+					prev_cel.link_set = BaseCel.new_link_set([], INF, offset_calibrated)
 					project.undo_redo.add_do_method(
 						project.layers[l].link_cel.bind(prev_cel, prev_cel.link_set)
 					)
@@ -586,7 +589,10 @@ func copy_frames(
 			var new_cel := src_cel.duplicate_cel()
 			if project.layers[l].new_cels_linked:
 				if src_cel.link_set == null:
-					src_cel.link_set = {}
+					var offset_calibrated := true
+					if src_cel is PixelCel and src_cel.image.is_invisible():
+						offset_calibrated = false
+					src_cel.link_set = BaseCel.new_link_set([], INF, offset_calibrated)
 					project.undo_redo.add_do_method(
 						project.layers[l].link_cel.bind(src_cel, src_cel.link_set)
 					)

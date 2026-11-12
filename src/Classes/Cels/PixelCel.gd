@@ -33,12 +33,17 @@ func set_indexed_mode(indexed: bool) -> void:
 func ensure_canvas_point_in_bounds(
 	canvas_pos: Vector2i, change_offset_when_invisible := true
 ) -> Vector2i:
-	if image.is_invisible() and change_offset_when_invisible:
-		change_offset(snap_cel_bounds(canvas_pos))
+	if image.is_invisible():
+		if change_offset_when_invisible:
+			change_offset(snap_cel_bounds(canvas_pos))
+	else:
 		if link_set:
-			for cel: BaseCel in link_set["cels"]:
-				if self != cel:
-					cel.offset = offset
+			var should_reset_offset: bool = !link_set.get("offset_calbrated", true)
+			if should_reset_offset:
+				link_set["offset_calbrated"] = true
+				for cel: BaseCel in link_set["cels"]:
+					if self != cel:
+						cel.offset = offset
 	var local := canvas_pos - offset
 	var new_offset := offset
 	var new_size := image.get_size()

@@ -11,10 +11,10 @@ var opacity := 1.0  ## Opacity/Transparency of the cel.
 ## The image stored in the cel.
 var image_texture: Texture2D:
 	get = _get_image_texture
-## If the cel is linked then this contains a reference to the link set [Dictionary] this cel is in:
-## [param { "cels": Array, "hue": float }].
-## [br] If the cel is not linked then it is [code]null[/code].
-var link_set = null  # { "cels": Array, "hue": float } or null
+## If the cel is linked then this contains a reference to the link set [Dictionary]
+## (see [method new_link_set] for it's keys).
+## [br] If the cel is not linked then this property is [code]null[/code].
+var link_set = null
 var transformed_content: Image  ## Used in transformations (moving, scaling etc with selections).
 ## Used for individual cel ordering. Used for when cels need to be drawn above or below
 ## their corresponding layer.
@@ -30,6 +30,10 @@ var ui_color := Color(0, 0, 0, 0):
 		ui_color_changed.emit()
 var offset := Vector2i.ZERO  ## The offset of the cel in pixel coordinates.
 var prev_offset := offset  ## Used for undo/redo purposes.
+
+
+static func new_link_set(cels := [], hue: float = INF, offset_calbrated := true) -> Dictionary:
+	return { "cels": cels, "hue": hue, "offset_calbrated": offset_calbrated }
 
 
 func get_final_opacity(layer: BaseLayer, animated := true) -> float:

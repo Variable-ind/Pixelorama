@@ -188,7 +188,12 @@ static func open_aseprite_file(path: String) -> void:
 						)
 						var link_set = cel_to_link.link_set
 						if link_set == null:
-							link_set = {}
+							# NOTE: cel_to_link is the source cel (it's proper name
+							# should be cel_to_link_with).
+							var offset_calibrated := true
+							if cel_to_link is PixelCel and cel_to_link.image.is_invisible():
+								offset_calibrated = false
+							link_set = BaseCel.new_link_set([], INF, offset_calibrated)
 							layer.link_cel(cel_to_link, link_set)
 						layer.link_cel(cel, link_set)
 						cel.set_content(cel_to_link.get_content(), cel_to_link.image_texture)

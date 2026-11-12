@@ -210,7 +210,14 @@ func _on_PopupMenu_id_pressed(id: int) -> void:
 
 			elif id == MenuOptions.LINK:
 				project.undo_redo.create_action("Link Cel")
-				var link_set: Dictionary = {} if cel.link_set == null else cel.link_set
+				var link_set: Dictionary
+				if cel.link_set == null:
+					var offset_calibrated := true
+					if cel is PixelCel and cel.image.is_invisible():
+						offset_calibrated = false
+					link_set = BaseCel.new_link_set([], INF, offset_calibrated)
+				else:
+					link_set = cel.link_set
 				if cel.link_set == null:
 					project.undo_redo.add_do_method(
 						project.layers[layer].link_cel.bind(cel, link_set)

@@ -236,7 +236,7 @@ func link_cel(cel: BaseCel, link_set = null) -> void:
 			link_set["cels"] = []
 		link_set["cels"].append(cel)
 		if not cel_link_sets.has(link_set):
-			if not link_set.has("hue"):
+			if not link_set.has("hue") or link_set.get("hue", INF) == INF:
 				var hues := PackedFloat32Array()
 				for other_link_set in cel_link_sets:
 					hues.append(other_link_set["hue"])
@@ -378,9 +378,16 @@ func serialize() -> Dictionary:
 			cels.append(frame.cels[index])
 		dict["link_sets"] = []
 		for link_set in cel_link_sets:
-			dict["link_sets"].append({"cels": [], "hue": link_set["hue"]})
+			var cel_indices := []  # This is passed by reference to new_link_set()
+			dict["link_sets"].append(
+				BaseCel.new_link_set(
+					cel_indices,
+					link_set.get("hue", INF),
+					link_set.get("offset_calbrated", true)
+				)
+			)
 			for cel in link_set["cels"]:
-				dict["link_sets"][-1]["cels"].append(cels.find(cel))
+				cel_indices.append(cels.find(cel))
 	return dict
 
 
@@ -406,15 +413,21 @@ func deserialize(dict: Dictionary) -> void:
 		dict["link_sets"] = [{"cels": dict["linked_cels"], "hue": Color.GREEN.h}]
 	if dict.has("link_sets"):
 		for serialized_link_set in dict["link_sets"]:
-			var link_set := {"cels": [], "hue": serialized_link_set["hue"]}
+			var cel_objects := []  # This is passed by reference to new_link_set()
+			var link_set := BaseCel.new_link_set(
+				cel_objects,
+				serialized_link_set.get("hue", INF),
+				serialized_link_set.get("offset_calbrated", true)
+			)
 			for linked_cel_index in serialized_link_set["cels"]:
 				var cel: BaseCel = project.frames[linked_cel_index].cels[index]
-				link_set["cels"].append(cel)
+				cel_objects.append(cel)
 				cel.link_set = link_set
-				var linked_cel: BaseCel = link_set["cels"][0]
+				var linked_cel: BaseCel = cel_objects[0]
+				# NOTE: The offset of cels remain independent regardless of the link state.
 				var correct_offset := cel.offset
 				cel.set_content(linked_cel.get_content(), linked_cel.image_texture)
-				## linked_cel.get_content() overwrites the offset too which is not desired
+				# linked_cel.get_content() overwrites the offset too which is not desired.
 				cel.offset = correct_offset
 			cel_link_sets.append(link_set)
 	if dict.has("effects"):

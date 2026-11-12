@@ -765,7 +765,10 @@ func open_image_as_spritesheet_layer_smart(
 				if project.layers[l].new_cels_linked:
 					var prev_cel := project.frames[project.current_frame].cels[l]
 					if prev_cel.link_set == null:
-						prev_cel.link_set = {}
+						var offset_calibrated := true
+						if prev_cel is PixelCel and prev_cel.image.is_invisible():
+							offset_calibrated = false
+						prev_cel.link_set = BaseCel.new_link_set([], INF, offset_calibrated)
 						project.undo_redo.add_do_method(
 							project.layers[l].link_cel.bind(prev_cel, prev_cel.link_set)
 						)
@@ -854,7 +857,10 @@ func open_image_as_spritesheet_layer(
 				if project.layers[l].new_cels_linked:
 					var prev_cel := project.frames[project.current_frame].cels[l]
 					if prev_cel.link_set == null:
-						prev_cel.link_set = {}
+						var offset_calibrated := true
+						if prev_cel is PixelCel and prev_cel.image.is_invisible():
+							offset_calibrated = false
+						prev_cel.link_set = BaseCel.new_link_set([], INF, offset_calibrated)
 						project.undo_redo.add_do_method(
 							project.layers[l].link_cel.bind(prev_cel, prev_cel.link_set)
 						)

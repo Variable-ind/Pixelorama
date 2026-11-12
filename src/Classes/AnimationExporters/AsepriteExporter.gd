@@ -232,6 +232,8 @@ static func _write_cel_chunk(
 	data.put_u8(clampi(int(cel.opacity * 255.0), 0, 255))
 	# Store cel type
 	var cel_type: int = 2  # Compressed image
+	# NOTE: Pixelorama can have different offset for each cel, even in link_set.
+	# Aseprite does not have this feature as of yet.
 	var is_link_cel := cel.link_set != null
 	if is_link_cel and cel.link_set.has("cels"):
 		var cels_array: Array = cel.link_set["cels"]
